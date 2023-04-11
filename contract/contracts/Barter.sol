@@ -32,6 +32,7 @@ contract Barter is Ownable{
         uint256 buyePrice; //买家需要质押代币数量 前端提醒买方质押代币数量要大于卖方质押代币数量
         uint256 buyerEx; //违约赔偿金  默认是买方质押数量 传参需要注意
         Status status; //订单状态
+        string description; //描述
     }
 
     struct DateTime {
@@ -60,7 +61,6 @@ contract Barter is Ownable{
     mapping(address => uint256) public total; //代币总质押数量
 
     event AddOrder(address indexed seller, uint256 indexed orderId ); //创建订单事件
-    event Place(address indexed buyer, uint256 indexed orderId ); //买家下单事件
     event SetStatus(address indexed defaulter, uint256 indexed orderId, Status indexed status); //取消订单事件
     event Confirm(address indexed buyer, uint256 indexed orderId ); //确认订单事件
 
@@ -75,17 +75,18 @@ contract Barter is Ownable{
     function addOrder(
         string memory _name,
         string memory _contactSeller,
+        string memory _description,
         address _buyer,
         address _token,
         uint256 _orderType,
         uint256 _amount,
         uint256 _price
     )external {
-        //2、卖家联系方式不能为空
+        //1、卖家联系方式不能为空
         require(bytes(_contactSeller).length!= 0,"Seller contact can not be null");
-        //4、验证代币合约是否有效
+        //2、验证代币合约是否有效
         require(verifyByAddress(_token) == 20 , "Invalid contract");
-        //10、将代币转入到合约地址
+        //3、将代币转入到合约地址
         IERC20(_token).transferFrom(_msgSender(), address(this), _price);
         uint256 _buyerEx = _price * mortgageRatio / 10000;
         orders.push(Order({
@@ -98,7 +99,8 @@ contract Barter is Ownable{
             price: _price,   
             buyePrice: 0,
             buyerEx: _buyerEx,
-            status: Status.Initial
+            status: Status.Initial,
+            description:_description
         }));
         uint256 _orderId = orders.length - 1;
         dateTime[_orderId].createTimestamp = block.timestamp;
@@ -120,19 +122,19 @@ contract Barter is Ownable{
         //3、校验订单是否指定买家
         require(order.buyer == address(0) || order.buyer == _user , "Non designated buyer");
         uint256 _buyePrice = order.price + order.buyerEx;
-        //6、将代币转入到合约地址
+        //4、将代币转入到合约地址
         order.token.transferFrom(_user,address(this) , _buyePrice);
         buyerList[_user].push(_orderId);
         total[address(order.token)] += _buyePrice; //更新总质押代币数量
         buyerList[_user].push(_orderId);
-        //7、将订单更新为已下单状态
+        //5、将订单更新为已下单状态
         order.status = Status.Ordered;
         dateTime[_orderId].placeTimestamp = block.timestamp;
         order.buyer = _user;
         order.buyePrice = _buyePrice;
         contact[_orderId].buyer = _buyerContact;
 		isContact[_orderId][_msgSender()] = true;
-        emit Place(_user, _orderId);
+        emit SetStatus(_user, _orderId, Status.Ordered);
     }
 
     function cancel(uint256 _orderId)external {
