@@ -8,7 +8,6 @@ async function insert( _event_name: string,
   _order_id:string,
   _data:string,
   _status:Status,
-  _updater:string,
   _hash:string) {
   const connection = await mysql.createConnection(config);
   try {
@@ -114,9 +113,7 @@ async function main() {
     case topic1:  
     const _args = resultParse.args;
     eventName =resultParse.name;
-    creator =_args["seller"];
-    updator=creator;
-    operater=creator;
+    operater=_args["seller"];
     status=Status.Initial;
     orderId=_args["orderId"].toNumber();
     break;
@@ -124,9 +121,7 @@ async function main() {
     {
       const _args = resultParse.args;
       eventName =resultParse.name;
-      creator =_args["buyner"];
-      updator=creator;
-      operater=creator;
+      operater=_args["buyer"];
       status=Status.Completed;
       orderId=_args["orderId"].toNumber();
       break;
@@ -135,15 +130,13 @@ async function main() {
     {
       const _args = resultParse.args;
       eventName =resultParse.name;
-      creator =_args["defaulter"];
-      updator=creator;
-      operater=creator;
+      operater=_args["defaulter"];
       status=_args["status"];
       orderId=_args["orderId"].toNumber();
       break;
     }}
-    console.log(eventName,operater,orderId,data,status,updator,transactionHashsh);
-    insert(eventName,operater,orderId,data,status,updator,transactionHashsh);
+    console.log(eventName,operater,orderId,data,status,transactionHashsh);
+    insert(eventName,operater,orderId,data,status,transactionHashsh);
 });
 });
 }
