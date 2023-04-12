@@ -43,10 +43,7 @@ async function main() {
     console.log("Parse Log Data->", iface.parseLog({ data, topics }));
     const resultParse= iface.parseLog({ data, topics });
     let eventName :string="";
-    let creator:string="";
-    let updator:string="";
     let operater:string="";
-    let createTime:Date= new Date();
     let status :Status=Status.Initial;
     let orderId:string="";
     switch (resultParse.topic)
