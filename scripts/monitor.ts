@@ -4,7 +4,7 @@ const {time, loadFixture} = require("@nomicfoundation/hardhat-network-helpers");
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 import pgPromise from 'pg-promise';
-import { config } from "./pgsqlconfig";
+import { config } from "./mysqlconfig";
 async function insert( _event_name: string,
   _operater:string,
   _order_id:string,
@@ -56,8 +56,8 @@ enum Status{
     ConsultCancelCompleted//协商取消完成10
   }      
 async function main() {
-    const provider = new ethers.providers.WebSocketProvider("wss://scroll-alphanet.blastapi.io/2ea187fb-52f9-4dae-ba5b-c0c54a63c9c7");
-    let contractAddress = "0xaf680251e2147176451402D66A59c0e5EE423e14"; 
+    const provider = new ethers.providers.WebSocketProvider("wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ");
+    let contractAddress = "0xE17906ED61fC2A1c9F290A15C14e6120A2FEf556"; 
     //引入ABI原始文件或是格式化后的ABI文件
     const abiIntermediatorRouter = require('../artifacts/contracts/Ebay.sol/Ebay.json').abi;
     const iface = new ethers.utils.Interface(abiIntermediatorRouter);
@@ -147,7 +147,6 @@ async function main() {
       orderId=_args["orderId"].toNumber();
       break;
     }}
-
     insert(eventName,operater,orderId,data,status,updator,transactionHashsh);
   
 });
