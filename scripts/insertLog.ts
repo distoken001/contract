@@ -42,6 +42,7 @@ export async function insert( _event_name: string,
     ];
   
     const [rows, fields] = await connection.execute(query, values);
+    return [rows,fields];
     } catch (error) {
       console.error('Error:', error);
     } finally {
