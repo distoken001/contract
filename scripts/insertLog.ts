@@ -1,6 +1,6 @@
-import { config } from "./mysqlconfig";
 import mysql from 'mysql2/promise';
 import {Status}  from  "./enumAll";
+import { executeQuery } from "./db";
 
 export async function insert( _event_name: string,
     _operater:string,
@@ -8,8 +8,7 @@ export async function insert( _event_name: string,
     _data:string,
     _status:Status,
     _hash:string) {
-    const connection = await mysql.createConnection(config);
-    try {
+    
     // 插入数据
     const insertData = {
       id: null,
@@ -40,13 +39,7 @@ export async function insert( _event_name: string,
       insertData.creator,
       insertData.hash
     ];
-  
-    const [rows, fields] = await connection.execute(query, values);
+
+    const [rows, fields] = await executeQuery (query, values);
     return [rows,fields];
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      // 关闭数据库连接
-     await connection.end();
-    }
   }

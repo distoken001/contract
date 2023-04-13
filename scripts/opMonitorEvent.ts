@@ -89,3 +89,37 @@ async function main() {
   });
 }
 main();
+ //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
+    //let aaa=ethers.utils.formatEther(iface.parseLog({ data, topics }).args[1]);
+    //console.log("Parse Log Data Args->", aaa);
+    //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[5]);
+    // console.log("Parse Log Data Args Order->", iface.parseLog({ data, topics }).args.values());
+
+    //const _order = _args['order'];
+    //const sellerPledgeQuantity =_order['sellerPledgeQuantity'].toNumber();
+
+
+
+//insert("dfsaf","fds","","",1,1,"",1,"",Status.Initial,"","");
+ /*
+    provider.on("block", async (block) => {
+        provider.on("pending",async(tx) =>{
+           console.log(tx);
+           const txDetail = await provider.getTransaction(tx);
+            console.log(txDetail);
+        });
+    })*/
+        //const encode = iface.encodeFunctionData("transfer",["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",100]);
+    //Decode Function Data
+    //const blockInfo = await provider.getBlock(result.blockNumber);
+    //console.log(blockInfo);
+    //const txDetail = await provider.getTransaction(result.transactionHash);
+    //console.log(txDetail);
+    //_args.map((_a,_i)=>{
+    //console.log('-----------')
+    //onsole.log(_i,_a);
+    //})
+    //    Object.keys(_args).map((_a,_i)=>{
+    //     console.log('+++++++++++++++')
+    //     console.log(_i,_a);
+    //    })*/

@@ -48,8 +48,6 @@ async function main() {
       const _args = resultParse.args;
       let orderId: string = _args["orderId"].toNumber();
      
-    
-    console.log(a);
     });
   });
 }
