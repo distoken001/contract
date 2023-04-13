@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 import {Status}  from  "./enumAll";
 import { executeQuery } from "./db";
 
-export async function insert( _event_name: string,
+export async function insertLog( _event_name: string,
     _operater:string,
     _order_id:string,
     _data:string,

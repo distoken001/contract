@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 import { Status } from "./enumAll";
-import { insert } from "./insertlog";
+import { insertLog } from "./insertLog";
 
 async function main() {
   const provider = new ethers.providers.WebSocketProvider(
@@ -84,7 +84,8 @@ async function main() {
         status,
         transactionHashsh
       );
-      insert(eventName, operater, orderId, data, status, transactionHashsh);
+      insertLog(eventName, operater, orderId, data, status, transactionHashsh);
+      
     });
   });
 }

@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 import { Status } from "./enumAll";
-import { insert } from "./insertlog";
+import { insertLog } from "./insertLog";
 import { FieldPacket, RowDataPacket } from "mysql2";
+import { UpdateStatus } from "./updateStatus";
 
 async function main() {
   const provider = new ethers.providers.WebSocketProvider(
@@ -46,8 +47,12 @@ async function main() {
       console.log("Parse Log Data->", iface.parseLog({ data, topics }));
       const resultParse = iface.parseLog({ data, topics });
       const _args = resultParse.args;
-      let orderId: string = _args["orderId"].toNumber();
-     
+      let orderId: number = _args["orderId"].toNumber();
+      const orderDetail= await contract.orders(orderId);
+      const contacts= await contract.getContact(orderId);
+      console.log(orderDetail);
+      console.log(contacts);
+      UpdateStatus(contacts["_buyer"],contacts["_seller"],orderId,orderDetail["status"])
     });
   });
 }
