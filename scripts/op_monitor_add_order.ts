@@ -3,15 +3,12 @@ import { string } from "hardhat/internal/core/params/argumentTypes";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
 import { insertOrder } from "./logic_insert_order";
-import{contractAddressCommon} from "./op_config";
+import { contractAddressCommon, monitorWss } from "./op_config";
 async function main() {
-  const provider = new ethers.providers.WebSocketProvider(
-    "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ"
-  );
+  const provider = new ethers.providers.WebSocketProvider(monitorWss);
   let contractAddress = contractAddressCommon;
   //引入ABI原始文件或是格式化后的ABI文件
-  const contractABI =
-    require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
+  const contractABI = require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
   const iface = new ethers.utils.Interface(contractABI);
   const abiIntermediatorHuman = iface.format(ethers.utils.FormatTypes.minimal);
   console.log(abiIntermediatorHuman);
@@ -34,13 +31,11 @@ async function main() {
       const resultParse = iface.parseLog({ data, topics });
       const _args = resultParse.args;
       const orderId = _args["orderId"].toNumber();
-      const orderDetail= await contract.orders(orderId);
+      const orderDetail = await contract.orders(orderId);
       console.log(orderDetail);
-      const contact= await contract.getContact(orderId);
+      const contact = await contract.getContact(orderId);
       console.log(contact);
-     // insertOrder(orderDetail["name"],orderDetail["description"],orderDetail["amount"],orderDetail["price"],orderDetail["img"],orderDetail);
-         
-      
+      // insertOrder(orderDetail["name"],orderDetail["description"],orderDetail["amount"],orderDetail["price"],orderDetail["img"],orderDetail);
     });
   });
 }

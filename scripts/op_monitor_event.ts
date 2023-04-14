@@ -2,12 +2,10 @@ import { ethers } from "ethers";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
-import { contractAddressCommon } from "./op_config";
+import { contractAddressCommon, monitorWss } from "./op_config";
 
 async function main() {
-  const provider = new ethers.providers.WebSocketProvider(
-    "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ"
-  );
+  const provider = new ethers.providers.WebSocketProvider(monitorWss);
   let contractAddress = contractAddressCommon;
   //引入ABI原始文件或是格式化后的ABI文件
   const abiIntermediatorRouter =
@@ -86,24 +84,21 @@ async function main() {
         transactionHashsh
       );
       insertLog(eventName, operater, orderId, data, status, transactionHashsh);
-      
     });
   });
 }
 main();
- //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
-    //let aaa=ethers.utils.formatEther(iface.parseLog({ data, topics }).args[1]);
-    //console.log("Parse Log Data Args->", aaa);
-    //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[5]);
-    // console.log("Parse Log Data Args Order->", iface.parseLog({ data, topics }).args.values());
+//console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
+//let aaa=ethers.utils.formatEther(iface.parseLog({ data, topics }).args[1]);
+//console.log("Parse Log Data Args->", aaa);
+//console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[5]);
+// console.log("Parse Log Data Args Order->", iface.parseLog({ data, topics }).args.values());
 
-    //const _order = _args['order'];
-    //const sellerPledgeQuantity =_order['sellerPledgeQuantity'].toNumber();
-
-
+//const _order = _args['order'];
+//const sellerPledgeQuantity =_order['sellerPledgeQuantity'].toNumber();
 
 //insert("dfsaf","fds","","",1,1,"",1,"",Status.Initial,"","");
- /*
+/*
     provider.on("block", async (block) => {
         provider.on("pending",async(tx) =>{
            console.log(tx);
@@ -111,17 +106,17 @@ main();
             console.log(txDetail);
         });
     })*/
-        //const encode = iface.encodeFunctionData("transfer",["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",100]);
-    //Decode Function Data
-    //const blockInfo = await provider.getBlock(result.blockNumber);
-    //console.log(blockInfo);
-    //const txDetail = await provider.getTransaction(result.transactionHash);
-    //console.log(txDetail);
-    //_args.map((_a,_i)=>{
-    //console.log('-----------')
-    //onsole.log(_i,_a);
-    //})
-    //    Object.keys(_args).map((_a,_i)=>{
-    //     console.log('+++++++++++++++')
-    //     console.log(_i,_a);
-    //    })*/
+//const encode = iface.encodeFunctionData("transfer",["0x5B38Da6a701c568545dCfcB03FcB875f56beddC4",100]);
+//Decode Function Data
+//const blockInfo = await provider.getBlock(result.blockNumber);
+//console.log(blockInfo);
+//const txDetail = await provider.getTransaction(result.transactionHash);
+//console.log(txDetail);
+//_args.map((_a,_i)=>{
+//console.log('-----------')
+//onsole.log(_i,_a);
+//})
+//    Object.keys(_args).map((_a,_i)=>{
+//     console.log('+++++++++++++++')
+//     console.log(_i,_a);
+//    })*/

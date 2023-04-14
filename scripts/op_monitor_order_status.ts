@@ -4,16 +4,13 @@ import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import { UpdateStatus } from "./logic_update_status";
-import { contractAddressCommon } from "./op_config";
+import { contractAddressCommon, monitorWss } from "./op_config";
 
 async function main() {
-  const provider = new ethers.providers.WebSocketProvider(
-    "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ"
-  );
+  const provider = new ethers.providers.WebSocketProvider(monitorWss);
   let contractAddress = contractAddressCommon;
   //引入ABI原始文件或是格式化后的ABI文件
-  const contractABI =
-    require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
+  const contractABI = require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
   const iface = new ethers.utils.Interface(contractABI);
   //const abiIntermediatorHuman = iface.format(ethers.utils.FormatTypes.minimal);
   //console.log(abiIntermediatorHuman);
@@ -49,11 +46,16 @@ async function main() {
       const resultParse = iface.parseLog({ data, topics });
       const _args = resultParse.args;
       let orderId: number = _args["orderId"].toNumber();
-      const orderDetail= await contract.orders(orderId);
-      const contacts= await contract.getContact(orderId);
+      const orderDetail = await contract.orders(orderId);
+      const contacts = await contract.getContact(orderId);
       console.log(orderDetail);
       console.log(contacts);
-      UpdateStatus(contacts["_buyer"],contacts["_seller"],orderId,orderDetail["status"])
+      UpdateStatus(
+        contacts["_buyer"],
+        contacts["_seller"],
+        orderId,
+        orderDetail["status"]
+      );
     });
   });
 }
