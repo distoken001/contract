@@ -25,7 +25,7 @@ export const insertOrder = async (
       INSERT INTO orders (
         order_id,
         name,
-        desc,
+        description,
         amount,
         price,
         img,
@@ -39,7 +39,8 @@ export const insertOrder = async (
         updater,
         creator,
         seller,
-        buyer
+        buyer,
+        token
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   

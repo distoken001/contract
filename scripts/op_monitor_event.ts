@@ -71,14 +71,14 @@ async function op_monitor_event() {
           break;
         }
       }
-      console.log(
-        eventName,
-        operater,
-        orderId,
-        data,
-        status,
-        transactionHashsh
-      );
+      // console.log(
+      //   eventName,
+      //   operater,
+      //   orderId,
+      //   data,
+      //   status,
+      //   transactionHashsh
+      // );
       insertLog(eventName, operater, orderId, data, status, transactionHashsh);
     });
   });

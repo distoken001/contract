@@ -18,7 +18,7 @@ async function op_monitor_add_order() {
   ];
   filters.forEach((filter) => {
     provider.on(filter, async (result) => {
-      console.log(result);
+      //console.log(result);
       const data = result.data;
       const topics = result.topics;
       console.log("Parse Log Data->", iface.parseLog({ data, topics }));
@@ -33,18 +33,18 @@ async function op_monitor_add_order() {
         orderId,
         orderDetail["name"],
         orderDetail["description"],
-        orderDetail["amount"],
-        orderDetail["price"],
+        orderDetail["amount"].toNumber(),
+        orderDetail["price"].toNumber(),
         orderDetail["img"],
-        orderDetail["seller_pledge"],
-        orderDetail["buyer_pledge"],
+        orderDetail["seller_pledge"].toNumber(),
+        orderDetail["buyer_pledge"].toNumber(),
         contact["_seller"],
         contact["_buyer"],
         orderDetail["status"],
         "system","system",
         orderDetail["seller"],
         orderDetail["buyer"],
-        orderDetail["token"],
+        orderDetail["token"]
       );
     });
   });

@@ -29,7 +29,7 @@ async function op_monitor_order_status() {
   ];
   filters.forEach((filter) => {
     provider.on(filter, async (result) => {
-      console.log(result);
+      //console.log(result);
       let transactionHashsh: string = result.transactionHash;
       let blockHash: string = result.blockHash;
       let contractAddress: string = result.address;
@@ -47,7 +47,8 @@ async function op_monitor_order_status() {
         contacts["_buyer"],
         contacts["_seller"],
         orderId,
-        orderDetail["status"]
+        orderDetail["status"],
+        orderDetail["buyer"]
       );
     });
   });
