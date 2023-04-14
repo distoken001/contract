@@ -50,7 +50,8 @@ contract Ebay is Ownable {
 
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
-    uint256 public mortgageRatio; //增量比例
+    uint256 public buyerIncRatio; //买家比卖家质押增量比例
+    uint256 public sellerRatio=10000; //卖家质押数量是商品总价的百分比/分母10000
     address public lockAddr;
 
     Order[] public orders;
@@ -72,13 +73,15 @@ contract Ebay is Ownable {
     constructor(
         uint256 _buyerRate,
         uint256 _sellerRate,
-        uint256 _mortgageRatio,
+        uint256 _buyerIncRatio,
+        uint256 _sellerRatio,
         address _lockAddr
     ) {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
-        mortgageRatio = _mortgageRatio;
+        buyerIncRatio = _buyerIncRatio;
         lockAddr = _lockAddr;
+        sellerRatio=_sellerRatio;
     }
 
     //创建订单
@@ -90,8 +93,7 @@ contract Ebay is Ownable {
         address _buyer,
         address _token,
         uint256 _price,
-        uint256 _amount,
-        uint256 _seller_pledge
+        uint256 _amount
     ) external {
         //1、卖家联系方式不能为空
         require(
@@ -100,13 +102,15 @@ contract Ebay is Ownable {
         );
         //2、验证代币合约是否有效
         require(verifyByAddress(_token) == 20, "Invalid contract");
-        //3、将代币转入到合约地址
+        //3.质押数量
+        uint256 _seller_pledge=  (_price *_amount*sellerRate) / 10000;
+        //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),
             address(this),
             _seller_pledge
         );
-        uint256 _buyerEx = (_seller_pledge * mortgageRatio) / 10000;
+        uint256 _buyerEx = (_seller_pledge * buyerIncRatio) / 10000;
         orders.push(
             Order({
                 name: _name,
@@ -330,11 +334,13 @@ contract Ebay is Ownable {
     function setRate(
         uint256 _buyerRate,
         uint256 _sellerRate,
-        uint256 _mortgageRatio
+        uint256 _buyerIncRatio,
+        uint256 _sellerRatio
     ) external onlyOwner {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
-        mortgageRatio = _mortgageRatio;
+        buyerIncRatio = _buyerIncRatio;
+        sellerRatio=_sellerRatio;
     }
 
     //set lockAddr
