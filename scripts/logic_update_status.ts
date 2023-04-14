@@ -16,7 +16,7 @@ export async function UpdateStatus( _buyner_contract: string,
       buyer_contact:_buyner_contract,
       seller_contact:_seller_contract
     };
-    const query = 'update orders SET status=?, operater=?, update_time=?, buyer_contact=?, seller_contact=? where order_id=?';
+    const query = 'update orders SET status=?, update_time=?, buyer_contact=?, seller_contact=? where order_id=?';
   
     const values = [
         updateData.status,
