@@ -1,24 +1,20 @@
 import { ethers } from "ethers";
-import { string } from "hardhat/internal/core/params/argumentTypes";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
 import { contractAddressCommon, monitorWss } from "./op_config";
 
-async function main() {
+async function op_monitor_event() {
+  console.log("function:op_monitor_event  is loading");
   const provider = new ethers.providers.WebSocketProvider(monitorWss);
   let contractAddress = contractAddressCommon;
   //引入ABI原始文件或是格式化后的ABI文件
   const abiIntermediatorRouter =
     require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
   const iface = new ethers.utils.Interface(abiIntermediatorRouter);
-  const abiIntermediatorHuman = iface.format(ethers.utils.FormatTypes.minimal);
-  console.log(abiIntermediatorHuman);
 
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
   const topic2 = ethers.utils.id("Confirm(address,uint256)");
   const topic3 = ethers.utils.id("SetStatus(address,uint256,uint8)");
-  //const topic5 = ethers.utils.id("OwnershipTransferred(address,address)");
-  console.log(topic1, topic2, topic3);
   let filters = [
     {
       address: contractAddress,
@@ -87,7 +83,7 @@ async function main() {
     });
   });
 }
-main();
+export { op_monitor_event };
 //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
 //let aaa=ethers.utils.formatEther(iface.parseLog({ data, topics }).args[1]);
 //console.log("Parse Log Data Args->", aaa);

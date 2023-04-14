@@ -1,5 +1,3 @@
-import mysql from 'mysql2/promise';
-import {Status}  from  "./enum_all";
 import { executeQuery } from "./db";
 
 export const insertOrder = async (
