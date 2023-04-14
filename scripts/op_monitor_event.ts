@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { string } from "hardhat/internal/core/params/argumentTypes";
-import { Status } from "./enumAll";
-import { insertLog } from "./insertLog";
+import { Status } from "./enum_all";
+import { insertLog } from "./logic_insert_log";
 
 async function main() {
   const provider = new ethers.providers.WebSocketProvider(
