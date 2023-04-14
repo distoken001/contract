@@ -1,12 +1,7 @@
 import mysql, { Pool, RowDataPacket, FieldPacket, OkPacket, ResultSetHeader } from 'mysql2/promise';
+import { dbConfig } from './op_config';
 
-const pool = mysql.createPool({
-  host: '39.98.64.53',
-  port: 3306,
-  database: 'ebay',
-  user: 'buqun',
-  password: 'Md__1208',
-});
+const pool = mysql.createPool(dbConfig);
 
 async function executeQuery(query: string, values: any[] = []): Promise<[RowDataPacket[], FieldPacket[]]> {
   const connection = await pool.getConnection();
