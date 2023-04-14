@@ -24,7 +24,6 @@ contract Ebay is Ownable {
     struct Order {
         address seller; //卖家
         address buyer; //买家
-        uint256 orderType; //订单类型  0：虚拟 1：实物
         string name; // 物品名称
         uint256 price; //商品价格
         uint256 amount; //物品数量
@@ -90,7 +89,6 @@ contract Ebay is Ownable {
         string memory _img,
         address _buyer,
         address _token,
-        uint256 _orderType,
         uint256 _price,
         uint256 _amount,
         uint256 _seller_pledge
@@ -115,7 +113,6 @@ contract Ebay is Ownable {
                 seller: _msgSender(),
                 buyer: _buyer,
                 token: IERC20(_token),
-                orderType: _orderType,
                 amount: _amount,
                 seller_pledge: _seller_pledge,
                 buyer_pledge: 0,
