@@ -290,6 +290,43 @@
       "artifacts": [
         "Lock"
       ]
+    },
+    "/Users/buqun/Documents/GitHub/contract/contracts/Distoken.sol": {
+      "lastModificationDate": 1681453174816,
+      "contentHash": "5cbbffd1f7a56091dedd73849799b50c",
+      "sourceName": "contracts/Distoken.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "USDT"
+      ]
     }
   }
 }
