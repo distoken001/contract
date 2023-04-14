@@ -16,6 +16,7 @@ export const insertOrder = async (
     updater: string,
     seller: string,
     buyer: string,
+    token:string
   ) => {
     const create_time = new Date();
     const update_time = create_time;
@@ -39,7 +40,7 @@ export const insertOrder = async (
         creator,
         seller,
         buyer
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     const values = [
@@ -60,6 +61,7 @@ export const insertOrder = async (
       creator,
       seller,
       buyer,
+      token
     ];
     const [rows, fields] = await executeQuery (sql, values);
     return [rows,fields];

@@ -103,7 +103,7 @@ contract Ebay is Ownable {
         //2、验证代币合约是否有效
         require(verifyByAddress(_token) == 20, "Invalid contract");
         //3.质押数量
-        uint256 _seller_pledge=  (_price *_amount*sellerRate) / 10000;
+        uint256 _seller_pledge=  (_price *_amount*sellerRatio) / 10000;
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),

@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import { contractAddressCommon, monitorWss } from "./op_config";
+import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
   console.log("function:op_monitor_add_order is loading");
   const provider = new ethers.providers.WebSocketProvider(monitorWss);
@@ -28,8 +29,24 @@ async function op_monitor_add_order() {
       console.log(orderDetail);
       const contact = await contract.getContact(orderId);
       console.log(contact);
-      // insertOrder(orderDetail["name"],orderDetail["description"],orderDetail["amount"],orderDetail["price"],orderDetail["img"],orderDetail);
+      insertOrder(
+        orderId,
+        orderDetail["name"],
+        orderDetail["description"],
+        orderDetail["amount"],
+        orderDetail["price"],
+        orderDetail["img"],
+        orderDetail["seller_pledge"],
+        orderDetail["buyer_pledge"],
+        contact["_seller"],
+        contact["_buyer"],
+        orderDetail["status"],
+        "system","system",
+        orderDetail["seller"],
+        orderDetail["buyer"],
+        orderDetail["token"],
+      );
     });
   });
 }
-export {op_monitor_add_order};
+export { op_monitor_add_order };
