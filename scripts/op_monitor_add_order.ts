@@ -2,6 +2,7 @@ import { ethers } from "ethers";
 import { string } from "hardhat/internal/core/params/argumentTypes";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
+import { insertOrder } from "./logic_insert_order";
 
 async function main() {
   const provider = new ethers.providers.WebSocketProvider(
@@ -34,8 +35,10 @@ async function main() {
       const _args = resultParse.args;
       const orderId = _args["orderId"].toNumber();
       const orderDetail= await contract.orders(orderId);
-      const contacts= await contract.getContact(orderId);
-
+      console.log(orderDetail);
+      const contact= await contract.getContact(orderId);
+      console.log(contact);
+      //insertOrder();
          
       
     });
