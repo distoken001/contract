@@ -38,7 +38,7 @@ async function main() {
       console.log(orderDetail);
       const contact= await contract.getContact(orderId);
       console.log(contact);
-      //insertOrder();
+     // insertOrder(orderDetail["name"],orderDetail["description"],orderDetail["amount"],orderDetail["price"],orderDetail["img"],orderDetail);
          
       
     });
