@@ -4,12 +4,13 @@ import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
 import { FieldPacket, RowDataPacket } from "mysql2";
 import { UpdateStatus } from "./logic_update_status";
+import { contractAddressCommon } from "./op_config";
 
 async function main() {
   const provider = new ethers.providers.WebSocketProvider(
     "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ"
   );
-  let contractAddress = "0xE17906ED61fC2A1c9F290A15C14e6120A2FEf556";
+  let contractAddress = contractAddressCommon;
   //引入ABI原始文件或是格式化后的ABI文件
   const contractABI =
     require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
