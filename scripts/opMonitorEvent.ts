@@ -12,8 +12,8 @@ async function main() {
   const abiIntermediatorRouter =
     require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
   const iface = new ethers.utils.Interface(abiIntermediatorRouter);
-  //const abiIntermediatorHuman = iface.format(ethers.utils.FormatTypes.minimal);
-  //console.log(abiIntermediatorHuman);
+  const abiIntermediatorHuman = iface.format(ethers.utils.FormatTypes.minimal);
+  console.log(abiIntermediatorHuman);
 
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
   const topic2 = ethers.utils.id("Confirm(address,uint256)");
