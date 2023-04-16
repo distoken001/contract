@@ -1,52 +1,59 @@
 import { ethers } from "ethers";
-import { contractAddressCommon, monitorWss } from "./op_config";
+import {
+  contractAddressCommon,
+  monitorWss,
+  monitorHttps,
+  contractABI,
+} from "./op_config";
 import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
   console.log("function:op_monitor_add_order is loading");
   const provider = new ethers.providers.WebSocketProvider(monitorWss);
-  let contractAddress = contractAddressCommon;
-  //引入ABI原始文件或是格式化后的ABI文件
-  const contractABI = require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
+  const providerHttps = new ethers.providers.StaticJsonRpcProvider(
+    monitorHttps
+  );
   const iface = new ethers.utils.Interface(contractABI);
-  const contract = new ethers.Contract(contractAddress, contractABI, provider);
+  const contract = new ethers.Contract(
+    contractAddressCommon,
+    contractABI,
+    providerHttps
+  );
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
-  let filters = [
-    {
-      address: contractAddress,
-      topics: [topic1],
-    },
-  ];
-  filters.forEach((filter) => {
-    provider.on(filter, async (result) => {
-      //console.log(result);
-      const data = result.data;
-      const topics = result.topics;
-      console.log("Parse Log Data->", iface.parseLog({ data, topics }));
-      const resultParse = iface.parseLog({ data, topics });
-      const _args = resultParse.args;
-      const orderId = _args["orderId"].toNumber();
-      const orderDetail = await contract.orders(orderId);
-      console.log(orderDetail);
-      const contact = await contract.getContact(orderId);
-      console.log(contact);
-      insertOrder(
-        orderId,
-        orderDetail["name"],
-        orderDetail["description"],
-        orderDetail["amount"].toNumber(),
-        orderDetail["price"].toNumber(),
-        orderDetail["img"],
-        orderDetail["seller_pledge"].toNumber(),
-        orderDetail["buyer_pledge"].toNumber(),
-        contact["_seller"],
-        contact["_buyer"],
-        orderDetail["status"],
-        "system","system",
-        orderDetail["seller"],
-        orderDetail["buyer"],
-        orderDetail["token"]
-      );
-    });
+  let filter = {
+    address: contractAddressCommon,
+    topics: [topic1],
+  };
+  provider.on(filter, async (result) => {
+    //console.log(result);
+    const data = result.data;
+    const topics = result.topics;
+    const resultParse = iface.parseLog({ data, topics });
+
+    const _args = resultParse.args;
+    console.log("Parse Log Data op_monitor_add_order->resultParse->_args->", _args);
+    const orderId = _args["orderId"].toNumber();
+    const orderDetail = await contract.orders(orderId);
+    console.log("订单详情:",orderDetail);
+    const contactData = await contract.getContact(orderId);
+    console.log("联系方式:",contactData);
+    insertOrder(
+      orderId,
+      orderDetail["name"],
+      orderDetail["description"],
+      orderDetail["amount"].toNumber(),
+      orderDetail["price"].toNumber(),
+      orderDetail["img"],
+      orderDetail["seller_pledge"].toNumber(),
+      orderDetail["buyer_pledge"].toNumber(),
+      contactData["_seller"],
+      contactData["_buyer"],
+      orderDetail["status"],
+      "system",
+      "system",
+      orderDetail["seller"],
+      orderDetail["buyer"],
+      orderDetail["token"]
+    );
   });
 }
 export { op_monitor_add_order };

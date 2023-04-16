@@ -22,7 +22,6 @@ export async function insertLog( _event_name: string,
       creator: 'system',
       hash: _hash
     };
-    console.error('Insert Data :', insertData);
     const query = 'INSERT INTO event_logs SET id=?, event_name=?, operater=?, order_id=?, data=?, status=?, create_time=?, update_time=?, updater=?, creator=?, hash=?';
   
     const values = [

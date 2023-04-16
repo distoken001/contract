@@ -1,16 +1,13 @@
 import { ethers } from "ethers";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
-import { contractAddressCommon, monitorWss } from "./op_config";
+import { contractABI, contractAddressCommon, monitorWss } from "./op_config";
 
 async function op_monitor_event() {
   console.log("function:op_monitor_event  is loading");
   const provider = new ethers.providers.WebSocketProvider(monitorWss);
   let contractAddress = contractAddressCommon;
-  //引入ABI原始文件或是格式化后的ABI文件
-  const abiIntermediatorRouter =
-    require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
-  const iface = new ethers.utils.Interface(abiIntermediatorRouter);
+  const iface = new ethers.utils.Interface(contractABI);
 
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
   const topic2 = ethers.utils.id("Confirm(address,uint256)");
@@ -33,15 +30,13 @@ async function op_monitor_event() {
     provider.on(filter, async (result) => {
       console.log(result);
       let transactionHashsh: string = result.transactionHash;
-      console.log("Parse Log Data->", transactionHashsh);
       let blockHash: string = result.blockHash;
-      console.log("Parse Log Data->", blockHash);
       let contractAddress: string = result.address;
-      console.log("Parse Log Data->", contractAddress);
       const data = result.data;
       const topics = result.topics;
-      console.log("Parse Log Data->", iface.parseLog({ data, topics }));
       const resultParse = iface.parseLog({ data, topics });
+      console.log("Parse Log Data op_monitor_event->resultParse->", resultParse);
+
       let eventName: string = "";
       let operater: string = "";
       let status: Status = Status.Initial;
@@ -71,14 +66,6 @@ async function op_monitor_event() {
           break;
         }
       }
-      // console.log(
-      //   eventName,
-      //   operater,
-      //   orderId,
-      //   data,
-      //   status,
-      //   transactionHashsh
-      // );
       insertLog(eventName, operater, orderId, data, status, transactionHashsh);
     });
   });
