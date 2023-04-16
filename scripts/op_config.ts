@@ -1,4 +1,4 @@
-const contractAddressCommon = "0x6b7D575Be4576BB6fbd3E9A79ba718F0bf5aC767";
+const contractAddressCommon = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
 const monitorWss="wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
 const monitorHttps="https://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
 const contractABI = require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;

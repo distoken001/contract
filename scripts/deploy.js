@@ -12,7 +12,8 @@ async function main() {
     100,
     100,
     5000,
-    "0x621d897886b99Ad84a4C32292338cfAF768a5C20"
+    10000,
+    "0xb1B8a8E9c2FFcc0B2072937d170bAe4E794f6238"
   );
   await ebay.deployed();
   console.log(ebay.address);
