@@ -51,7 +51,7 @@ contract Ebay is Ownable {
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
     uint256 public buyerIncRatio; //买家比卖家质押增量比例
-    uint256 public sellerRatio=10000; //卖家质押数量是商品总价的百分比/分母10000
+    uint256 public sellerRatio = 10000; //卖家质押数量是商品总价的百分比/分母10000
     address public lockAddr;
 
     Order[] public orders;
@@ -81,7 +81,7 @@ contract Ebay is Ownable {
         sellerRate = _sellerRate;
         buyerIncRatio = _buyerIncRatio;
         lockAddr = _lockAddr;
-        sellerRatio=_sellerRatio;
+        sellerRatio = _sellerRatio;
     }
 
     //创建订单
@@ -103,7 +103,7 @@ contract Ebay is Ownable {
         //2、验证代币合约是否有效
         require(verifyByAddress(_token) == 20, "Invalid contract");
         //3.质押数量
-        uint256 _seller_pledge=  (_price *_amount*sellerRatio) / 10000;
+        uint256 _seller_pledge = (_price * _amount * sellerRatio) / 10000;
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),
@@ -324,7 +324,10 @@ contract Ebay is Ownable {
     function getContact(
         uint256 _orderId
     ) external view returns (string memory _seller, string memory _buyer) {
-        if (isContact[_orderId][_msgSender()] == true) {
+        if (orders[_orderId].status == Status.Initial) {
+            _seller = contact[_orderId].seller;
+            _buyer = contact[_orderId].buyer;
+        } else if (isContact[_orderId][_msgSender()] == true) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
         }
@@ -340,7 +343,7 @@ contract Ebay is Ownable {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
         buyerIncRatio = _buyerIncRatio;
-        sellerRatio=_sellerRatio;
+        sellerRatio = _sellerRatio;
     }
 
     //set lockAddr
