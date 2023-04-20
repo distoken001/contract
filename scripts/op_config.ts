@@ -1,3 +1,4 @@
+import { getConfigValue } from './getConfig';
 const contractAddressCommon = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
 const monitorWss="wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
 const monitorHttps="https://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
