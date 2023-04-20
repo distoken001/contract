@@ -7,7 +7,7 @@
   "scripts": {
     "start_ts:dev": "npm run clean&&npm install --production&&tsc&&pm2 start ts-node --name contract_monitor --  ./scripts/start.ts",
     "start:dev": "npm run clean&&npm install --production&&tsc&&pm2 start ./dist/start.js  --name contract_monitor",
-    "clean": "rimraf ./dist/**/*.js  ./dist/**/*.js.map"
+    "clean": "rimraf './dist/**/*.js' './dist/**/*.js.map'"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
