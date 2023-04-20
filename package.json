@@ -6,7 +6,7 @@
   },
   "scripts": {
     "start": "pm2 start ts-node --name contract_monitor --  ./scripts/start.ts  ",
-    "startjs": "pm2 start ./dist/start.js  --name contract_monitor -i 4  "
+    "startjs": "pm2 start ./dist/start.js  --name contract_monitor -i 1  "
 
   },
   "dependencies": {
