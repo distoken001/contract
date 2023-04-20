@@ -5,7 +5,7 @@
     "hardhat": "^2.13.1"
   },
   "scripts": {
-    "start": "pm2 start npx --name \"contract_monitor\" -- hardhat run ./scripts/start.ts  "
+    "start": "pm2 start ts-node --name \"contract_monitor\" --  ./scripts/start.ts  "
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
