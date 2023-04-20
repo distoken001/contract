@@ -6,7 +6,7 @@ async function getChainId( rpcUrl : string ) {
   const provider = new ethers.providers.StaticJsonRpcProvider(rpcUrl);
   
   // 使用Ethers.js提供者来查询chain ID
-  const chainId = await provider.getNetwork().then(network => network.chainId);
+  const chainId = await provider.getNetwork().then((network: { chainId: any; }) => network.chainId);
   
   return chainId;
 }
