@@ -10,7 +10,7 @@ function main() {
   const abiIntermediatorHuman = iface.format(ethers.utils.FormatTypes.minimal);
   console.log("abi:",abiIntermediatorHuman);
   op_monitor_add_order();
-  op_monitor_event();
-  op_monitor_order_status();
+  //op_monitor_event();
+  //op_monitor_order_status();
 }
 main();
