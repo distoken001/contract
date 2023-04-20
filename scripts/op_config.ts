@@ -1,4 +1,5 @@
-const contractAddressCommon = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
+import { ethers } from "ethers";
+const opContractAddress = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
 const monitorWss="wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
 const monitorHttps="https://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
 const contractABI = require("../artifacts/contracts/Ebay.sol/Ebay.json").abi;
@@ -9,4 +10,10 @@ const dbConfig= {
     user: 'dev',
     password: 'Dev@1234',
   }
-export { contractAddressCommon, monitorWss, dbConfig, monitorHttps,contractABI };
+  const providerWss = new ethers.providers.WebSocketProvider(monitorWss);
+  const providerHttps = new ethers.providers.StaticJsonRpcProvider(
+    monitorHttps
+  );
+  const iface = new ethers.utils.Interface(contractABI);
+  const chainId = providerHttps.getNetwork().then(network => network.chainId);
+export { opContractAddress, monitorWss, dbConfig, monitorHttps,contractABI,providerHttps,providerWss,chainId ,iface};
