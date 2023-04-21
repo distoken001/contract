@@ -2,7 +2,7 @@ module.exports = {
     apps: [
       {
         name: 'contract_monitor',
-        script: ' node ./dist/start.js',
+        script: ' node ./dist/op_chain/start.js',
         instances: 1,
         autorestart: true,
         watch: false,
