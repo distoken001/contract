@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertOrder = void 0;
 const db_1 = require("./db");
-const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buyerPledge, sellerContact, buyerContact, status, creator, updater, seller, buyer, token, chainId) => __awaiter(void 0, void 0, void 0, function* () {
+const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buyerPledge, sellerContact, buyerContact, status, creator, updater, seller, buyer, token, chainId, buyerEx) => __awaiter(void 0, void 0, void 0, function* () {
     const create_time = new Date();
     const update_time = create_time;
     const sql = `
@@ -34,8 +34,9 @@ const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buye
         seller,
         buyer,
         token,
-        chain_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+        chain_id,
+        buyer_ex
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
     `;
     const values = [
         orderId,
@@ -56,7 +57,8 @@ const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buye
         seller,
         buyer,
         token,
-        chainId
+        chainId,
+        buyerEx
     ];
     const [rows, fields] = yield (0, db_1.executeQuery)(sql, values);
     return [rows, fields];

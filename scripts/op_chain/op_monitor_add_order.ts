@@ -52,7 +52,8 @@ async function op_monitor_add_order() {
       orderDetail["seller"],
       orderDetail["buyer"],
       orderDetail["token"],
-      await opChainId
+      await opChainId,
+      orderDetail["buyer_ex"].toNumber(),
     );
   });
 }

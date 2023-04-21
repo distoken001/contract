@@ -25,10 +25,10 @@ const arbProviderHttps = new ethers.providers.StaticJsonRpcProvider(
   arbMonitorHttps
 );
 const opIface = new ethers.utils.Interface(contractABI);
-const opChainId = arbProviderHttps
+const arbchainId = arbProviderHttps
   .getNetwork()
   .then((network) => network.chainId);
-const opContract = new ethers.Contract(
+const arbcontract = new ethers.Contract(
   arbContractAddress,
   contractABI,
   arbProviderHttps
@@ -39,7 +39,7 @@ export {
   contractABI,
   arbProviderWss,
   arbProviderHttps,
-  opChainId,
-  opContract,
+  arbchainId,
+  arbcontract,
   opIface,
 };

@@ -1,20 +1,16 @@
 import { ethers } from "ethers";
 import { UpdateStatus } from "./logic_update_status";
 import {
-  contractABI,
   opContractAddress,
   opProviderWss,
   opIface,
+  opContract,
+  opChainId
 } from "./op_config";
 
 async function op_monitor_order_status() {
   console.log("function:op_monitor_order_status is loading");
 
-  const contract = new ethers.Contract(
-    opContractAddress,
-    contractABI,
-    opProviderWss
-  );
   const topic2 = ethers.utils.id("Confirm(address,uint256)");
   const topic3 = ethers.utils.id("SetStatus(address,uint256,uint8)");
   let filters = [
@@ -39,8 +35,8 @@ async function op_monitor_order_status() {
       const _args = resultParse.args;
 
       let orderId: number = _args["orderId"].toNumber();
-      const orderDetail = await contract.orders(orderId);
-      const contactData = await contract.getContact(orderId);
+      const orderDetail = await opContract.orders(orderId);
+      const contactData = await opContract.getContact(orderId);
       console.log("订单详情：", orderDetail);
       console.log("联系方式", contactData);
       UpdateStatus(
@@ -48,7 +44,8 @@ async function op_monitor_order_status() {
         contactData["_seller"],
         orderId,
         orderDetail["status"],
-        orderDetail["buyer"]
+        orderDetail["buyer"],
+        await opChainId
       );
     });
   });

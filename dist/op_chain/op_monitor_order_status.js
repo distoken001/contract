@@ -16,7 +16,6 @@ const op_config_1 = require("./op_config");
 function op_monitor_order_status() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("function:op_monitor_order_status is loading");
-        const contract = new ethers_1.ethers.Contract(op_config_1.opContractAddress, op_config_1.contractABI, op_config_1.opProviderWss);
         const topic2 = ethers_1.ethers.utils.id("Confirm(address,uint256)");
         const topic3 = ethers_1.ethers.utils.id("SetStatus(address,uint256,uint8)");
         let filters = [
@@ -40,11 +39,11 @@ function op_monitor_order_status() {
                 const resultParse = op_config_1.opIface.parseLog({ data, topics });
                 const _args = resultParse.args;
                 let orderId = _args["orderId"].toNumber();
-                const orderDetail = yield contract.orders(orderId);
-                const contactData = yield contract.getContact(orderId);
+                const orderDetail = yield op_config_1.opContract.orders(orderId);
+                const contactData = yield op_config_1.opContract.getContact(orderId);
                 console.log("订单详情：", orderDetail);
                 console.log("联系方式", contactData);
-                (0, logic_update_status_1.UpdateStatus)(contactData["_buyer"], contactData["_seller"], orderId, orderDetail["status"], orderDetail["buyer"]);
+                (0, logic_update_status_1.UpdateStatus)(contactData["_buyer"], contactData["_seller"], orderId, orderDetail["status"], orderDetail["buyer"], yield op_config_1.opChainId);
             }));
         });
     });

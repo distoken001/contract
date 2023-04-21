@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateStatus = void 0;
 const db_1 = require("./db");
-function UpdateStatus(_buyner_contract, _seller_contract, _order_id, _status, _buyer) {
+function UpdateStatus(_buyner_contract, _seller_contract, _order_id, _status, _buyer, _chain_id) {
     return __awaiter(this, void 0, void 0, function* () {
         const updateData = {
             order_id: _order_id,
@@ -23,8 +23,9 @@ function UpdateStatus(_buyner_contract, _seller_contract, _order_id, _status, _b
             buyer_contact: _buyner_contract,
             seller_contact: _seller_contract,
             buyner: _buyer,
+            chain_id: _chain_id
         };
-        const query = "update orders SET status=?, update_time=?, buyer_contact=?, seller_contact=?,buyer= ?  where order_id=?";
+        const query = "update orders SET status=?, update_time=?, buyer_contact=?, seller_contact=?,buyer= ?  where order_id=? and chain_id=?";
         const values = [
             updateData.status,
             updateData.update_time,
@@ -32,6 +33,7 @@ function UpdateStatus(_buyner_contract, _seller_contract, _order_id, _status, _b
             updateData.seller_contact,
             updateData.buyner,
             updateData.order_id,
+            updateData.chain_id
         ];
         const [rows, fields] = yield (0, db_1.executeQuery)(query, values);
         return [rows, fields];

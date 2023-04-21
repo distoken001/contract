@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.opIface = exports.opContract = exports.opChainId = exports.arbProviderHttps = exports.arbProviderWss = exports.contractABI = exports.dbConfig = exports.arbContractAddress = void 0;
+exports.opIface = exports.arbcontract = exports.arbchainId = exports.arbProviderHttps = exports.arbProviderWss = exports.contractABI = exports.dbConfig = exports.arbContractAddress = void 0;
 const ethers_1 = require("ethers");
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 exports.contractABI = contractABI;
@@ -32,9 +32,9 @@ const arbProviderHttps = new ethers_1.ethers.providers.StaticJsonRpcProvider(arb
 exports.arbProviderHttps = arbProviderHttps;
 const opIface = new ethers_1.ethers.utils.Interface(contractABI);
 exports.opIface = opIface;
-const opChainId = arbProviderHttps
+const arbchainId = arbProviderHttps
     .getNetwork()
     .then((network) => network.chainId);
-exports.opChainId = opChainId;
-const opContract = new ethers_1.ethers.Contract(arbContractAddress, contractABI, arbProviderHttps);
-exports.opContract = opContract;
+exports.arbchainId = arbchainId;
+const arbcontract = new ethers_1.ethers.Contract(arbContractAddress, contractABI, arbProviderHttps);
+exports.arbcontract = arbcontract;
