@@ -4,9 +4,8 @@
   },
   "scripts": {
     "clean": "npx rimraf ./dist/**/*.js  ./dist/*.js",
-    "start:dev": "npm run clean&&npm install --production&&tsc&&pm2 start  pm2.config.js",
-    "start:prod": "npm run clean&&npm install --production&&tsc&&pm2 start  pm2.config.js --env prod  "
-   
+    "deploy:dev": "npm run clean&&npx hardhat compile&&npm install --production&&tsc&&pm2 start  pm2.config.js",
+    "deploy:prod": "npm run clean&&npx hardhat compile&&npm install --production&&tsc&&pm2 start  pm2.config.js --env production  "
   },
   "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
