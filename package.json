@@ -3,9 +3,10 @@
   "devDependencies": {
   },
   "scripts": {
-    "start_ts:dev": "npm run clean&&npm install --production&&tsc&&pm2 start ts-node --name contract_monitor --  ./scripts/start.ts",
-    "start:dev": "npm run clean&&npm install --production&&tsc&&pm2 start  pm2.config.js ",
-    "clean": "npx rimraf ./dist/**/*.js  ./dist/*.js"
+    "clean": "npx rimraf ./dist/**/*.js  ./dist/*.js",
+    "start:dev": "npm run clean&&npm install --production&&tsc&&pm2 start  pm2.config.js",
+    "start:prod": "npm run clean&&npm install --production&&tsc&&pm2 start  pm2.config.js --env prod  "
+   
   },
   "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
