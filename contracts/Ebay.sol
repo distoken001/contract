@@ -32,7 +32,7 @@ contract Ebay is Ownable {
         IERC20 token; //质押代币合约地址
         uint256 seller_pledge; //商品价格=卖家需要质押代币数量
         uint256 buyer_pledge; //买家需要质押代币数量 前端提醒买方质押代币数量要大于卖方质押代币数量
-        uint256 buyerEx; // 买家增量质押
+        uint256 buyer_ex; // 买家比卖家需要多质押数量
         Status status; //订单状态
     }
 
@@ -110,7 +110,7 @@ contract Ebay is Ownable {
             address(this),
             _seller_pledge
         );
-        uint256 _buyerEx = (_seller_pledge * buyerIncRatio) / 10000;
+        uint256 _buyer_ex = (_seller_pledge * buyerIncRatio) / 10000;
         orders.push(
             Order({
                 name: _name,
@@ -120,7 +120,7 @@ contract Ebay is Ownable {
                 amount: _amount,
                 seller_pledge: _seller_pledge,
                 buyer_pledge: 0,
-                buyerEx: _buyerEx,
+                buyer_ex: _buyer_ex,
                 status: Status.Initial,
                 description: _description,
                 img: _img,
@@ -149,7 +149,7 @@ contract Ebay is Ownable {
             order.buyer == address(0) || order.buyer == _user,
             "Non designated buyer"
         );
-        uint256 _buyePrice = order.seller_pledge + order.buyerEx;
+        uint256 _buyePrice = order.seller_pledge + order.buyer_ex;
         //4、将代币转入到合约地址
         order.token.transferFrom(_user, address(this), _buyePrice);
         buyerList[_user].push(_orderId);

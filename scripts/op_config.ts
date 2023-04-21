@@ -5,11 +5,11 @@ let monitorWss: string = "";
 let monitorHttps: string = "";
 let dbConfig = {};
 if (process.env.NODE_ENV == "dev") {
-  opContractAddress = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
+  opContractAddress = "0xD0C5B6365268e5A429688c8Ae45E36e9Ac2d2a4e";
   monitorWss =
-    "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
+    "wss://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
   monitorHttps =
-    "https://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
+    "https://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
   dbConfig = {
     host: "97.74.86.12",
     port: 3306,
