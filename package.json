@@ -1,8 +1,6 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "hardhat": "^2.13.1"
   },
   "scripts": {
     "start_ts:dev": "npm run clean&&npm install --production&&tsc&&pm2 start ts-node --name contract_monitor --  ./scripts/start.ts",
@@ -10,8 +8,9 @@
     "clean": "npx rimraf ./dist/**/*.js  ./dist/*.js"
   },
   "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "hardhat": "^2.13.1",
     "@openzeppelin/contracts": "^4.8.2",
-    "ethers": "^6.3.0",
     "mysql2": "^3.2.0",
     "pg-promise": "^11.4.3",
     "rimraf": "^5.0.0"
