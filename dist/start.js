@@ -7,7 +7,6 @@ const op_monitor_order_status_1 = require("./op_monitor_order_status");
 const op_config_1 = require("./op_config");
 function main() {
     console.log("main start!!!");
-    const provider = new ethers_1.ethers.providers.WebSocketProvider(op_config_1.monitorWss);
     const iface = new ethers_1.ethers.utils.Interface(op_config_1.contractABI);
     const abiIntermediatorHuman = iface.format(ethers_1.ethers.utils.FormatTypes.minimal);
     console.log("abi:", abiIntermediatorHuman);

@@ -1,4 +1,4 @@
-const { ethers } = require('ethers');
+/*const { ethers } = require('ethers');
 
 async function getChainId( rpcUrl : string ) {
   
@@ -13,3 +13,4 @@ async function getChainId( rpcUrl : string ) {
 export {getChainId};
 
 
+*/

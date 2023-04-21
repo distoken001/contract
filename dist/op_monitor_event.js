@@ -35,14 +35,14 @@ function op_monitor_event() {
             },
         ];
         filters.forEach((filter) => {
-            op_config_1.providerWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
+            op_config_1.opProviderWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
                 console.log(result);
                 let transactionHashsh = result.transactionHash;
                 let blockHash = result.blockHash;
                 let contractAddress = result.address;
                 const data = result.data;
                 const topics = result.topics;
-                const resultParse = op_config_1.iface.parseLog({ data, topics });
+                const resultParse = op_config_1.opIface.parseLog({ data, topics });
                 console.log("Parse Log Data op_monitor_event->resultParse->", resultParse);
                 let eventName = "";
                 let operater = "";

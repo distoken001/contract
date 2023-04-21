@@ -3,9 +3,8 @@ import { UpdateStatus } from "./logic_update_status";
 import {
   contractABI,
   opContractAddress,
-  monitorWss,
-  providerWss,
-  iface,
+  opProviderWss,
+  opIface,
 } from "./op_config";
 
 async function op_monitor_order_status() {
@@ -14,7 +13,7 @@ async function op_monitor_order_status() {
   const contract = new ethers.Contract(
     opContractAddress,
     contractABI,
-    providerWss
+    opProviderWss
   );
   const topic2 = ethers.utils.id("Confirm(address,uint256)");
   const topic3 = ethers.utils.id("SetStatus(address,uint256,uint8)");
@@ -29,14 +28,14 @@ async function op_monitor_order_status() {
     },
   ];
   filters.forEach((filter) => {
-    providerWss.on(filter, async (result) => {
+    opProviderWss.on(filter, async (result) => {
       //console.log(result);
       let transactionHashsh: string = result.transactionHash;
       let blockHash: string = result.blockHash;
       let contractAddress: string = result.address;
       const data = result.data;
       const topics = result.topics;
-      const resultParse = iface.parseLog({ data, topics });
+      const resultParse = opIface.parseLog({ data, topics });
       const _args = resultParse.args;
 
       let orderId: number = _args["orderId"].toNumber();

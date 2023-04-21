@@ -2,11 +2,9 @@ import { ethers } from "ethers";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
 import {
-  contractABI,
   opContractAddress,
-  monitorWss,
-  providerWss,
-  iface,
+  opProviderWss,
+  opIface,
 } from "./op_config";
 
 async function op_monitor_event() {
@@ -29,14 +27,14 @@ async function op_monitor_event() {
     },
   ];
   filters.forEach((filter) => {
-    providerWss.on(filter, async (result) => {
+    opProviderWss.on(filter, async (result) => {
       console.log(result);
       let transactionHashsh: string = result.transactionHash;
       let blockHash: string = result.blockHash;
       let contractAddress: string = result.address;
       const data = result.data;
       const topics = result.topics;
-      const resultParse = iface.parseLog({ data, topics });
+      const resultParse = opIface.parseLog({ data, topics });
       console.log(
         "Parse Log Data op_monitor_event->resultParse->",
         resultParse

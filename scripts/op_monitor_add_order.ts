@@ -1,12 +1,9 @@
 import { ethers } from "ethers";
 import {
   opContractAddress,
-  monitorWss,
-  monitorHttps,
   contractABI,
-  providerHttps,
-  providerWss,
-  chainId,
+  opProviderHttps,
+  opChainId,
 } from "./op_config";
 import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
@@ -15,14 +12,14 @@ async function op_monitor_add_order() {
   const contract = new ethers.Contract(
     opContractAddress,
     contractABI,
-    providerHttps
+    opProviderHttps
   );
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
   let filter = {
     address: opContractAddress,
     topics: [topic1],
   };
-  providerWss.on(filter, async (result) => {
+  opProviderHttps.on(filter, async (result) => {
     console.log(result);
     const data = result.data;
     const topics = result.topics;
@@ -55,7 +52,7 @@ async function op_monitor_add_order() {
       orderDetail["seller"],
       orderDetail["buyer"],
       orderDetail["token"],
-      await chainId
+      await opChainId
     );
   });
 }

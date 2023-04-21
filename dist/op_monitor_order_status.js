@@ -16,7 +16,7 @@ const op_config_1 = require("./op_config");
 function op_monitor_order_status() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("function:op_monitor_order_status is loading");
-        const contract = new ethers_1.ethers.Contract(op_config_1.opContractAddress, op_config_1.contractABI, op_config_1.providerWss);
+        const contract = new ethers_1.ethers.Contract(op_config_1.opContractAddress, op_config_1.contractABI, op_config_1.opProviderWss);
         const topic2 = ethers_1.ethers.utils.id("Confirm(address,uint256)");
         const topic3 = ethers_1.ethers.utils.id("SetStatus(address,uint256,uint8)");
         let filters = [
@@ -30,14 +30,14 @@ function op_monitor_order_status() {
             },
         ];
         filters.forEach((filter) => {
-            op_config_1.providerWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
+            op_config_1.opProviderWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
                 //console.log(result);
                 let transactionHashsh = result.transactionHash;
                 let blockHash = result.blockHash;
                 let contractAddress = result.address;
                 const data = result.data;
                 const topics = result.topics;
-                const resultParse = op_config_1.iface.parseLog({ data, topics });
+                const resultParse = op_config_1.opIface.parseLog({ data, topics });
                 const _args = resultParse.args;
                 let orderId = _args["orderId"].toNumber();
                 const orderDetail = yield contract.orders(orderId);

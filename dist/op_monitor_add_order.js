@@ -17,13 +17,13 @@ function op_monitor_add_order() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("function:op_monitor_add_order is loading");
         const iface = new ethers_1.ethers.utils.Interface(op_config_1.contractABI);
-        const contract = new ethers_1.ethers.Contract(op_config_1.opContractAddress, op_config_1.contractABI, op_config_1.providerHttps);
+        const contract = new ethers_1.ethers.Contract(op_config_1.opContractAddress, op_config_1.contractABI, op_config_1.opProviderHttps);
         const topic1 = ethers_1.ethers.utils.id("AddOrder(address,uint256)");
         let filter = {
             address: op_config_1.opContractAddress,
             topics: [topic1],
         };
-        op_config_1.providerWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
+        op_config_1.opProviderHttps.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
             console.log(result);
             const data = result.data;
             const topics = result.topics;
@@ -35,7 +35,7 @@ function op_monitor_add_order() {
             console.log("订单详情:", orderDetail);
             const contactData = yield contract.getContact(orderId);
             console.log("联系方式:", contactData);
-            (0, logic_insert_order_1.insertOrder)(orderId, orderDetail["name"], orderDetail["description"], orderDetail["amount"].toNumber(), orderDetail["price"].toNumber(), orderDetail["img"], orderDetail["seller_pledge"].toNumber(), orderDetail["buyer_pledge"].toNumber(), contactData["_seller"], contactData["_buyer"], orderDetail["status"], "system", "system", orderDetail["seller"], orderDetail["buyer"], orderDetail["token"], yield op_config_1.chainId);
+            (0, logic_insert_order_1.insertOrder)(orderId, orderDetail["name"], orderDetail["description"], orderDetail["amount"].toNumber(), orderDetail["price"].toNumber(), orderDetail["img"], orderDetail["seller_pledge"].toNumber(), orderDetail["buyer_pledge"].toNumber(), contactData["_seller"], contactData["_buyer"], orderDetail["status"], "system", "system", orderDetail["seller"], orderDetail["buyer"], orderDetail["token"], yield op_config_1.opChainId);
         }));
     });
 }

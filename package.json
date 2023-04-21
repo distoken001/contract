@@ -1,6 +1,7 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
+    "typescript-plugin-styled-components": "^2.0.0"
   },
   "scripts": {
     "clean": "npx rimraf ./dist/**/*.js  ./dist/*.js",
@@ -9,8 +10,8 @@
   },
   "dependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "hardhat": "^2.13.1",
     "@openzeppelin/contracts": "^4.8.2",
+    "hardhat": "^2.13.1",
     "mysql2": "^3.2.0",
     "pg-promise": "^11.4.3",
     "rimraf": "^5.0.0"
