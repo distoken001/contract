@@ -8,18 +8,10 @@ let opContractAddress = "";
 exports.opContractAddress = opContractAddress;
 let opMonitorWss = "";
 let opMonitorHttps = "";
-let arbMonitorWss = "";
-let arbMonitorHttps = "";
-let arbContractAddress = "";
 let dbConfig = {};
 exports.dbConfig = dbConfig;
 if (process.env.NODE_ENV == "dev") {
-    arbContractAddress = "0xD0C5B6365268e5A429688c8Ae45E36e9Ac2d2a4e";
-    arbMonitorWss =
-        "wss://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
-    arbMonitorHttps =
-        "https://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
-    exports.opContractAddress = opContractAddress = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
+    exports.opContractAddress = opContractAddress = "0x24d89E128e1DEb40958253435ac41b13d5169fba";
     opMonitorWss =
         "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
     opMonitorHttps =

@@ -1,8 +1,5 @@
 import { ethers } from "ethers";
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
-let opContractAddress: string = "";
-let opMonitorWss: string = "";
-let opMonitorHttps: string = "";
 let arbMonitorWss: string = "";
 let arbMonitorHttps: string = "";
 let arbContractAddress: string = "";
@@ -13,12 +10,6 @@ if (process.env.NODE_ENV == "dev") {
     "wss://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
   arbMonitorHttps =
     "https://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
-
-  opContractAddress = "0x7Ea3Fb58959b0bbF66402a09d2cE3263b0B76b73";
-  opMonitorWss =
-    "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
-  opMonitorHttps =
-    "https://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
   dbConfig = {
     host: "97.74.86.12",
     port: 3306,
@@ -29,25 +20,25 @@ if (process.env.NODE_ENV == "dev") {
 } else {
 }
 
-const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);
-const opProviderHttps = new ethers.providers.StaticJsonRpcProvider(
-  opMonitorHttps
+const arbProviderWss = new ethers.providers.WebSocketProvider(arbMonitorWss);
+const arbProviderHttps = new ethers.providers.StaticJsonRpcProvider(
+  arbMonitorHttps
 );
 const opIface = new ethers.utils.Interface(contractABI);
-const opChainId = opProviderHttps
+const opChainId = arbProviderHttps
   .getNetwork()
   .then((network) => network.chainId);
 const opContract = new ethers.Contract(
-  opContractAddress,
+  arbContractAddress,
   contractABI,
-  opProviderHttps
+  arbProviderHttps
 );
 export {
-  opContractAddress,
+  arbContractAddress,
   dbConfig,
   contractABI,
-  opProviderWss,
-  opProviderHttps,
+  arbProviderWss,
+  arbProviderHttps,
   opChainId,
   opContract,
   opIface,
