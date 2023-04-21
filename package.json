@@ -1,8 +1,5 @@
 {
   "name": "hardhat-project",
-  "devDependencies": {
-    "typescript-plugin-styled-components": "^2.0.0"
-  },
   "scripts": {
     "clean": "npx rimraf ./dist/**/*.js  ./dist/*.js",
     "deploy:dev": "npm run clean&&npx hardhat compile&&npm install --production&&tsc&&pm2 start  pm2.config.js",
