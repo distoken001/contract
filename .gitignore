@@ -37,4 +37,5 @@ next-env.d.ts
 .yarn.lock
 **/DS_Store
 DS_Store
+.DS_Store
 yarn.lock
