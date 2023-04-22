@@ -324,7 +324,7 @@ contract Ebay is Ownable {
     function getContact(
         uint256 _orderId
     ) external view returns (string memory _seller, string memory _buyer) {
-        if (orders[_orderId].status == Status.Initial) {
+        if (_msgSender()==owner()) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
         } else if (isContact[_orderId][_msgSender()] == true) {
