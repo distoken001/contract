@@ -33,9 +33,12 @@ function op_monitor_add_order() {
             const orderId = _args["orderId"].toNumber();
             const orderDetail = yield contract.orders(orderId);
             console.log("订单详情:", orderDetail);
-            const contactData = yield contract.getContact(orderId);
-            console.log("联系方式:", contactData);
-            (0, logic_insert_order_1.insertOrder)(orderId, orderDetail["name"], orderDetail["description"], orderDetail["amount"].toNumber(), orderDetail["price"].toNumber(), orderDetail["img"], orderDetail["seller_pledge"].toNumber(), orderDetail["buyer_pledge"].toNumber(), contactData["_seller"], contactData["_buyer"], orderDetail["status"], "system", "system", orderDetail["seller"], orderDetail["buyer"], orderDetail["token"], yield config_1.opChainId, orderDetail["buyer_ex"].toNumber());
+            //const contactData = await contract.getContact(orderId);
+            //console.log("联系方式:", contactData);
+            (0, logic_insert_order_1.insertOrder)(orderId, orderDetail["name"], orderDetail["description"], orderDetail["amount"].toNumber(), orderDetail["price"].toNumber(), orderDetail["img"], orderDetail["seller_pledge"].toNumber(), orderDetail["buyer_pledge"].toNumber(), 
+            //contactData["_seller"],
+            //contactData["_buyer"],
+            orderDetail["status"], "system", "system", orderDetail["seller"], orderDetail["buyer"], orderDetail["token"], yield config_1.opChainId, orderDetail["buyer_ex"].toNumber());
         }));
     });
 }

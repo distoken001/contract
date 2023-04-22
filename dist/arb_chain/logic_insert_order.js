@@ -11,7 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertOrder = void 0;
 const db_1 = require("./db");
-const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buyerPledge, sellerContact, buyerContact, status, creator, updater, seller, buyer, token, chainId, buyerEx) => __awaiter(void 0, void 0, void 0, function* () {
+const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buyerPledge, 
+//sellerContact: string,
+//buyerContact: string,
+status, creator, updater, seller, buyer, token, chainId, buyerEx) => __awaiter(void 0, void 0, void 0, function* () {
     const create_time = new Date();
     const update_time = create_time;
     const sql = `
@@ -47,8 +50,8 @@ const insertOrder = (orderId, name, desc, amount, price, img, sellerPledge, buye
         img,
         sellerPledge,
         buyerPledge,
-        sellerContact,
-        buyerContact,
+        //sellerContact,
+        //buyerContact,
         status,
         create_time,
         update_time,

@@ -44,7 +44,7 @@ async function op_monitor_add_order() {
       orderDetail["img"],
       orderDetail["seller_pledge"].toNumber(),
       orderDetail["buyer_pledge"].toNumber(),
-     //contactData["_seller"],
+      //contactData["_seller"],
       //contactData["_buyer"],
       orderDetail["status"],
       "system",
@@ -53,7 +53,7 @@ async function op_monitor_add_order() {
       orderDetail["buyer"],
       orderDetail["token"],
       await opChainId,
-      orderDetail["buyer_ex"].toNumber(),
+      orderDetail["buyer_ex"].toNumber()
     );
   });
 }

@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.opIface = exports.opContract = exports.opChainId = exports.opProviderHttps = exports.opProviderWss = exports.contractABI = exports.dbConfig = exports.opContractAddress = void 0;
 const ethers_1 = require("ethers");
+require('dotenv').config();
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 exports.contractABI = contractABI;
 let opContractAddress = process.env.OP_CONTRACT_ADDRESS;
