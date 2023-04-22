@@ -4,28 +4,13 @@ exports.opIface = exports.opContract = exports.opChainId = exports.opProviderHtt
 const ethers_1 = require("ethers");
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 exports.contractABI = contractABI;
-let opContractAddress = "";
+let opContractAddress = process.env.OP_CONTRACT_ADDRESS;
 exports.opContractAddress = opContractAddress;
-let opMonitorWss = "";
-let opMonitorHttps = "";
-let dbConfig = {};
+let opMonitorWss = process.env.API_WSS_ARB;
+let opMonitorHttps = process.env.API_HTTP_ARB;
+// 将 JSON 字符串解析为对象
+const dbConfig = JSON.parse(process.env.DB_CONFIG);
 exports.dbConfig = dbConfig;
-if (process.env.NODE_ENV == "dev") {
-    exports.opContractAddress = opContractAddress = "0xD0C5B6365268e5A429688c8Ae45E36e9Ac2d2a4e";
-    opMonitorWss =
-        "wss://arb-goerli.g.alchemy.com/v2/3Z1zdRFsUjYSxzBIjSr6Svkej1E4YbNf";
-    opMonitorHttps =
-        "https://arb-goerli.g.alchemy.com/v2/3Z1zdRFsUjYSxzBIjSr6Svkej1E4YbNf";
-    exports.dbConfig = dbConfig = {
-        host: "97.74.86.12",
-        port: 3306,
-        database: "ebay",
-        user: "dev",
-        password: "Dev@1234",
-    };
-}
-else {
-}
 const opProviderWss = new ethers_1.ethers.providers.WebSocketProvider(opMonitorWss);
 exports.opProviderWss = opProviderWss;
 const opProviderHttps = new ethers_1.ethers.providers.StaticJsonRpcProvider(opMonitorHttps);

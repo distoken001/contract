@@ -5,6 +5,7 @@ const op_monitor_add_order_1 = require("./op_monitor_add_order");
 const op_monitor_event_1 = require("./op_monitor_event");
 const op_monitor_order_status_1 = require("./op_monitor_order_status");
 const op_config_1 = require("./op_config");
+require('dotenv').config();
 function main() {
     console.log("main start!!!");
     const iface = new ethers_1.ethers.utils.Interface(op_config_1.contractABI);
