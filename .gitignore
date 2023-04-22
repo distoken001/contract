@@ -41,3 +41,4 @@ DS_Store
 yarn.lock
 yarn 2.lock
 .env
+./dist
