@@ -18,7 +18,8 @@ contract Ebay is Ownable {
         SellerLanchCancel, //卖家发起取消7
         SellerRejectCancel, //卖家拒绝取消8
         BuyerRejectCancel, //买家拒绝取消9
-        ConsultCancelCompleted //协商取消完成10
+        ConsultCancelCompleted, //协商取消完成10
+        AdminCancelCompleted //协商取消完成11
     }
 
     struct Order {
@@ -41,6 +42,7 @@ contract Ebay is Ownable {
         uint256 finishedTimestamp; //订单完成时间
         uint256 cancelTimestamp; //订单取消时间
         uint256 placeTimestamp; //买家下单时间
+        uint256 adminCancelTimestamp; //管理员强制取消时间
     }
 
     struct Contact {
@@ -218,7 +220,7 @@ contract Ebay is Ownable {
     }
 
     //发起取消
-    function launchCancleOrder(uint256 _orderId) external {
+    function launchCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
@@ -244,7 +246,7 @@ contract Ebay is Ownable {
     }
 
     //拒绝取消
-    function rejectCancleOrder(uint256 _orderId) external {
+    function rejectCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
@@ -280,7 +282,7 @@ contract Ebay is Ownable {
     }
 
     //确认取消
-    function confirmCancleOrder(uint256 _orderId) external {
+    function confirmCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
@@ -321,10 +323,37 @@ contract Ebay is Ownable {
         emit SetStatus(_msgSender(), _orderId, _status);
     }
 
+    //管理员取消
+    function adminCancle(uint256 _orderId) external {
+        //1、校验订单是否存在
+        Order storage order = orders[_orderId];
+        require(_orderId < orders.length, "Order does not exist");
+        //3、校验调用合约者是否是买家 or 卖家
+        require(owner() == _msgSender(), "No permissions");
+        //默认协商取消完成
+        Status _status = Status.AdminCancelCompleted;
+       
+        uint256 buyerFee = (order.seller_pledge * buyerRate) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 sellerFee = (order.seller_pledge * sellerRate) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
+        //卖方返还和买方返回
+        uint256 sellerBack = order.seller_pledge - sellerFee;
+        uint256 buyerBack = order.buyer_pledge - buyerFee;
+        //结果小于0要转换为0
+        sellerBack = sellerBack < 0 ? 0 : sellerBack;
+        buyerBack = buyerBack < 0 ? 0 : sellerBack;
+        order.token.safeTransfer(order.seller, sellerBack);
+        order.token.safeTransfer(order.buyer, buyerBack);
+        order.token.safeTransfer(lockAddr, sellerFee + buyerFee);
+        total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
+        order.status = _status;
+        dateTime[_orderId].adminCancelTimestamp = block.timestamp;
+        emit SetStatus(_msgSender(), _orderId, _status);
+    }
+
     function getContact(
         uint256 _orderId
     ) external view returns (string memory _seller, string memory _buyer) {
-        if (_msgSender()==owner()) {
+        if (_msgSender() == owner()) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
         } else if (isContact[_orderId][_msgSender()] == true) {
