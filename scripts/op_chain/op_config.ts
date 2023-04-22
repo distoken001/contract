@@ -1,21 +1,10 @@
 import { ethers } from "ethers";
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
-let opContractAddress = process.env.OP_CONTRACT_ADDRESS;
-let opMonitorWss: string = "";
-let opMonitorHttps: string = "";
-let dbConfig = {};
-  opMonitorWss =
-    "wss://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
-  opMonitorHttps =
-    "https://opt-goerli.g.alchemy.com/v2/sWBj_XQ2JLxUoY6emqWwigmtPa2roOXJ";
-  dbConfig = {
-    host: "97.74.86.12",
-    port: 3306,
-    database: "ebay",
-    user: "dev",
-    password: "Dev@1234",
-  };
-
+let opContractAddress:string = process.env.OP_CONTRACT_ADDRESS!;
+let opMonitorWss: string =  process.env.API_WSS_OP!;
+let opMonitorHttps: string =  process.env.API_HTTP_OP!;
+// 将 JSON 字符串解析为对象
+const dbConfig = JSON.parse( process.env.DB_CONFIG!);
 const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);
 const opProviderHttps = new ethers.providers.StaticJsonRpcProvider(
   opMonitorHttps
