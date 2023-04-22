@@ -9,15 +9,15 @@ module.exports = {
   solidity: "0.8.19",
   networks: {
     op_goerli: {
-      url: process.env.API_URL_OP,
+      url: process.env.API_HTTP_OP,
       accounts: [process.env.PRIVATE_KEY],
     },
     arb_goerli: {
-      url: process.env.API_URL_ARB,
+      url: process.env.API_HTTP_ARB,
       accounts: [process.env.PRIVATE_KEY],
     },
     goerli: {
-      url: process.env.API_URL,
+      url: process.env.API_HTTP,
       accounts: [process.env.PRIVATE_KEY],
     },
   },
