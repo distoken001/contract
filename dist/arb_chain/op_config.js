@@ -13,9 +13,9 @@ exports.dbConfig = dbConfig;
 if (process.env.NODE_ENV == "dev") {
     exports.opContractAddress = opContractAddress = "0xD0C5B6365268e5A429688c8Ae45E36e9Ac2d2a4e";
     opMonitorWss =
-        "wss://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
+        "wss://arb-goerli.g.alchemy.com/v2/3Z1zdRFsUjYSxzBIjSr6Svkej1E4YbNf";
     opMonitorHttps =
-        "https://opt-goerli.g.alchemy.com/v2/ujuLqrVg0LpzlYy_Lqu4Hjrq4T3rA6Ss";
+        "https://arb-goerli.g.alchemy.com/v2/3Z1zdRFsUjYSxzBIjSr6Svkej1E4YbNf";
     exports.dbConfig = dbConfig = {
         host: "97.74.86.12",
         port: 3306,
