@@ -323,7 +323,7 @@ contract Ebay is Ownable {
         emit SetStatus(_msgSender(), _orderId, _status);
     }
 
-    //管理员取消
+    //争议订单取消
     function adminCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
