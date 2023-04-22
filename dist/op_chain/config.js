@@ -9,6 +9,7 @@ exports.opContractAddress = opContractAddress;
 let opMonitorWss = process.env.API_WSS_OP;
 let opMonitorHttps = process.env.API_HTTP_OP;
 // 将 JSON 字符串解析为对象
+console.log("db", process.env.DB_CONFIG);
 const dbConfig = JSON.parse(process.env.DB_CONFIG);
 exports.dbConfig = dbConfig;
 const opProviderWss = new ethers_1.ethers.providers.WebSocketProvider(opMonitorWss);

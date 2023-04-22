@@ -4,7 +4,7 @@ import {
   contractABI,
   opProviderHttps,
   opChainId,
-} from "./op_config";
+} from "./config";
 import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
   console.log("function:op_monitor_add_order is loading");

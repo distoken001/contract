@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.closePool = exports.executeTransaction = exports.executeQuery = void 0;
 const promise_1 = __importDefault(require("mysql2/promise"));
-const op_config_1 = require("./op_config");
-const pool = promise_1.default.createPool(op_config_1.dbConfig);
+const config_1 = require("./config");
+const pool = promise_1.default.createPool(config_1.dbConfig);
 function executeQuery(query, values = []) {
     return __awaiter(this, void 0, void 0, function* () {
         const connection = yield pool.getConnection();

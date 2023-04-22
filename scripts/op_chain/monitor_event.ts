@@ -5,7 +5,7 @@ import {
   opContractAddress,
   opProviderWss,
   opIface,
-} from "./op_config";
+} from "./config";
 
 async function op_monitor_event() {
   console.log("function:op_monitor_event  is loading");

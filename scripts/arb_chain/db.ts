@@ -1,5 +1,5 @@
 import mysql, { Pool, RowDataPacket, FieldPacket, OkPacket, ResultSetHeader } from 'mysql2/promise';
-import { dbConfig } from './op_config';
+import { dbConfig } from './config';
 
 const pool = mysql.createPool(dbConfig);
 

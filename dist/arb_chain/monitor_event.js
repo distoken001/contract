@@ -13,7 +13,7 @@ exports.op_monitor_event = void 0;
 const ethers_1 = require("ethers");
 const enum_all_1 = require("./enum_all");
 const logic_insert_log_1 = require("./logic_insert_log");
-const op_config_1 = require("./op_config");
+const config_1 = require("./config");
 function op_monitor_event() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("function:op_monitor_event  is loading");
@@ -22,27 +22,27 @@ function op_monitor_event() {
         const topic3 = ethers_1.ethers.utils.id("SetStatus(address,uint256,uint8)");
         let filters = [
             {
-                address: op_config_1.opContractAddress,
+                address: config_1.opContractAddress,
                 topics: [topic1],
             },
             {
-                address: op_config_1.opContractAddress,
+                address: config_1.opContractAddress,
                 topics: [topic2],
             },
             {
-                address: op_config_1.opContractAddress,
+                address: config_1.opContractAddress,
                 topics: [topic3],
             },
         ];
         filters.forEach((filter) => {
-            op_config_1.opProviderWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
+            config_1.opProviderWss.on(filter, (result) => __awaiter(this, void 0, void 0, function* () {
                 console.log(result);
                 let transactionHashsh = result.transactionHash;
                 let blockHash = result.blockHash;
                 let contractAddress = result.address;
                 const data = result.data;
                 const topics = result.topics;
-                const resultParse = op_config_1.opIface.parseLog({ data, topics });
+                const resultParse = config_1.opIface.parseLog({ data, topics });
                 console.log("Parse Log Data op_monitor_event->resultParse->", resultParse);
                 let eventName = "";
                 let operater = "";

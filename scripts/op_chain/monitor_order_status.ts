@@ -6,7 +6,7 @@ import {
   opIface,
   opContract,
   opChainId
-} from "./op_config";
+} from "./config";
 
 async function op_monitor_order_status() {
   console.log("function:op_monitor_order_status is loading");
