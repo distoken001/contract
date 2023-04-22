@@ -39,3 +39,4 @@ next-env.d.ts
 DS_Store
 .DS_Store
 yarn.lock
+yarn 2.lock
