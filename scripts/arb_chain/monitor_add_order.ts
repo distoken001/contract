@@ -33,8 +33,8 @@ async function op_monitor_add_order() {
     const orderId = _args["orderId"].toNumber();
     const orderDetail = await contract.orders(orderId);
     console.log("订单详情:", orderDetail);
-    const contactData = await contract.getContact(orderId);
-    console.log("联系方式:", contactData);
+    //const contactData = await contract.getContact(orderId);
+    //console.log("联系方式:", contactData);
     insertOrder(
       orderId,
       orderDetail["name"],
@@ -44,8 +44,8 @@ async function op_monitor_add_order() {
       orderDetail["img"],
       orderDetail["seller_pledge"].toNumber(),
       orderDetail["buyer_pledge"].toNumber(),
-      contactData["_seller"],
-      contactData["_buyer"],
+     //contactData["_seller"],
+      //contactData["_buyer"],
       orderDetail["status"],
       "system",
       "system",

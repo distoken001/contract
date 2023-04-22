@@ -1,10 +1,10 @@
 import { ethers } from "ethers";
+require('dotenv').config();
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 let opContractAddress:string = process.env.OP_CONTRACT_ADDRESS!;
 let opMonitorWss: string =  process.env.API_WSS_OP!;
 let opMonitorHttps: string =  process.env.API_HTTP_OP!;
 // 将 JSON 字符串解析为对象
-console.log("db",process.env.DB_CONFIG!);
 const dbConfig = JSON.parse( process.env.DB_CONFIG!);
 const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);
 const opProviderHttps = new ethers.providers.StaticJsonRpcProvider(
