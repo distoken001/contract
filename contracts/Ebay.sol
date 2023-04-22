@@ -19,7 +19,7 @@ contract Ebay is Ownable {
         SellerRejectCancel, //卖家拒绝取消8
         BuyerRejectCancel, //买家拒绝取消9
         ConsultCancelCompleted, //协商取消完成10
-        AdminCancelCompleted //协商取消完成11
+        AdminCancelCompleted //争议订单取消完成11
     }
 
     struct Order {
