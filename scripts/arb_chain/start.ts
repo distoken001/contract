@@ -3,6 +3,7 @@ import { op_monitor_add_order } from "./op_monitor_add_order";
 import { op_monitor_event } from "./op_monitor_event";
 import { op_monitor_order_status } from "./op_monitor_order_status";
 import { contractABI } from "./op_config";
+require('dotenv').config();
 function main() {
   console.log("main start!!!");
   const iface = new ethers.utils.Interface(contractABI);
