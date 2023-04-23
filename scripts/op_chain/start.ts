@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { op_monitor_add_order } from "./monitor_add_order";
-import { op_monitor_event } from "./monitor_event";
+import { op_monitor_event } from "./monitor_add_event";
 import { op_monitor_order_status } from "./monitor_order_status";
 import { contractABI } from "./config";
 function main() {

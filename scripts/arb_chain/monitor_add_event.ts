@@ -1,11 +1,7 @@
 import { ethers } from "ethers";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
-import {
-  opContractAddress,
-  opProviderWss,
-  opIface,
-} from "./config";
+import { opContractAddress, opProviderWss, opIface, opChainId } from "./config";
 
 async function op_monitor_event() {
   console.log("function:op_monitor_event  is loading");
@@ -69,7 +65,15 @@ async function op_monitor_event() {
           break;
         }
       }
-      insertLog(eventName, operater, orderId, data, status, transactionHashsh);
+      insertLog(
+        eventName,
+        operater,
+        orderId,
+        data,
+        status,
+        transactionHashsh,
+        await opChainId
+      );
     });
   });
 }
