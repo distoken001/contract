@@ -179,8 +179,7 @@ contract Ebay is Ownable {
         Status _status = Status.SellerCancelWithoutDuty;
         order.token.safeTransfer(order.seller, order.seller_pledge); // 转给卖家 卖家质押数量
         total[address(order.token)] -= order.seller_pledge; //更新总质押代币数量
-        //4.2、未匹配订单，卖家取消，则原路返还全部质押数量
-        //5、将订单更新为取消状态
+        //3、将订单更新为取消状态
         order.status = _status;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
         emit SetStatus(_user, _orderId, _status);
@@ -240,7 +239,7 @@ contract Ebay is Ownable {
         if (order.seller == _msgSender()) {
             _status = Status.SellerLanchCancel;
         }
-        //5、将订单更新为发起取消状态
+        //4、将订单更新为发起取消状态
         order.status = _status;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
@@ -286,7 +285,7 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
-        //3、校验调用合约者是否是买家 or 卖家
+        //2、校验调用合约者是否是买家 or 卖家
         require(
             order.buyer == _msgSender() || order.seller == _msgSender(),
             "No permissions"
@@ -296,13 +295,13 @@ contract Ebay is Ownable {
         if (
             order.seller == _msgSender() && order.buyer == _msgSender()
         ) {} else if (order.seller == _msgSender()) {
-            //2、校验订单状态是否可以取消
+            //3、校验订单状态是否可以取消
             require(
                 order.status == Status.BuyerLanchCancel,
                 "Order cannot be canceled"
             );
         } else {
-            //2、校验订单状态是否可以取消
+            //4、校验订单状态是否可以取消
             require(
                 order.status == Status.SellerLanchCancel,
                 "Order cannot be canceled"
@@ -330,9 +329,9 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
-        //3、校验调用合约者是否是买家 or 卖家
+        //2、校验调用合约者是否是买家 or 卖家
         require(owner() == _msgSender(), "No permissions");
-        //默认协商取消完成
+        //3、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
 
         uint256 buyerFee = (order.seller_pledge * buyerRate) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
