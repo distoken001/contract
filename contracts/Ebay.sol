@@ -263,20 +263,20 @@ contract Ebay is Ownable {
         );
         Status _status = Status.BuyerRejectCancel;
         if (order.seller == _msgSender()) {
-            //2、校验订单状态是否可以取消
+            //4、校验订单状态是否可以取消
             require(
                 order.status == Status.BuyerLanchCancel,
                 "Order cannot be canceled"
             );
             _status = Status.SellerRejectCancel;
         } else {
-            //2、校验订单状态是否可以取消
+            //5、校验订单状态是否可以取消
             require(
                 order.status == Status.SellerLanchCancel,
                 "Order cannot be canceled"
             );
         }
-        //5、将订单更新为发起取消状态
+        //6、将订单更新为发起取消状态
         order.status = _status;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
@@ -293,7 +293,9 @@ contract Ebay is Ownable {
         );
         //默认协商取消完成
         Status _status = Status.ConsultCancelCompleted;
-        if (order.seller == _msgSender()) {
+        if (
+            order.seller == _msgSender() && order.buyer == _msgSender()
+        ) {} else if (order.seller == _msgSender()) {
             //2、校验订单状态是否可以取消
             require(
                 order.status == Status.BuyerLanchCancel,
@@ -332,7 +334,7 @@ contract Ebay is Ownable {
         require(owner() == _msgSender(), "No permissions");
         //默认协商取消完成
         Status _status = Status.AdminCancelCompleted;
-       
+
         uint256 buyerFee = (order.seller_pledge * buyerRate) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
         uint256 sellerFee = (order.seller_pledge * sellerRate) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
         //卖方返还和买方返回
