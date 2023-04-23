@@ -6,7 +6,8 @@ export async function insertLog( _event_name: string,
     _order_id:string,
     _data:string,
     _status:Status,
-    _hash:string) {
+    _hash:string,
+    _chain_id:number) {
     
     // 插入数据
     const insertData = {
@@ -20,9 +21,10 @@ export async function insertLog( _event_name: string,
       update_time: new Date(),
       updater: 'system',
       creator: 'system',
-      hash: _hash
+      hash: _hash,
+      chain_id:_chain_id
     };
-    const query = 'INSERT INTO event_logs SET id=?, event_name=?, operater=?, order_id=?, data=?, status=?, create_time=?, update_time=?, updater=?, creator=?, hash=?';
+    const query = 'INSERT INTO event_logs SET id=?, event_name=?, operater=?, order_id=?, data=?, status=?, create_time=?, update_time=?, updater=?, creator=?, hash=?,chain_id=?';
   
     const values = [
       insertData.id,
@@ -35,7 +37,8 @@ export async function insertLog( _event_name: string,
       insertData.update_time,
       insertData.updater,
       insertData.creator,
-      insertData.hash
+      insertData.hash,
+      insertData.chain_id
     ];
 
     const [rows, fields] = await executeQuery (query, values);
