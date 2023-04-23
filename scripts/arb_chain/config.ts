@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 require('dotenv').config();
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
-let opContractAddress:string = process.env.OP_CONTRACT_ADDRESS!;
+let opContractAddress:string = process.env.ARB_CONTRACT_ADDRESS!;
 let opMonitorWss: string =  process.env.API_WSS_ARB!;
 let opMonitorHttps: string =  process.env.API_HTTP_ARB!;
 // 将 JSON 字符串解析为对象
