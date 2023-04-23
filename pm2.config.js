@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
       {
-        name: 'contract_monitor_op',
+        name: 'monitor_op',
         script: ' node ./dist/op_chain/start.js',
         instances: 1,
         autorestart: true,
@@ -12,7 +12,7 @@ module.exports = {
         }
       },
       {
-        name: 'contract_monitor_arb',
+        name: 'monitor_arb',
         script: 'node ./dist/arb_chain/start.js',
         instances: 1,
         autorestart: true,
