@@ -3,7 +3,7 @@ import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
 import { opContractAddress, opProviderWss, opIface, opChainId } from "./config";
 
-async function op_monitor_event() {
+async function op_monitor_add_event() {
   console.log("function:op_monitor_event  is loading");
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
   const topic2 = ethers.utils.id("Confirm(address,uint256)");
@@ -77,7 +77,7 @@ async function op_monitor_event() {
     });
   });
 }
-export { op_monitor_event };
+export { op_monitor_add_event };
 //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
 //let aaa=ethers.utils.formatEther(iface.parseLog({ data, topics }).args[1]);
 //console.log("Parse Log Data Args->", aaa);
