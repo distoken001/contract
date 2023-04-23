@@ -33,8 +33,6 @@ export const insertOrder = async (
         img,
         seller_pledge,
         buyer_pledge,
-        seller_contact,
-        buyer_contact,
         status,
         create_time,
         update_time,
@@ -45,7 +43,7 @@ export const insertOrder = async (
         token,
         chain_id,
         buyer_ex
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     const values = [

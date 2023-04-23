@@ -1,5 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
-
+require('dotenv').config();
 // set proxy
 const { ProxyAgent, setGlobalDispatcher } = require("undici");
 const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
@@ -26,9 +26,9 @@ module.exports = {
       optimisticGoerli: process.env.OPTIMISTIC_KEY,
       arbitrumGoerli: process.env.ARBITRUM_KEY,
       goerli: process.env.MAIN_KEY,
-      optimistic: process.env.OPTIMISTIC_KEY,
-      arbitrum: process.env.ARBITRUM_KEY,
-      main: process.env.MAIN_KEY,
+      optimisticEthereum: process.env.OPTIMISTIC_KEY,
+      arbitrumOne: process.env.ARBITRUM_KEY,
+      mainnet: process.env.MAIN_KEY,
     },
   },
 };
