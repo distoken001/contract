@@ -337,8 +337,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/contract/contracts/Ebay.sol": {
-      "lastModificationDate": 1682172566699,
-      "contentHash": "d4bf23999dfd8680c47006b2d393f8bc",
+      "lastModificationDate": 1682221322423,
+      "contentHash": "d9194662738427fb438d7edb396235b6",
       "sourceName": "contracts/Ebay.sol",
       "solcConfig": {
         "version": "0.8.19",
