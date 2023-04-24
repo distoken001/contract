@@ -32,9 +32,9 @@ contract Ebay is Ownable {
         string description; //描述
         string img; //商品图片
         IERC20 token; //质押代币合约地址
-        uint256 seller_pledge; //商品价格=卖家需要质押代币数量
-        uint256 buyer_pledge; //买家需要质押代币数量 前端提醒买方质押代币数量要大于卖方质押代币数量
-        uint256 buyer_ex; // 买家比卖家需要多质押数量
+        uint256 seller_pledge; //卖家实际质押数量，如果是白名单用户则是手续费
+        uint256 buyer_pledge; //买家实际质押数量（至少得是商品总价）
+        uint256 buyer_ex; // 买家超出商品总价质押部分（如果是白名单用户则是手续费）
         Status status; //订单状态
     }
 
@@ -119,6 +119,9 @@ contract Ebay is Ownable {
             _seller_pledge
         );
         uint256 _buyer_ex = _price.mul(_amount).mul(buyerIncRatio).div(10000);
+        if (isWhitelisted(_buyer)) {
+            _buyer_ex = _price.mul(_amount).mul(buyerRate).div(10000);
+        }
         orders.push(
             Order({
                 name: _name,
