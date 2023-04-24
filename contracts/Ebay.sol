@@ -160,6 +160,9 @@ contract Ebay is Ownable {
             order.buyer == address(0) || order.buyer == _user,
             "Non designated buyer"
         );
+        if(isWhitelisted(_user)){
+            order.buyer_ex=order.price.mul(order.amount).mul(buyerRate);
+        }
         uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
             order.buyer_ex
         );
