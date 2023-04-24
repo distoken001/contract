@@ -360,8 +360,11 @@ contract Ebay is Ownable {
         require(_orderId < orders.length, "Order does not exist");
         require(order.status != Status.AdminCancelCompleted, "Has been cancel");
         require(order.status != Status.Completed, "Has been Completed");
-        require(order.status != Status.ConsultCancelCompleted, "Has been ConsultCancelCompleted");
-        
+        require(
+            order.status != Status.ConsultCancelCompleted,
+            "Has been ConsultCancelCompleted"
+        );
+
         //2、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
         order.status = _status;
