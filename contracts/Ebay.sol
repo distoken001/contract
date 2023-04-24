@@ -107,8 +107,12 @@ contract Ebay is Ownable {
         uint256 _seller_pledge = _price.mul(_amount).mul(sellerRatio).div(
             10000
         );
+        uint256 _seller_tx_fee = _price.mul(_amount).mul(sellerRate).div(10000);
+        if (_seller_pledge < _seller_tx_fee) {
+            _seller_pledge = _seller_tx_fee;
+        }
         if (isWhitelisted(_msgSender())) {
-            _seller_pledge = _price.mul(_amount).mul(sellerRate).div(10000);
+            _seller_pledge = _seller_tx_fee;
         }
         //3、将代币转入到合约地址
         IERC20(_token).transferFrom(
@@ -116,13 +120,13 @@ contract Ebay is Ownable {
             address(this),
             _seller_pledge
         );
-        uint256 buyer_tx_fee = _price.mul(_amount).mul(buyerRate).div(10000);
+        uint256 _buyer_tx_fee = _price.mul(_amount).mul(buyerRate).div(10000);
         uint256 _buyer_ex = _price.mul(_amount).mul(buyerIncRatio).div(10000);
-        if (buyer_tx_fee > _buyer_ex) {
-            _buyer_ex = buyer_tx_fee;
+        if (_buyer_tx_fee > _buyer_ex) {
+            _buyer_ex = _buyer_tx_fee;
         }
         if (isWhitelisted(_buyer)) {
-            _buyer_ex = buyer_tx_fee;
+            _buyer_ex = _buyer_tx_fee;
         }
         orders.push(
             Order({
