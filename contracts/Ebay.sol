@@ -373,12 +373,20 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
-        require(order.status != Status.AdminCancelCompleted, "Has been cancel");
-        require(order.status != Status.Completed, "Has been Completed");
+        require(
+            order.status != Status.AdminCancelCompleted,
+            "Status  AdminCancelCompleted"
+        );
+        require(order.status != Status.Completed, "Status Completed");
         require(
             order.status != Status.ConsultCancelCompleted,
-            "Has been ConsultCancelCompleted"
+            "Status  ConsultCancelCompleted"
         );
+        require(
+            order.status != Status.SellerCancelWithoutDuty,
+            "Status SellerCancelWithoutDuty"
+        );
+        require(order.status != Status.Initial, "Status Initial");
 
         //2、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
@@ -406,6 +414,58 @@ contract Ebay is Ownable {
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminCancelTimestamp = block.timestamp;
         emit SetStatus(_msgSender(), _orderId, _status);
+    }
+
+    //争议订单强制确认
+    function adminConfirm(uint256 _orderId) external onlyOwner {
+        //1、校验订单是否存在
+        Order storage order = orders[_orderId];
+        require(_orderId < orders.length, "Order does not exist");
+        require(order.status != Status.Initial, "Status Initial");
+        require(
+            order.status != Status.AdminCancelCompleted,
+            "Status AdminCancelCompleted"
+        );
+        require(
+            order.status != Status.ConsultCancelCompleted,
+            "Status ConsultCancelCompleted"
+        );
+        require(order.status != Status.Completed, "Status Completed");
+        require(
+            order.status != Status.SellerCancelWithoutDuty,
+            "Status SellerCancelWithoutDuty"
+        );
+
+        //2、默认争议订单被确认
+        //更新状态
+        order.status = Status.Completed;
+        //4、计算双方需要支付的服务费，进行退押金操作
+        uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
+            10000
+        );
+        if (order.seller_pledge < sellerFee) {
+            sellerFee = order.seller_pledge;
+        }
+        uint256 buyerFee = order.price.mul(order.amount).mul(buyerRate).div(
+            10000
+        );
+        if (order.buyer_ex < buyerFee) {
+            buyerFee = order.buyer_ex;
+        }
+        uint256 sellerBack = (order.seller_pledge +
+            (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
+        uint256 buyerBack = order
+            .buyer_pledge
+            .sub(order.price.mul(order.amount))
+            .sub(buyerFee); //返还买家数量
+
+        order.token.safeTransfer(order.seller, sellerBack); //转给卖家
+        order.token.safeTransfer(order.buyer, buyerBack); //转给买家
+        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
+        dateTime[_orderId].finishedTimestamp = block.timestamp;
+        total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
+
+        emit Confirm(_msgSender(), _orderId);
     }
 
     function getContact(
