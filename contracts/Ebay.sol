@@ -118,9 +118,13 @@ contract Ebay is Ownable {
             address(this),
             _seller_pledge
         );
+        uint256 buyer_tx_fee = _price.mul(_amount).mul(buyerRate).div(10000);
         uint256 _buyer_ex = _price.mul(_amount).mul(buyerIncRatio).div(10000);
+        if (buyer_tx_fee > _buyer_ex) {
+            _buyer_ex = buyer_tx_fee;
+        }
         if (isWhitelisted(_buyer)) {
-            _buyer_ex = _price.mul(_amount).mul(buyerRate).div(10000);
+            _buyer_ex = buyer_tx_fee;
         }
         orders.push(
             Order({
@@ -160,21 +164,22 @@ contract Ebay is Ownable {
             order.buyer == address(0) || order.buyer == _user,
             "Non designated buyer"
         );
-        if(isWhitelisted(_user)){
-            order.buyer_ex=order.price.mul(order.amount).mul(buyerRate);
+        //4、将订单更新为已下单状态
+        order.status = Status.Ordered;
+        if (isWhitelisted(_user)) {
+            order.buyer_ex = order.price.mul(order.amount).mul(buyerRate);
         }
         uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
             order.buyer_ex
         );
-        //4、将代币转入到合约地址
+        //5、将代币转入到合约地址
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         buyerList[_user].push(_orderId);
         total[address(order.token)] = total[address(order.token)].add(
             _buyer_pledge
         ); //更新总质押代币数量
         buyerList[_user].push(_orderId);
-        //5、将订单更新为已下单状态
-        order.status = Status.Ordered;
+
         dateTime[_orderId].placeTimestamp = block.timestamp;
         order.buyer = _user;
         order.buyer_pledge = _buyer_pledge;
@@ -219,6 +224,8 @@ contract Ebay is Ownable {
                 order.status == Status.BuyerRejectCancel,
             "Order cannot be confirmed"
         );
+        //更新状态
+        order.status = Status.Completed;
         //4、计算双方需要支付的服务费，进行退押金操作
         uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
             10000
@@ -226,19 +233,18 @@ contract Ebay is Ownable {
         if (order.seller_pledge < sellerFee) {
             sellerFee = order.seller_pledge;
         }
-        //计算卖家平台服务费 这里服务费全按卖家质押数量计算
         uint256 buyerFee = order.price.mul(order.amount).mul(buyerRate).div(
             10000
         );
-        if (order.buyer_pledge < buyerFee) {
-            buyerFee = order.buyer_pledge;
+        if (order.buyer_ex < buyerFee) {
+            buyerFee = order.buyer_ex;
         }
-        //计算买家平台服务费 这里服务费全按商品总价计算
         uint256 sellerBack = (order.seller_pledge +
             (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
-        uint256 buyerBack = order.buyer_pledge.sub(order.seller_pledge).sub(
-            buyerFee
-        ); //返还买家数量
+        uint256 buyerBack = order
+            .buyer_pledge
+            .sub(order.price.mul(order.amount))
+            .sub(buyerFee); //返还买家数量
 
         order.token.safeTransfer(order.seller, sellerBack); //转给卖家
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
@@ -246,8 +252,6 @@ contract Ebay is Ownable {
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
 
-        //5、将订单更新为完成状态
-        order.status = Status.Completed;
         emit Confirm(_msgSender(), _orderId);
     }
 
