@@ -282,13 +282,15 @@ contract Ebay is Ownable {
                 order.status == Status.SellerLanchCancel,
             "Order cannot be canceled"
         );
+        Status _status = Status.BuyerRejectCancel;
         //3、校验调用合约者是否是买家 or 卖家
         require(
             order.buyer == _msgSender() || order.seller == _msgSender(),
             "No permissions"
         );
-        Status _status = Status.BuyerRejectCancel;
-        if (order.seller == _msgSender()) {
+        if (order.buyer == _msgSender() && order.seller == _msgSender()) {
+            _status = Status.BuyerRejectCancel;
+        } else if (order.seller == _msgSender()) {
             //4、校验订单状态是否可以取消
             require(
                 order.status == Status.BuyerLanchCancel,
@@ -352,13 +354,11 @@ contract Ebay is Ownable {
     }
 
     //争议订单取消
-    function adminCancle(uint256 _orderId) external {
+    function adminCancle(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
-        //2、校验调用合约者是否是买家 or 卖家
-        require(owner() == _msgSender(), "No permissions");
-        //3、默认争议订单取消
+        //2、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
 
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
