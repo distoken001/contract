@@ -366,10 +366,17 @@ contract Ebay is Ownable {
 
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
             10000
-        ); //平台服务费 这里服务费全按商品总价计算
+        );
+        if (buyerFee < order.buyer_pledge) {
+            buyerFee = order.buyer_pledge;
+        }
+
         uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)).div(
             10000
-        ); //平台服务费 这里服务费全按商品总价计算
+        );
+        if (sellerFee < order.seller_pledge) {
+            sellerFee = order.seller_pledge;
+        }
         //卖方返还和买方返回
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
