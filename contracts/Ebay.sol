@@ -19,8 +19,7 @@ contract Ebay is Ownable {
         SellerLanchCancel, //卖家发起取消7
         SellerRejectCancel, //卖家拒绝取消8
         BuyerRejectCancel, //买家拒绝取消9
-        ConsultCancelCompleted, //协商取消完成10
-        AdminCancelCompleted //争议订单取消完成11
+        ConsultCancelCompleted //协商取消完成10
     }
 
     struct Order {
@@ -374,10 +373,6 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
-        require(
-            order.status != Status.AdminCancelCompleted,
-            "Status  AdminCancelCompleted"
-        );
         require(order.status != Status.Completed, "Status Completed");
         require(
             order.status != Status.ConsultCancelCompleted,
@@ -390,7 +385,7 @@ contract Ebay is Ownable {
         require(order.status != Status.Initial, "Status Initial");
 
         //2、默认争议订单取消
-        Status _status = Status.AdminCancelCompleted;
+        Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
 
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
@@ -423,10 +418,6 @@ contract Ebay is Ownable {
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
         require(order.status != Status.Initial, "Status Initial");
-        require(
-            order.status != Status.AdminCancelCompleted,
-            "Status AdminCancelCompleted"
-        );
         require(
             order.status != Status.ConsultCancelCompleted,
             "Status ConsultCancelCompleted"
