@@ -50,7 +50,7 @@ contract Ebay is Ownable {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
     }
-
+    mapping(address => bool) public whiteList;
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
     uint256 public buyerIncRatio; //买家比卖家质押增量比例
@@ -211,9 +211,14 @@ contract Ebay is Ownable {
             "Order cannot be confirmed"
         );
         //4、计算双方需要支付的服务费，进行退押金操作
-          uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(10000);//计算卖家平台服务费 这里服务费全按卖家质押数量计算
-        uint256 buyerFee =  order.price.mul(order.amount).mul(buyerRate).div(10000); //计算买家平台服务费 这里服务费全按卖家质押数量计算
-        uint256 sellerBack = (order.seller_pledge+ (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
+        uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
+            10000
+        ); //计算卖家平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee = order.price.mul(order.amount).mul(buyerRate).div(
+            10000
+        ); //计算买家平台服务费 这里服务费全按卖家质押数量计算
+        uint256 sellerBack = (order.seller_pledge +
+            (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
         uint256 buyerBack = order.buyer_pledge.sub(order.seller_pledge).sub(
             buyerFee
         ); //返还买家数量
@@ -318,8 +323,11 @@ contract Ebay is Ownable {
                 "Order cannot be canceled"
             );
         }
-        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(10000); //平台服务费 这里服务费全商品总价计算
-        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)) / 10000; //平台服务费 这里服务费按商品总价计算
+        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
+            10000
+        ); //平台服务费 这里服务费全商品总价计算
+        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)) /
+            10000; //平台服务费 这里服务费按商品总价计算
         //卖方返还和买方返回
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
@@ -342,8 +350,12 @@ contract Ebay is Ownable {
         //3、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
 
-        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(10000); //平台服务费 这里服务费全按商品总价计算
-        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)).div(10000); //平台服务费 这里服务费全按商品总价计算
+        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
+            10000
+        ); //平台服务费 这里服务费全按商品总价计算
+        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)).div(
+            10000
+        ); //平台服务费 这里服务费全按商品总价计算
         //卖方返还和买方返回
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
@@ -384,6 +396,21 @@ contract Ebay is Ownable {
     //set lockAddr
     function setLock(address _lockAddr) external onlyOwner {
         lockAddr = _lockAddr;
+    }
+
+    // 添加一个地址到白名单
+    function addToWhitelist(address _address) public onlyOwner {
+        whiteList[_address] = true;
+    }
+
+    // 从白名单中删除一个地址
+    function removeFromWhitelist(address _address) public onlyOwner {
+        whiteList[_address] = false;
+    }
+
+    // 检查一个地址是否在白名单中
+    function isWhitelisted(address _address) public view returns (bool) {
+        return whiteList[_address];
     }
 
     function verifyByAddress(
