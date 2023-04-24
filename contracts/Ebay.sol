@@ -44,6 +44,7 @@ contract Ebay is Ownable {
         uint256 cancelTimestamp; //订单取消时间
         uint256 placeTimestamp; //买家下单时间
         uint256 adminCancelTimestamp; //管理员强制取消时间
+        uint256 adminConfirmTimestamp; //管理员强制确认时间
     }
 
     struct Contact {
@@ -464,7 +465,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-
+        dateTime[_orderId].adminConfirmTimestamp = block.timestamp;
         emit Confirm(_msgSender(), _orderId);
     }
 
