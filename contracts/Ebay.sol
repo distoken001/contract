@@ -424,7 +424,7 @@ contract Ebay is Ownable {
         return whiteList[_address];
     }
 
-    function renounceOwnership() public view override  {
+    function renounceOwnership() public view override onlyOwner {
         require(_msgSender() != owner(), "Ownable: cannot renounce ownership");
     }
 
