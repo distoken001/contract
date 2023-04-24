@@ -387,8 +387,8 @@ contract Ebay is Ownable {
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
             10000
         );
-        if (buyerFee < order.buyer_pledge) {
-            buyerFee = order.buyer_pledge;
+        if (buyerFee < order.buyer_ex) {
+            buyerFee = order.buyer_ex;
         }
 
         uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)).div(
