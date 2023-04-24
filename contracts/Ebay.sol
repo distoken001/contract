@@ -106,14 +106,16 @@ contract Ebay is Ownable {
         //2、验证代币合约是否有效
         require(verifyByAddress(_token) == 20, "Invalid contract");
         //3.质押数量
-        uint256 _seller_pledge = (_price * _amount * sellerRatio) / 10000;
+        uint256 _seller_pledge = _price.mul(_amount).mul(sellerRatio).div(
+            10000
+        );
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),
             address(this),
             _seller_pledge
         );
-        uint256 _buyer_ex = (_seller_pledge * buyerIncRatio) / 10000;
+        uint256 _buyer_ex = _seller_pledge.mul(buyerIncRatio).div(10000);
         orders.push(
             Order({
                 name: _name,
@@ -209,8 +211,8 @@ contract Ebay is Ownable {
             "Order cannot be confirmed"
         );
         //4、计算双方需要支付的服务费，进行退押金操作
-        uint256 sellerFee = (order.seller_pledge.mul(sellerRate)).div(10000); //计算卖家平台服务费 这里服务费全按卖家质押数量计算
-        uint256 buyerFee = (order.seller_pledge.mul(buyerRate)).div(10000); //计算买家平台服务费 这里服务费全按卖家质押数量计算
+        uint256 sellerFee = order.seller_pledge.mul(sellerRate).div(10000); //计算卖家平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee = order.seller_pledge.mul(buyerRate).div(10000); //计算买家平台服务费 这里服务费全按卖家质押数量计算
         uint256 sellerBack = order.seller_pledge.mul(2).sub(sellerFee); //返还卖家数量
         uint256 buyerBack = order.buyer_pledge.sub(order.seller_pledge).sub(
             buyerFee
@@ -218,7 +220,7 @@ contract Ebay is Ownable {
 
         order.token.safeTransfer(order.seller, sellerBack); //转给卖家  （卖家质押数量 + 卖家应得数量：这里默认跟质押数量是相同的 - 卖家平台服务费
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家  （买家质押数量 - 卖家应得数量：这里默认跟质押数量是相同的 - 买家平台服务费 ）
-        order.token.safeTransfer(lockAddr, sellerFee.add( buyerFee)); //fee
+        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
 
@@ -316,17 +318,14 @@ contract Ebay is Ownable {
                 "Order cannot be canceled"
             );
         }
-        uint256 buyerFee = (order.seller_pledge .mul( buyerRate)) .div( 10000); //平台服务费 这里服务费全按卖家质押数量计算
-        uint256 sellerFee = (order.seller_pledge .mul(sellerRate)) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee = (order.seller_pledge.mul(buyerRate)).div(10000); //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 sellerFee = (order.seller_pledge.mul(sellerRate)) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
         //卖方返还和买方返回
-        uint256 sellerBack = order.seller_pledge .sub( sellerFee);
-        uint256 buyerBack = order.buyer_pledge .sub( buyerFee);
-        //结果小于0要转换为0
-        sellerBack = sellerBack < 0 ? 0 : sellerBack;
-        buyerBack = buyerBack < 0 ? 0 : sellerBack;
+        uint256 sellerBack = order.seller_pledge.sub(sellerFee);
+        uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
         order.token.safeTransfer(order.seller, sellerBack);
         order.token.safeTransfer(order.buyer, buyerBack);
-        order.token.safeTransfer(lockAddr, sellerFee .add( buyerFee));
+        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         order.status = _status;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
@@ -343,14 +342,14 @@ contract Ebay is Ownable {
         //3、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
 
-        uint256 buyerFee = (order.seller_pledge .mul(buyerRate)).div( 10000); //平台服务费 这里服务费全按卖家质押数量计算
-        uint256 sellerFee = (order.seller_pledge .mul( sellerRate)).div( 10000); //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee = (order.seller_pledge.mul(buyerRate)).div(10000); //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 sellerFee = (order.seller_pledge.mul(sellerRate)).div(10000); //平台服务费 这里服务费全按卖家质押数量计算
         //卖方返还和买方返回
-        uint256 sellerBack = order.seller_pledge .sub(sellerFee);
+        uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
         order.token.safeTransfer(order.seller, sellerBack);
         order.token.safeTransfer(order.buyer, buyerBack);
-        order.token.safeTransfer(lockAddr, sellerFee .add(buyerFee));
+        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         order.status = _status;
         dateTime[_orderId].adminCancelTimestamp = block.timestamp;
