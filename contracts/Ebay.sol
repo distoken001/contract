@@ -357,11 +357,12 @@ contract Ebay is Ownable {
     function adminCancle(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
+        require(_orderId < orders.length, "Order does not exist");
         require(order.status != Status.AdminCancelCompleted, "Has been cancel");
+
         //2、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
         order.status = _status;
-        require(_orderId < orders.length, "Order does not exist");
 
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
             10000
