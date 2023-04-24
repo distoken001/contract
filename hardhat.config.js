@@ -17,7 +17,7 @@ module.exports = {
       accounts: [process.env.PRIVATE_KEY],
     },
     goerli: {
-      url: process.env.API_HTTP,
+      url: process.env.API_HTTP_MAIN,
       accounts: [process.env.PRIVATE_KEY],
     },
   },
