@@ -428,6 +428,7 @@ contract Ebay is Ownable {
 
     // 添加一个地址到白名单
     function addToWhitelist(address _address) public onlyOwner {
+        require(_address != address(0), "address can not be 0");
         whiteList[_address] = true;
     }
 
