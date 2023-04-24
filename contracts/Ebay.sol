@@ -109,6 +109,9 @@ contract Ebay is Ownable {
         uint256 _seller_pledge = _price.mul(_amount).mul(sellerRatio).div(
             10000
         );
+        if (isWhitelisted(_msgSender())) {
+            _seller_pledge = _price.mul(_amount).mul(sellerRate).div(10000);
+        }
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),
@@ -213,18 +216,26 @@ contract Ebay is Ownable {
         //4、计算双方需要支付的服务费，进行退押金操作
         uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
             10000
-        ); //计算卖家平台服务费 这里服务费全按卖家质押数量计算
+        );
+        if (order.seller_pledge < sellerFee) {
+            sellerFee = order.seller_pledge;
+        }
+        //计算卖家平台服务费 这里服务费全按卖家质押数量计算
         uint256 buyerFee = order.price.mul(order.amount).mul(buyerRate).div(
             10000
-        ); //计算买家平台服务费 这里服务费全按卖家质押数量计算
+        );
+        if (order.buyer_pledge < buyerFee) {
+            buyerFee = order.buyer_pledge;
+        }
+        //计算买家平台服务费 这里服务费全按商品总价计算
         uint256 sellerBack = (order.seller_pledge +
             (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
         uint256 buyerBack = order.buyer_pledge.sub(order.seller_pledge).sub(
             buyerFee
         ); //返还买家数量
 
-        order.token.safeTransfer(order.seller, sellerBack); //转给卖家  （卖家质押数量 + 卖家应得数量：这里默认跟质押数量是相同的 - 卖家平台服务费
-        order.token.safeTransfer(order.buyer, buyerBack); //转给买家  （买家质押数量 - 卖家应得数量：这里默认跟质押数量是相同的 - 买家平台服务费 ）
+        order.token.safeTransfer(order.seller, sellerBack); //转给卖家
+        order.token.safeTransfer(order.buyer, buyerBack); //转给买家
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
