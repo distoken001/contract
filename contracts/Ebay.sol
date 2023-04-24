@@ -177,7 +177,7 @@ contract Ebay is Ownable {
         buyerList[_user].push(_orderId);
         total[address(order.token)] = total[address(order.token)].add(
             _buyer_pledge
-        ); //更新总质押代币数量
+        );
         buyerList[_user].push(_orderId);
 
         dateTime[_orderId].placeTimestamp = block.timestamp;
@@ -346,19 +346,24 @@ contract Ebay is Ownable {
                 "Order cannot be canceled"
             );
         }
+        order.status = _status;
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
             10000
-        ); //平台服务费 这里服务费全商品总价计算
+        );
+        if (order.buyer_ex < buyerFee) {
+            buyerFee = order.buyer_ex;
+        }
         uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)) /
-            10000; //平台服务费 这里服务费按商品总价计算
-        //卖方返还和买方返回
+            10000;
+        if (order.seller_pledge < sellerFee) {
+            sellerFee = order.seller_pledge;
+        }
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
         order.token.safeTransfer(order.seller, sellerBack);
         order.token.safeTransfer(order.buyer, buyerBack);
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        order.status = _status;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
