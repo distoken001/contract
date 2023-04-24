@@ -7,17 +7,11 @@
 const hre = require("hardhat");
 
 async function main() {
-  const Ebay = await hre.ethers.getContractFactory("Ebay");
-  const ebay = await Ebay.deploy(
-    200,
-    200,
-    2000,
-    10000,
-    "0xb1B8a8E9c2FFcc0B2072937d170bAe4E794f6238"
-  );
-  await ebay.deployed();
-  console.log(ebay.address);
-};
+  const USDT = await hre.ethers.getContractFactory("TetherUS");
+  const usdt = await USDT.deploy();
+  await usdt.deployed();
+  console.log(usdt.address);
+}
 
 main().catch((error) => {
   console.error(error);
