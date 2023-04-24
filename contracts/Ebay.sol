@@ -115,7 +115,7 @@ contract Ebay is Ownable {
             address(this),
             _seller_pledge
         );
-        uint256 _buyer_ex = _seller_pledge.mul(buyerIncRatio).div(10000);
+        uint256 _buyer_ex = _price.mul(_amount).mul(buyerIncRatio).div(10000);
         orders.push(
             Order({
                 name: _name,
@@ -154,7 +154,7 @@ contract Ebay is Ownable {
             order.buyer == address(0) || order.buyer == _user,
             "Non designated buyer"
         );
-        uint256 _buyer_pledge = order.price.mul(order.amount).add(
+        uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
             order.buyer_ex
         );
         //4、将代币转入到合约地址
@@ -211,9 +211,9 @@ contract Ebay is Ownable {
             "Order cannot be confirmed"
         );
         //4、计算双方需要支付的服务费，进行退押金操作
-        uint256 sellerFee = order.seller_pledge.mul(sellerRate).div(10000); //计算卖家平台服务费 这里服务费全按卖家质押数量计算
-        uint256 buyerFee = order.seller_pledge.mul(buyerRate).div(10000); //计算买家平台服务费 这里服务费全按卖家质押数量计算
-        uint256 sellerBack = order.seller_pledge.mul(2).sub(sellerFee); //返还卖家数量
+          uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(10000);//计算卖家平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee =  order.price.mul(order.amount).mul(buyerRate).div(10000); //计算买家平台服务费 这里服务费全按卖家质押数量计算
+        uint256 sellerBack = (order.seller_pledge+ (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
         uint256 buyerBack = order.buyer_pledge.sub(order.seller_pledge).sub(
             buyerFee
         ); //返还买家数量
@@ -286,7 +286,7 @@ contract Ebay is Ownable {
                 "Order cannot be canceled"
             );
         }
-        //6、将订单更新为发起取消状态
+        //6、将订单更新为拒绝取消状态
         order.status = _status;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
@@ -318,8 +318,8 @@ contract Ebay is Ownable {
                 "Order cannot be canceled"
             );
         }
-        uint256 buyerFee = (order.seller_pledge.mul(buyerRate)).div(10000); //平台服务费 这里服务费全按卖家质押数量计算
-        uint256 sellerFee = (order.seller_pledge.mul(sellerRate)) / 10000; //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(10000); //平台服务费 这里服务费全商品总价计算
+        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)) / 10000; //平台服务费 这里服务费按商品总价计算
         //卖方返还和买方返回
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
@@ -342,8 +342,8 @@ contract Ebay is Ownable {
         //3、默认争议订单取消
         Status _status = Status.AdminCancelCompleted;
 
-        uint256 buyerFee = (order.seller_pledge.mul(buyerRate)).div(10000); //平台服务费 这里服务费全按卖家质押数量计算
-        uint256 sellerFee = (order.seller_pledge.mul(sellerRate)).div(10000); //平台服务费 这里服务费全按卖家质押数量计算
+        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(10000); //平台服务费 这里服务费全按商品总价计算
+        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)).div(10000); //平台服务费 这里服务费全按商品总价计算
         //卖方返还和买方返回
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
