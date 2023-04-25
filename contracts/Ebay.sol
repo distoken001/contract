@@ -103,7 +103,9 @@ contract Ebay is Ownable {
             bytes(_contactSeller).length != 0,
             "Seller contact can not be null"
         );
-        //2.质押数量
+        //2、验证代币合约是否有效
+        require(verifyByAddress(_token) == 20, "Invalid contract");
+        //3.质押数量
         uint256 _seller_pledge = _price.mul(_amount).mul(sellerRatio).div(
             10000
         );
@@ -114,7 +116,7 @@ contract Ebay is Ownable {
         if (isWhitelisted(_msgSender())) {
             _seller_pledge = _seller_tx_fee;
         }
-        //3、将代币转入到合约地址
+        //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),
             address(this),
@@ -510,5 +512,31 @@ contract Ebay is Ownable {
 
     function renounceOwnership() public view override onlyOwner {
         require(_msgSender() != owner(), "Ownable: cannot renounce ownership");
+    }
+      function verifyByAddress(
+        address _address
+    ) internal returns (uint256 contractType) {
+        bytes memory ownerOfData = abi.encodeWithSignature(
+            "ownerOf(uint256)",
+            0
+        );
+        (, bytes memory returnOwnerOfData) = _address.call{value: 0}(
+            ownerOfData
+        );
+        if (returnOwnerOfData.length > 0) {
+            return 721;
+        } else {
+            bytes memory totalSupplyData = abi.encodeWithSignature(
+                "totalSupply()"
+            );
+            (, bytes memory returnTotalSupplyData) = _address.call{value: 0}(
+                totalSupplyData
+            );
+            if (returnTotalSupplyData.length > 0) {
+                return 20;
+            } else {
+                return 1155;
+            }
+        }
     }
 }
