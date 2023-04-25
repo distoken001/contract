@@ -18,7 +18,8 @@ export const insertOrder = async (
     buyer: string,
     token:string,
     chainId :number,
-    buyerEx:number
+    buyerEx:number,
+    contract:string
   ) => {
     const create_time = new Date();
     const update_time = create_time;
@@ -42,8 +43,9 @@ export const insertOrder = async (
         buyer,
         token,
         chain_id,
-        buyer_ex
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        buyer_ex,
+        contract
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
     `;
   
     const values = [
@@ -66,7 +68,8 @@ export const insertOrder = async (
       buyer,
       token,
       chainId,
-      buyerEx
+      buyerEx,
+      contract
     ];
     const [rows, fields] = await executeQuery (sql, values);
     return [rows,fields];
