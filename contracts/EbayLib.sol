@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
+library EbayLib {
+    using SafeMath for uint256;
+
+    function calculateSellerPledge(
+        uint256 price,
+        uint256 amount,
+        uint256 sellerRatio,
+        uint256 sellerRate
+    ) internal pure returns (uint256 sellerPledge, uint256 sellerTxFee) {
+        sellerPledge = price.mul(amount).mul(sellerRatio).div(10000);
+        sellerTxFee = price.mul(amount).mul(sellerRate).div(10000);
+        if (sellerPledge < sellerTxFee) {
+            sellerPledge = sellerTxFee;
+        }
+        return (sellerPledge, sellerTxFee);
+    }
+
+    function calculateBuyerTxFeeAndExcess(
+        uint256 price,
+        uint256 amount,
+        uint256 buyerRate,
+        uint256 buyerIncRatio
+    ) internal pure returns (uint256 buyerTxFee, uint256 buyerExcess) {
+        buyerTxFee = price.mul(amount).mul(buyerRate).div(10000);
+        buyerExcess = price.mul(amount).mul(buyerIncRatio).div(10000);
+        if (buyerTxFee > buyerExcess) {
+            buyerExcess = buyerTxFee;
+        }
+        return (buyerTxFee, buyerExcess);
+    }
+
+    function verifyByAddress(
+        address _address
+    ) internal returns (uint256 contractType) {
+        bytes memory ownerOfData = abi.encodeWithSignature(
+            "ownerOf(uint256)",
+            0
+        );
+        (, bytes memory returnOwnerOfData) = _address.call{value: 0}(
+            ownerOfData
+        );
+        if (returnOwnerOfData.length > 0) {
+            return 721;
+        } else {
+            bytes memory totalSupplyData = abi.encodeWithSignature(
+                "totalSupply()"
+            );
+            (, bytes memory returnTotalSupplyData) = _address.call{value: 0}(
+                totalSupplyData
+            );
+            if (returnTotalSupplyData.length > 0) {
+                return 20;
+            } else {
+                return 1155;
+            }
+        }
+    }
+}

@@ -4,6 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./EbayLib.sol";
 
 contract Ebay is Ownable {
     using SafeERC20 for IERC20;
@@ -104,15 +105,10 @@ contract Ebay is Ownable {
             "Seller contact can not be null"
         );
         //2、验证代币合约是否有效
-        require(verifyByAddress(_token) == 20, "Invalid contract");
+        require(EbayLib.verifyByAddress(_token) == 20, "Invalid contract");
         //3.质押数量
-        uint256 _seller_pledge = _price.mul(_amount).mul(sellerRatio).div(
-            10000
-        );
-        uint256 _seller_tx_fee = _price.mul(_amount).mul(sellerRate).div(10000);
-        if (_seller_pledge < _seller_tx_fee) {
-            _seller_pledge = _seller_tx_fee;
-        }
+        (uint256 _seller_pledge, uint256 _seller_tx_fee) = EbayLib
+            .calculateSellerPledge(_price, _amount, sellerRatio, sellerRate);
         if (isWhitelisted(_msgSender())) {
             _seller_pledge = _seller_tx_fee;
         }
@@ -122,11 +118,15 @@ contract Ebay is Ownable {
             address(this),
             _seller_pledge
         );
-        uint256 _buyer_tx_fee = _price.mul(_amount).mul(buyerRate).div(10000);
-        uint256 _buyer_ex = _price.mul(_amount).mul(buyerIncRatio).div(10000);
-        if (_buyer_tx_fee > _buyer_ex) {
-            _buyer_ex = _buyer_tx_fee;
-        }
+
+        (uint256 _buyer_tx_fee, uint256 _buyer_ex) = EbayLib
+            .calculateBuyerTxFeeAndExcess(
+                _price,
+                _amount,
+                buyerRate,
+                buyerIncRatio
+            );
+            
         if (isWhitelisted(_buyer)) {
             _buyer_ex = _buyer_tx_fee;
         }
@@ -512,31 +512,5 @@ contract Ebay is Ownable {
 
     function renounceOwnership() public view override onlyOwner {
         require(_msgSender() != owner(), "Ownable: cannot renounce ownership");
-    }
-      function verifyByAddress(
-        address _address
-    ) internal returns (uint256 contractType) {
-        bytes memory ownerOfData = abi.encodeWithSignature(
-            "ownerOf(uint256)",
-            0
-        );
-        (, bytes memory returnOwnerOfData) = _address.call{value: 0}(
-            ownerOfData
-        );
-        if (returnOwnerOfData.length > 0) {
-            return 721;
-        } else {
-            bytes memory totalSupplyData = abi.encodeWithSignature(
-                "totalSupply()"
-            );
-            (, bytes memory returnTotalSupplyData) = _address.call{value: 0}(
-                totalSupplyData
-            );
-            if (returnTotalSupplyData.length > 0) {
-                return 20;
-            } else {
-                return 1155;
-            }
-        }
     }
 }
