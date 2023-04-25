@@ -386,7 +386,7 @@ contract Ebay is Ownable {
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
-     
+
         (
             uint256 buyerFee,
             uint256 sellerFee,
@@ -406,6 +406,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminCancelTimestamp = block.timestamp;
+        dateTime[_orderId].cancelTimestamp = block.timestamp;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
 
@@ -428,7 +429,7 @@ contract Ebay is Ownable {
         //2、默认争议订单被确认
         //更新状态
         order.status = Status.Completed;
-      
+
         (
             uint256 sellerFee,
             uint256 buyerFee,
