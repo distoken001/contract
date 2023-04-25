@@ -315,12 +315,12 @@ contract Ebay is Ownable {
                 order.status == Status.SellerLanchCancel,
             "Order cannot be canceled"
         );
-        Status _status = Status.BuyerRejectCancel;
         //3、校验调用合约者是否是买家 or 卖家
         require(
             order.buyer == _msgSender() || order.seller == _msgSender(),
             "No permissions"
         );
+        Status _status = Status.BuyerRejectCancel;
         if (
             order.buyer == _msgSender() && order.seller == _msgSender()
         ) {} else if (order.seller == _msgSender()) {
