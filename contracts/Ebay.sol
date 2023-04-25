@@ -184,7 +184,7 @@ contract Ebay is Ownable {
     function place(uint256 _orderId, string memory _buyerContact) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         address _user = _msgSender();
@@ -220,7 +220,7 @@ contract Ebay is Ownable {
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         //2、校验订单状态是否可以取消
         address _user = _msgSender();
         require(order.seller == _user, "No permissions");
@@ -230,7 +230,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.seller, order.seller_pledge); // 转给卖家 卖家质押数量
         total[address(order.token)] = total[address(order.token)].sub(
             order.seller_pledge
-        ); //更新总质押代币数量
+        ); 
         //3、将订单更新为取消状态
         order.status = _status;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
@@ -241,7 +241,7 @@ contract Ebay is Ownable {
     function confirm(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         //2、校验订单的买家是否为调用者
         require(order.buyer == _msgSender(), "No permissions");
         //3、校验订单状态是否可以确认
@@ -282,7 +282,7 @@ contract Ebay is Ownable {
     function launchCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         //2、校验订单状态是否可以取消
         require(
             order.status == Status.Ordered ||
@@ -308,7 +308,7 @@ contract Ebay is Ownable {
     function rejectCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         //2、校验订单状态是否可以取消
         require(
             order.status == Status.BuyerLanchCancel ||
@@ -346,7 +346,7 @@ contract Ebay is Ownable {
     function confirmCancle(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         //2、校验调用合约者是否是买家 or 卖家
         require(
             order.buyer == _msgSender() || order.seller == _msgSender(),
@@ -396,7 +396,7 @@ contract Ebay is Ownable {
     function adminCancel(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         require(order.status != Status.Completed, "Status Completed");
         require(
             order.status != Status.ConsultCancelCompleted,
@@ -439,7 +439,7 @@ contract Ebay is Ownable {
     function adminConfirm(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        require(_orderId < orders.length, "Order does not exist");
+        validate(_orderId);
         require(order.status != Status.Initial, "Status Initial");
         require(
             order.status != Status.ConsultCancelCompleted,
@@ -524,7 +524,9 @@ contract Ebay is Ownable {
         return whiteList[_address];
     }
 
-    function renounceOwnership() public view override onlyOwner {
-        require(_msgSender() != owner(), "Ownable: cannot renounce ownership");
+    function renounceOwnership() public pure override {}
+
+    function validate(uint256 _orderId) internal view {
+        require(_orderId < orders.length, "Order does not exist");
     }
 }
