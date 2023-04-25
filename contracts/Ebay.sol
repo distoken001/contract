@@ -66,7 +66,8 @@ contract Ebay is Ownable {
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
 
-    event AddOrder(address indexed seller, uint256 indexed orderId); //创建订单事件
+    event SellerAddOrder(address indexed seller, uint256 indexed orderId); //卖家创建订单事件
+    event BuyerAddOrder(address indexed buyer, uint256 indexed orderId); //买家创建订单事件
     event SetStatus(
         address indexed defaulter,
         uint256 indexed orderId,
@@ -87,9 +88,8 @@ contract Ebay is Ownable {
         lockAddr = _lockAddr;
         sellerRatio = _sellerRatio;
     }
-
-    //创建订单
-    function addOrder(
+    //创建卖单
+    function sellerAddOrder(
         string memory _name,
         string memory _contactSeller,
         string memory _description,
@@ -152,11 +152,14 @@ contract Ebay is Ownable {
         isContact[_orderId][_msgSender()] = true;
         total[_token] += _seller_pledge; //更新总质押代币数量
         sellerList[_msgSender()].push(_orderId);
-        emit AddOrder(_msgSender(), _orderId);
+        emit SellerAddOrder(_msgSender(), _orderId);
     }
 
     //买家下单
-    function place(uint256 _orderId, string memory _buyerContact) external {
+    function buyerPlace(
+        uint256 _orderId,
+        string memory _buyerContact
+    ) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
@@ -386,7 +389,7 @@ contract Ebay is Ownable {
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
-     
+
         (
             uint256 buyerFee,
             uint256 sellerFee,
@@ -428,7 +431,7 @@ contract Ebay is Ownable {
         //2、默认争议订单被确认
         //更新状态
         order.status = Status.Completed;
-      
+
         (
             uint256 sellerFee,
             uint256 buyerFee,
