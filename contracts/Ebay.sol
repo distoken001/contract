@@ -126,7 +126,7 @@ contract Ebay is Ownable {
                 buyerRate,
                 buyerIncRatio
             );
-            
+
         if (isWhitelisted(_buyer)) {
             _buyer_ex = _buyer_tx_fee;
         }
@@ -230,6 +230,8 @@ contract Ebay is Ownable {
         );
         //更新状态
         order.status = Status.Completed;
+
+        /*
         //4、计算双方需要支付的服务费，进行退押金操作
         uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
             10000
@@ -249,7 +251,21 @@ contract Ebay is Ownable {
             .buyer_pledge
             .sub(order.price.mul(order.amount))
             .sub(buyerFee); //返还买家数量
-
+*/
+        (
+            uint256 sellerFee,
+            uint256 buyerFee,
+            uint256 sellerBack,
+            uint256 buyerBack
+        ) = EbayLib.calculateRefunds(
+                order.seller_pledge,
+                order.buyer_pledge,
+                order.price,
+                order.amount,
+                buyerRate,
+                sellerRate,
+                order.buyer_ex
+            );
         order.token.safeTransfer(order.seller, sellerBack); //转给卖家
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee

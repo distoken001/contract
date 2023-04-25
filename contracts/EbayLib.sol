@@ -34,6 +34,38 @@ library EbayLib {
         return (buyerTxFee, buyerExcess);
     }
 
+    function calculateRefunds(
+        uint256 sellerPledge,
+        uint256 buyerPledge,
+        uint256 price,
+        uint256 amount,
+        uint256 buyerRate,
+        uint256 sellerRate,
+        uint256 buyerEx
+    )
+        internal
+        pure
+        returns (
+            uint256 sellerFee,
+            uint256 buyerFee,
+            uint256 sellerBack,
+            uint256 buyerBack
+        )
+    {
+        sellerFee = price.mul(amount).mul(sellerRate).div(10000);
+        if (sellerPledge < sellerFee) {
+            sellerFee = sellerPledge;
+        }
+        buyerFee = price.mul(amount).mul(buyerRate).div(10000);
+        if (buyerEx < buyerFee) {
+            buyerFee = buyerEx;
+        }
+        sellerBack = (sellerPledge + (price.mul(amount))).sub(sellerFee); // 返还卖家数量
+        buyerBack = buyerPledge.sub(price.mul(amount)).sub(buyerFee); // 返还买家数量
+
+        return (sellerFee, buyerFee, sellerBack, buyerBack);
+    }
+
     function verifyByAddress(
         address _address
     ) internal returns (uint256 contractType) {
