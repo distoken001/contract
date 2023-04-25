@@ -88,6 +88,43 @@ contract Ebay is Ownable {
         sellerRatio = _sellerRatio;
     }
 
+    //计算卖家质押
+    function calculateSellerPledge(
+        uint256 price,
+        uint256 amount
+    ) public view returns (uint256 sellerPledge, uint256 sellerTxFee) {
+        (sellerPledge, sellerTxFee) = EbayLib.calculateSellerPledge(
+            price,
+            amount,
+            sellerRatio,
+            sellerRate
+        );
+        if (isWhitelisted(_msgSender())) {
+            sellerPledge = sellerTxFee;
+        }
+    }
+
+    //计算买家质押
+    function calculateBuyerTxFeeAndExcess(
+        uint256 price,
+        uint256 amount
+    )
+        public
+        view
+        returns (uint256 buyerTxFee, uint256 buyerExcess, uint256 buyerPledge)
+    {
+        (buyerTxFee, buyerExcess) = EbayLib.calculateBuyerTxFeeAndExcess(
+            price,
+            amount,
+            buyerRate,
+            buyerIncRatio
+        );
+        if (isWhitelisted(_msgSender())) {
+            buyerExcess = buyerTxFee;
+        }
+        buyerPledge = buyerExcess.add(price.mul(amount));
+    }
+
     //创建订单
     function addOrder(
         string memory _name,
@@ -107,11 +144,9 @@ contract Ebay is Ownable {
         //2、验证代币合约是否有效
         require(EbayLib.verifyByAddress(_token) == 20, "Invalid contract");
         //3.质押数量
-        (uint256 _seller_pledge, uint256 _seller_tx_fee) = EbayLib
-            .calculateSellerPledge(_price, _amount, sellerRatio, sellerRate);
-        if (isWhitelisted(_msgSender())) {
-            _seller_pledge = _seller_tx_fee;
-        }
+
+        (uint256 _seller_pledge, ) = calculateSellerPledge(_price, _amount);
+
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
             _msgSender(),
@@ -119,17 +154,7 @@ contract Ebay is Ownable {
             _seller_pledge
         );
 
-        (uint256 _buyer_tx_fee, uint256 _buyer_ex) = EbayLib
-            .calculateBuyerTxFeeAndExcess(
-                _price,
-                _amount,
-                buyerRate,
-                buyerIncRatio
-            );
-
-        if (isWhitelisted(_buyer)) {
-            _buyer_ex = _buyer_tx_fee;
-        }
+        (, uint256 _buyer_ex, ) = calculateBuyerTxFeeAndExcess(_price, _amount);
         orders.push(
             Order({
                 name: _name,
