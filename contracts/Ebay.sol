@@ -72,7 +72,7 @@ contract Ebay is Ownable {
         uint256 indexed orderId,
         Status indexed status
     );
-    event Confirm(address indexed buyer, uint256 indexed orderId); //确认订单事件
+    event Confirm(address indexed defaulter, uint256 indexed orderId); //确认订单事件
 
     constructor(
         uint256 _buyerRate,
