@@ -230,7 +230,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.seller, order.seller_pledge); // 转给卖家 卖家质押数量
         total[address(order.token)] = total[address(order.token)].sub(
             order.seller_pledge
-        ); 
+        );
         //3、将订单更新为取消状态
         order.status = _status;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
@@ -279,7 +279,7 @@ contract Ebay is Ownable {
     }
 
     //发起取消
-    function launchCancle(uint256 _orderId) external {
+    function launchCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         validate(_orderId);
@@ -305,7 +305,7 @@ contract Ebay is Ownable {
     }
 
     //拒绝取消
-    function rejectCancle(uint256 _orderId) external {
+    function rejectCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         validate(_orderId);
@@ -321,9 +321,9 @@ contract Ebay is Ownable {
             order.buyer == _msgSender() || order.seller == _msgSender(),
             "No permissions"
         );
-        if (order.buyer == _msgSender() && order.seller == _msgSender()) {
-            _status = Status.BuyerRejectCancel;
-        } else if (order.seller == _msgSender()) {
+        if (
+            order.buyer == _msgSender() && order.seller == _msgSender()
+        ) {} else if (order.seller == _msgSender()) {
             //4、校验订单状态是否可以取消
             require(
                 order.status == Status.BuyerLanchCancel,
@@ -343,7 +343,7 @@ contract Ebay is Ownable {
     }
 
     //确认取消
-    function confirmCancle(uint256 _orderId) external {
+    function confirmCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         validate(_orderId);
