@@ -2,11 +2,10 @@ import { Status } from "./enum_all";
 import { executeQuery } from "./db";
 
 export async function UpdateStatus(
-  _buyner_contract: string,
-  _seller_contract: string,
   _order_id: number,
   _status: Status,
   _buyer: string,
+  _buyer_ex:number,
   _chain_id :number
 ) {
   const updateData = {
@@ -16,19 +15,17 @@ export async function UpdateStatus(
     update_time: new Date(),
     updater: "system",
     creator: "system",
-    buyer_contact: _buyner_contract,
-    seller_contact: _seller_contract,
     buyner: _buyer,
-    chain_id:_chain_id
+    chain_id:_chain_id,
+    buyer_ex:_buyer_ex
   };
   const query =
-    "update orders SET status=?, update_time=?, buyer_contact=?, seller_contact=?,buyer= ?  where order_id=? and chain_id=?";
+    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?  where order_id=? and chain_id=?";
 
   const values = [
     updateData.status,
+    updateData.buyer_ex,
     updateData.update_time,
-    updateData.buyer_contact,
-    updateData.seller_contact,
     updateData.buyner,
     updateData.order_id,
     updateData.chain_id

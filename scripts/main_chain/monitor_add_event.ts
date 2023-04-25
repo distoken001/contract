@@ -51,7 +51,7 @@ async function op_monitor_add_event() {
         case topic2: {
           const _args = resultParse.args;
           eventName = resultParse.name;
-          operater = _args["buyer"];
+          operater = _args["defaulter"];
           status = Status.Completed;
           orderId = _args["orderId"].toNumber();
           break;

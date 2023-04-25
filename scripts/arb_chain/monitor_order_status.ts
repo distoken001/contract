@@ -40,13 +40,10 @@ async function op_monitor_order_status() {
       console.log("订单详情：", orderDetail);
       //console.log("联系方式", contactData);
       UpdateStatus(
-        //contactData["_buyer"],
-        //contactData["_seller"],
-        "",
-        "",
         orderId,
         orderDetail["status"],
         orderDetail["buyer"],
+        orderDetail["buyer_ex"].toNumber(),
         await opChainId
       );
     });
