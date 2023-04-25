@@ -230,28 +230,6 @@ contract Ebay is Ownable {
         );
         //更新状态
         order.status = Status.Completed;
-
-        /*
-        //4、计算双方需要支付的服务费，进行退押金操作
-        uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
-            10000
-        );
-        if (order.seller_pledge < sellerFee) {
-            sellerFee = order.seller_pledge;
-        }
-        uint256 buyerFee = order.price.mul(order.amount).mul(buyerRate).div(
-            10000
-        );
-        if (order.buyer_ex < buyerFee) {
-            buyerFee = order.buyer_ex;
-        }
-        uint256 sellerBack = (order.seller_pledge +
-            (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
-        uint256 buyerBack = order
-            .buyer_pledge
-            .sub(order.price.mul(order.amount))
-            .sub(buyerFee); //返还买家数量
-*/
         (
             uint256 sellerFee,
             uint256 buyerFee,
@@ -367,21 +345,6 @@ contract Ebay is Ownable {
             );
         }
         order.status = _status;
-        /*
-        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
-            10000
-        );
-        if (order.buyer_ex < buyerFee) {
-            buyerFee = order.buyer_ex;
-        }
-        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)) /
-            10000;
-        if (order.seller_pledge < sellerFee) {
-            sellerFee = order.seller_pledge;
-        }
-        uint256 sellerBack = order.seller_pledge.sub(sellerFee);
-        uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
-        */
         (
             uint256 buyerFee,
             uint256 sellerFee,
@@ -423,25 +386,8 @@ contract Ebay is Ownable {
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
-       /*
-        uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
-            10000
-        );
-        if (buyerFee < order.buyer_ex) {
-            buyerFee = order.buyer_ex;
-        }
-
-        uint256 sellerFee = (order.price.mul(order.amount).mul(sellerRate)).div(
-            10000
-        );
-        if (sellerFee < order.seller_pledge) {
-            sellerFee = order.seller_pledge;
-        }
-        //卖方返还和买方返回
-        uint256 sellerBack = order.seller_pledge.sub(sellerFee);
-        uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
-        */
-         (
+     
+        (
             uint256 buyerFee,
             uint256 sellerFee,
             uint256 sellerBack,
@@ -482,27 +428,7 @@ contract Ebay is Ownable {
         //2、默认争议订单被确认
         //更新状态
         order.status = Status.Completed;
-        /*
-        //4、计算双方需要支付的服务费，进行退押金操作
-        uint256 sellerFee = order.price.mul(order.amount).mul(sellerRate).div(
-            10000
-        );
-        if (order.seller_pledge < sellerFee) {
-            sellerFee = order.seller_pledge;
-        }
-        uint256 buyerFee = order.price.mul(order.amount).mul(buyerRate).div(
-            10000
-        );
-        if (order.buyer_ex < buyerFee) {
-            buyerFee = order.buyer_ex;
-        }
-        uint256 sellerBack = (order.seller_pledge +
-            (order.price.mul(order.amount))).sub(sellerFee); //返还卖家数量
-        uint256 buyerBack = order
-            .buyer_pledge
-            .sub(order.price.mul(order.amount))
-            .sub(buyerFee); //返还买家数量
-*/
+      
         (
             uint256 sellerFee,
             uint256 buyerFee,
@@ -519,7 +445,7 @@ contract Ebay is Ownable {
             );
         order.token.safeTransfer(order.seller, sellerBack); //转给卖家
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
-        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); 
+        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminConfirmTimestamp = block.timestamp;
