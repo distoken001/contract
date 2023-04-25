@@ -257,7 +257,7 @@ contract Ebay is Ownable {
             uint256 buyerFee,
             uint256 sellerBack,
             uint256 buyerBack
-        ) = EbayLib.calculateRefunds(
+        ) = EbayLib.confirmCalculateRefunds(
                 order.seller_pledge,
                 order.buyer_pledge,
                 order.price,
@@ -367,6 +367,7 @@ contract Ebay is Ownable {
             );
         }
         order.status = _status;
+        /*
         uint256 buyerFee = (order.price.mul(order.amount).mul(buyerRate)).div(
             10000
         );
@@ -380,6 +381,21 @@ contract Ebay is Ownable {
         }
         uint256 sellerBack = order.seller_pledge.sub(sellerFee);
         uint256 buyerBack = order.buyer_pledge.sub(buyerFee);
+        */
+        (
+            uint256 buyerFee,
+            uint256 sellerFee,
+            uint256 sellerBack,
+            uint256 buyerBack
+        ) = EbayLib.confirmCancelCalculateFeesAndRefunds(
+                order.buyer_pledge,
+                order.seller_pledge,
+                order.price,
+                order.amount,
+                buyerRate,
+                sellerRate,
+                order.buyer_ex
+            );
         order.token.safeTransfer(order.seller, sellerBack);
         order.token.safeTransfer(order.buyer, buyerBack);
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
