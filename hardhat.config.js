@@ -1,5 +1,5 @@
 require("@nomicfoundation/hardhat-toolbox");
-require('dotenv').config();
+require("dotenv").config();
 // set proxy
 //const { ProxyAgent, setGlobalDispatcher } = require("undici");
 //const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
@@ -7,6 +7,10 @@ require('dotenv').config();
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.19",
+  paths: {
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
   networks: {
     op_goerli: {
       url: process.env.API_HTTP_OP,
