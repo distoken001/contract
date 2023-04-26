@@ -1,9 +1,9 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 // set proxy
-const { ProxyAgent, setGlobalDispatcher } = require("undici");
-const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
-setGlobalDispatcher(proxyAgent);
+//const { ProxyAgent, setGlobalDispatcher } = require("undici");
+//const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
+//setGlobalDispatcher(proxyAgent);
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.19",
