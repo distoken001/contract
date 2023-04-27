@@ -6,8 +6,8 @@ export async function UpdateStatus(
   _status: Status,
   _buyer: string,
   _buyer_ex:number,
-  _chain_id :number,
-  _buyer_pledge:number
+  _buyer_pledge:number,
+  _chain_id :number
 ) {
   const updateData = {
     order_id: _order_id,
@@ -16,7 +16,7 @@ export async function UpdateStatus(
     update_time: new Date(),
     updater: "system",
     creator: "system",
-    buyner: _buyer,
+    buyer: _buyer,
     chain_id:_chain_id,
     buyer_ex:_buyer_ex,
     buyer_pledge:_buyer_pledge
@@ -28,7 +28,7 @@ export async function UpdateStatus(
     updateData.status,
     updateData.buyer_ex,
     updateData.update_time,
-    updateData.buyner,
+    updateData.buyer,
     updateData.buyer_pledge,
     updateData.order_id,
     updateData.chain_id
