@@ -6,7 +6,6 @@
 // global scope, and execute the script.
 
 const hre = require("hardhat");
-
 async function main() {
   const Ebay = await hre.ethers.getContractFactory("Ebay");
   const ebay = await Ebay.deploy(
