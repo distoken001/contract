@@ -8,15 +8,15 @@ require('dotenv').config();
 module.exports = {
   solidity: "0.8.19",
   networks: {
-    op_goerli: {
+    op: {
       url: process.env.API_HTTP_OP,
       accounts: [process.env.PRIVATE_KEY],
     },
-    arb_goerli: {
+    arb: {
       url: process.env.API_HTTP_ARB,
       accounts: [process.env.PRIVATE_KEY],
     },
-    goerli: {
+    main: {
       url: process.env.API_HTTP_MAIN,
       accounts: [process.env.PRIVATE_KEY],
     },
