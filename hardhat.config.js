@@ -14,6 +14,7 @@ module.exports = {
     },
     arb: {
       url: process.env.API_HTTP_ARB,
+      
       accounts: [process.env.PRIVATE_KEY],
     },
     main: {
