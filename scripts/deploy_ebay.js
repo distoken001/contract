@@ -13,7 +13,7 @@ async function main() {
     200,
     200,
     2000,
-    10000,
+    2000,
     "0xb1B8a8E9c2FFcc0B2072937d170bAe4E794f6238"
   );
   await ebay.deployed();
