@@ -337,8 +337,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/contract/contracts/Share.sol": {
-      "lastModificationDate": 1681993822107,
-      "contentHash": "993bfc5b7adefaa3e093cee5783a1f35",
+      "lastModificationDate": 1682591917692,
+      "contentHash": "6a96efe3b897e3d520feb7b9051fec0b",
       "sourceName": "contracts/Share.sol",
       "solcConfig": {
         "version": "0.8.19",
@@ -369,10 +369,10 @@
         "@openzeppelin/contracts/finance/PaymentSplitter.sol"
       ],
       "versionPragmas": [
-        "^0.8.4"
+        "^0.8.19"
       ],
       "artifacts": [
-        "Share"
+        "SharePayment"
       ]
     },
     "/Users/buqun/Documents/GitHub/contract/node_modules/@openzeppelin/contracts/finance/PaymentSplitter.sol": {
