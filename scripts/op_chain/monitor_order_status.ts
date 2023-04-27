@@ -44,6 +44,7 @@ async function op_monitor_order_status() {
         orderDetail["status"],
         orderDetail["buyer"],
         orderDetail["buyer_ex"].toNumber(),
+        orderDetail["buyer_pledge"].toNumber(),
         await opChainId
       );
     });

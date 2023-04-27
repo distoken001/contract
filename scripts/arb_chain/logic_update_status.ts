@@ -6,7 +6,8 @@ export async function UpdateStatus(
   _status: Status,
   _buyer: string,
   _buyer_ex:number,
-  _chain_id :number
+  _chain_id :number,
+  _buyer_pledge:number
 ) {
   const updateData = {
     order_id: _order_id,
@@ -17,16 +18,18 @@ export async function UpdateStatus(
     creator: "system",
     buyner: _buyer,
     chain_id:_chain_id,
-    buyer_ex:_buyer_ex
+    buyer_ex:_buyer_ex,
+    buyer_pledge:_buyer_pledge
   };
   const query =
-    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?  where order_id=? and chain_id=?";
+    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?  where order_id=? and chain_id=?";
 
   const values = [
     updateData.status,
     updateData.buyer_ex,
     updateData.update_time,
     updateData.buyner,
+    updateData.buyer_pledge,
     updateData.order_id,
     updateData.chain_id
   ];
