@@ -1,19 +1,15 @@
 import { ethers } from "ethers";
 import {
   opContractAddress,
-  contractABI,
   opProviderHttps,
   opChainId,
+  tokenContractABI,
+  opContract,
+  opIface,
 } from "./config";
 import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
   console.log("function:op_monitor_add_order is loading");
-  const iface = new ethers.utils.Interface(contractABI);
-  const contract = new ethers.Contract(
-    opContractAddress,
-    contractABI,
-    opProviderHttps
-  );
   const topic1 = ethers.utils.id("AddOrder(address,uint256)");
   let filter = {
     address: opContractAddress,
@@ -23,7 +19,7 @@ async function op_monitor_add_order() {
     console.log(result);
     const data = result.data;
     const topics = result.topics;
-    const resultParse = iface.parseLog({ data, topics });
+    const resultParse = opIface.parseLog({ data, topics });
 
     const _args = resultParse.args;
     console.log(
@@ -31,10 +27,19 @@ async function op_monitor_add_order() {
       _args
     );
     const orderId = _args["orderId"].toNumber();
-    const orderDetail = await contract.orders(orderId);
+    const orderDetail = await opContract.orders(orderId);
     console.log("订单详情:", orderDetail);
-    const contactData = await contract.getContact(orderId);
-    console.log("联系方式:", contactData);
+    // const contactData = await opContract.getContact(orderId);
+    // console.log("联系方式:", contactData);
+    const token= orderDetail["token"];
+    const tokenContract = new ethers.Contract(
+      token,
+      tokenContractABI,
+      opProviderHttps
+    );
+    const decimals =await tokenContract.decimals();
+
+   
     insertOrder(
       orderId,
       orderDetail["name"],
@@ -54,7 +59,8 @@ async function op_monitor_add_order() {
       orderDetail["token"],
       await opChainId,
       orderDetail["buyer_ex"].toNumber(),
-      opContractAddress
+      opContractAddress,
+      decimals
     );
   });
 }

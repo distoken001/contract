@@ -7,6 +7,7 @@ let opMonitorHttps: string = process.env.API_HTTP_MAIN!;
 // 将 JSON 字符串解析为对象
 const dbConfig = JSON.parse(process.env.DB_CONFIG!);
 const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);
+const tokenContractABI = require("../../artifacts/contracts/Token.sol/Token.json").abi;
 const opProviderHttps = new ethers.providers.StaticJsonRpcProvider(
   opMonitorHttps
 );
@@ -28,4 +29,5 @@ export {
   opChainId,
   opContract,
   opIface,
+  tokenContractABI
 };

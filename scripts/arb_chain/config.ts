@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 require('dotenv').config();
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
+const tokenContractABI = require("../../artifacts/contracts/Token.sol/Token.json").abi;
 let opContractAddress:string = process.env.ARB_CONTRACT_ADDRESS!;
 let opMonitorWss: string =  process.env.API_WSS_ARB!;
 let opMonitorHttps: string =  process.env.API_HTTP_ARB!;
@@ -28,4 +29,5 @@ export {
   opChainId,
   opContract,
   opIface,
+  tokenContractABI
 };
