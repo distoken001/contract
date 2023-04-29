@@ -483,8 +483,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/de-market/contract/contracts/Share.sol": {
-      "lastModificationDate": 1682731537570,
-      "contentHash": "eb061b93b831574ae75d3c97f4e0c43a",
+      "lastModificationDate": 1682747373470,
+      "contentHash": "aaeb4ca34b88578b69d31f7e0d9c63b6",
       "sourceName": "contracts/Share.sol",
       "solcConfig": {
         "version": "0.8.19",
