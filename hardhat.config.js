@@ -17,7 +17,7 @@ module.exports = {
       
       accounts: [process.env.PRIVATE_KEY],
     },
-    main: {
+    mainnet: {
       url: process.env.API_HTTP_MAIN,
       accounts: [process.env.PRIVATE_KEY],
     },
