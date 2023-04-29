@@ -1,9 +1,9 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('dotenv').config();
 // set proxy
-// const { ProxyAgent, setGlobalDispatcher } = require("undici");
-// const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
-// setGlobalDispatcher(proxyAgent);
+const { ProxyAgent, setGlobalDispatcher } = require("undici");
+const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
+setGlobalDispatcher(proxyAgent);
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.19",
@@ -21,6 +21,11 @@ module.exports = {
       url: process.env.API_HTTP_MAIN,
       accounts: [process.env.PRIVATE_KEY],
     },
+    polygon: {
+      url: process.env.API_HTTP_POLYGON,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+
   },
   etherscan: {
     apiKey: {
@@ -30,6 +35,8 @@ module.exports = {
       optimisticEthereum: process.env.OPTIMISTIC_KEY,
       arbitrumOne: process.env.ARBITRUM_KEY,
       mainnet: process.env.MAIN_KEY,
+      polygon: process.env.POLYGON_KEY,
+      polygonMumbai:process.env.POLYGON_KEY,
     },
   },
 };
