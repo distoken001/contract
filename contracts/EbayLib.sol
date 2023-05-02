@@ -5,7 +5,19 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 library EbayLib {
     using SafeMath for uint256;
-
+        enum Status {
+        Initial, //待购买0
+        Ordered, //被下单1
+        Completed, //已完成2
+        BuyerBreak, //买家毁约3
+        SellerBreak, //卖家毁约4
+        SellerCancelWithoutDuty, //卖家无责取消5
+        BuyerLanchCancel, //买家发起取消6
+        SellerLanchCancel, //卖家发起取消7
+        SellerRejectCancel, //卖家拒绝取消8
+        BuyerRejectCancel, //买家拒绝取消9
+        ConsultCancelCompleted //协商取消完成10
+    }
     function calculateSellerPledge(
         uint256 price,
         uint256 amount,
@@ -123,5 +135,19 @@ library EbayLib {
                 return 1155;
             }
         }
+    }
+
+    function validateStatus(Status status) internal pure {
+        require(status != Status.Initial, "Status Initial");
+        require(
+            status != Status.ConsultCancelCompleted,
+            "Status ConsultCancelCompleted"
+        );
+        require(status != Status.Completed, "Status Completed");
+        require(
+            status != Status.SellerCancelWithoutDuty,
+            "Status SellerCancelWithoutDuty"
+        );
+        require(status != Status.SellerBreak, "Status SellerBreak");
     }
 }

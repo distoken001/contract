@@ -45,6 +45,7 @@ contract Ebay is Ownable {
         uint256 placeTimestamp; //买家下单时间
         uint256 adminCancelTimestamp; //管理员强制取消时间
         uint256 adminConfirmTimestamp; //管理员强制确认时间
+        uint256 adminBreakTimestamp; //管理员强制认定违约时间
     }
 
     struct Contact {
@@ -395,19 +396,9 @@ contract Ebay is Ownable {
     //争议订单取消强制双方返还
     function adminCancel(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
         validate(_orderId);
-        require(order.status != Status.Completed, "Status Completed");
-        require(
-            order.status != Status.ConsultCancelCompleted,
-            "Status  ConsultCancelCompleted"
-        );
-        require(
-            order.status != Status.SellerCancelWithoutDuty,
-            "Status SellerCancelWithoutDuty"
-        );
-        require(order.status != Status.Initial, "Status Initial");
-
+        Order storage order = orders[_orderId];
+        EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
@@ -438,19 +429,9 @@ contract Ebay is Ownable {
     //争议订单强制确认
     function adminConfirm(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
         validate(_orderId);
-        require(order.status != Status.Initial, "Status Initial");
-        require(
-            order.status != Status.ConsultCancelCompleted,
-            "Status ConsultCancelCompleted"
-        );
-        require(order.status != Status.Completed, "Status Completed");
-        require(
-            order.status != Status.SellerCancelWithoutDuty,
-            "Status SellerCancelWithoutDuty"
-        );
-
+        Order storage order = orders[_orderId];
+        EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单被确认
         //更新状态
         order.status = Status.Completed;
@@ -476,6 +457,21 @@ contract Ebay is Ownable {
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminConfirmTimestamp = block.timestamp;
         emit Confirm(_msgSender(), _orderId);
+    }
+
+    function adminBreak(uint256 _orderId) external onlyOwner {
+        validate(_orderId);
+        Order storage order = orders[_orderId];
+        EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
+        Status _status = Status.SellerBreak;
+        order.status = _status;
+        order.token.safeTransfer(
+            order.buyer,
+            order.buyer_pledge + order.seller_pledge
+        );
+        total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
+        dateTime[_orderId].adminBreakTimestamp = block.timestamp;
+        emit SetStatus(_msgSender(), _orderId, _status);
     }
 
     function getContact(
