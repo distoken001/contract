@@ -52,7 +52,8 @@ contract Ebay is Ownable {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
     }
-    mapping(address => bool) public whiteList;
+    mapping(address => bool) public buyerWhiteList;
+    mapping(address => bool) public sellerWhiteList;
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
     uint256 public buyerIncRatio; //买家比卖家质押增量比例
@@ -100,7 +101,7 @@ contract Ebay is Ownable {
             sellerRatio,
             sellerRate
         );
-        if (isWhitelisted(_msgSender())) {
+        if (isWhite(_msgSender(), false)) {
             sellerPledge = sellerTxFee;
         }
     }
@@ -120,7 +121,7 @@ contract Ebay is Ownable {
             buyerRate,
             buyerIncRatio
         );
-        if (isWhitelisted(_msgSender())) {
+        if (isWhite(_msgSender(), true)) {
             buyerExcess = buyerTxFee;
         }
         buyerPledge = buyerExcess.add(price.mul(amount));
@@ -185,7 +186,7 @@ contract Ebay is Ownable {
     function place(uint256 _orderId, string memory _buyerContact) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        validate(_orderId);
+        validate(_orderId, false);
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         address _user = _msgSender();
@@ -196,7 +197,7 @@ contract Ebay is Ownable {
         );
         //4、将订单更新为已下单状态
         order.status = Status.Ordered;
-        if (isWhitelisted(_user)) {
+        if (isWhite(_user, true)) {
             order.buyer_ex = order.price.mul(order.amount).mul(buyerRate);
         }
         uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
@@ -221,7 +222,7 @@ contract Ebay is Ownable {
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        validate(_orderId);
+        validate(_orderId, true);
         //2、校验订单状态是否可以取消
         address _user = _msgSender();
         require(order.seller == _user, "No permissions");
@@ -242,10 +243,8 @@ contract Ebay is Ownable {
     function confirm(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        validate(_orderId);
-        //2、校验订单的买家是否为调用者
-        require(order.buyer == _msgSender(), "No permissions");
-        //3、校验订单状态是否可以确认
+        validate(_orderId, true);
+        //2、校验订单状态是否可以确认
         require(
             order.status == Status.Ordered ||
                 order.status == Status.BuyerLanchCancel ||
@@ -283,7 +282,7 @@ contract Ebay is Ownable {
     function launchCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        validate(_orderId);
+        validate(_orderId, true);
         //2、校验订单状态是否可以取消
         require(
             order.status == Status.Ordered ||
@@ -291,17 +290,12 @@ contract Ebay is Ownable {
                 order.status == Status.BuyerRejectCancel,
             "Order cannot be launched"
         );
-        //3、校验调用合约者是否是买家 or 卖家
-        require(
-            order.buyer == _msgSender() || order.seller == _msgSender(),
-            "No permissions"
-        );
-        Status _status = Status.BuyerLanchCancel; // 6 买家发起取消
+        Status _status = Status.BuyerLanchCancel;
+        //3、将订单更新为发起取消状态
+        order.status = _status;
         if (order.seller == _msgSender()) {
             _status = Status.SellerLanchCancel;
         }
-        //4、将订单更新为发起取消状态
-        order.status = _status;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
 
@@ -309,7 +303,7 @@ contract Ebay is Ownable {
     function rejectCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        validate(_orderId);
+        validate(_orderId, true);
         //2、校验订单状态是否可以取消
         require(
             order.status == Status.BuyerLanchCancel ||
@@ -317,28 +311,19 @@ contract Ebay is Ownable {
             "Order cannot be canceled"
         );
         Status _status = Status.BuyerRejectCancel;
-        //3、校验调用合约者是否是买家 or 卖家
-        require(
-            order.buyer == _msgSender() || order.seller == _msgSender(),
-            "No permissions"
-        );
-        if (
-            order.buyer == _msgSender() && order.seller == _msgSender()
-        ) {} else if (order.seller == _msgSender()) {
-            //4、校验订单状态是否可以取消
+        if (order.buyer == _msgSender()) {
+            require(
+                order.status == Status.SellerLanchCancel,
+                "Order cannot be canceled"
+            );
+        } else {
             require(
                 order.status == Status.BuyerLanchCancel,
                 "Order cannot be canceled"
             );
             _status = Status.SellerRejectCancel;
-        } else {
-            //5、校验订单状态是否可以取消
-            require(
-                order.status == Status.SellerLanchCancel,
-                "Order cannot be canceled"
-            );
         }
-        //6、将订单更新为拒绝取消状态
+        //3、将订单更新为拒绝取消状态
         order.status = _status;
         emit SetStatus(_msgSender(), _orderId, _status);
     }
@@ -347,26 +332,17 @@ contract Ebay is Ownable {
     function confirmCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
-        validate(_orderId);
-        //2、校验调用合约者是否是买家 or 卖家
-        require(
-            order.buyer == _msgSender() || order.seller == _msgSender(),
-            "No permissions"
-        );
+        validate(_orderId, true);
         //默认协商取消完成
         Status _status = Status.ConsultCancelCompleted;
-        if (
-            order.seller == _msgSender() && order.buyer == _msgSender()
-        ) {} else if (order.seller == _msgSender()) {
-            //3、校验订单状态是否可以取消
+        if (order.buyer == _msgSender()) {
             require(
-                order.status == Status.BuyerLanchCancel,
+                order.status == Status.SellerLanchCancel,
                 "Order cannot be canceled"
             );
         } else {
-            //4、校验订单状态是否可以取消
             require(
-                order.status == Status.SellerLanchCancel,
+                order.status == Status.BuyerLanchCancel,
                 "Order cannot be canceled"
             );
         }
@@ -396,7 +372,7 @@ contract Ebay is Ownable {
     //争议订单取消强制双方返还
     function adminCancel(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
-        validate(_orderId);
+        validate(_orderId, false);
         Order storage order = orders[_orderId];
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单取消
@@ -429,11 +405,10 @@ contract Ebay is Ownable {
     //争议订单强制确认
     function adminConfirm(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
-        validate(_orderId);
+        validate(_orderId, false);
         Order storage order = orders[_orderId];
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单被确认
-        //更新状态
         order.status = Status.Completed;
 
         (
@@ -460,7 +435,7 @@ contract Ebay is Ownable {
     }
 
     function adminBreak(uint256 _orderId) external onlyOwner {
-        validate(_orderId);
+        validate(_orderId, false);
         Order storage order = orders[_orderId];
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         Status _status = Status.SellerBreak;
@@ -505,24 +480,46 @@ contract Ebay is Ownable {
     }
 
     // 添加一个地址到白名单
-    function addToWhitelist(address _address) public onlyOwner {
+    function addToWhite(address _address, bool isBuyer) public onlyOwner {
         require(_address != address(0), "address can not be 0");
-        whiteList[_address] = true;
+        if (isBuyer) {
+            buyerWhiteList[_address] = true;
+        } else {
+            sellerWhiteList[_address] = true;
+        }
     }
 
     // 从白名单中删除一个地址
-    function removeFromWhitelist(address _address) public onlyOwner {
-        whiteList[_address] = false;
+    function remove(address _address, bool isBuyer) public onlyOwner {
+        if (isBuyer) {
+            buyerWhiteList[_address] = false;
+        } else {
+            sellerWhiteList[_address] = false;
+        }
     }
 
     // 检查一个地址是否在白名单中
-    function isWhitelisted(address _address) public view returns (bool) {
-        return whiteList[_address];
+    function isWhite(
+        address _address,
+        bool isBuyer
+    ) public view returns (bool) {
+        if (isBuyer) {
+            return buyerWhiteList[_address];
+        } else {
+            return sellerWhiteList[_address];
+        }
     }
 
     function renounceOwnership() public pure override {}
 
-    function validate(uint256 _orderId) internal view {
+    function validate(uint256 _orderId, bool isValidateSender) internal view {
+        Order memory order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
+        if (isValidateSender) {
+            require(
+                order.buyer == _msgSender() || order.seller == _msgSender(),
+                "No permissions"
+            );
+        }
     }
 }
