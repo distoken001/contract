@@ -253,6 +253,7 @@ contract Ebay is Ownable {
                 order.status == Status.BuyerRejectCancel,
             "Order cannot be confirmed"
         );
+        require(order.buyer == _msgSender(), "No permissions");
         //更新状态
         order.status = Status.Completed;
         (
@@ -481,7 +482,6 @@ contract Ebay is Ownable {
 
     // 添加一个地址到白名单
     function addToWhite(address _address, bool isBuyer) public onlyOwner {
-        require(_address != address(0), "address can not be 0");
         if (isBuyer) {
             buyerWhiteList[_address] = true;
         } else {
