@@ -22,7 +22,7 @@ export const insertOrder = async (
     contract:string,
     decimals :number
   ) => {
-    const create_time = new Date();
+    const create_time = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });;
     const update_time = create_time;
   
     const sql = `
