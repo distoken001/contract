@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import {
   opContractAddress,
+  contractABI,
   opProviderHttps,
   opChainId,
   tokenContractABI,
