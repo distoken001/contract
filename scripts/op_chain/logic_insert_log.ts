@@ -8,7 +8,6 @@ export async function insertLog( _event_name: string,
     _status:Status,
     _hash:string,
     _chain_id:number) {
-    
     // 插入数据
     const insertData = {
       id: null,
@@ -17,8 +16,8 @@ export async function insertLog( _event_name: string,
       order_id: _order_id,
       data: _data,
       status: _status,
-      create_time: new Date(),
-      update_time: new Date(),
+      create_time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
+      update_time: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
       updater: 'system',
       creator: 'system',
       hash: _hash,

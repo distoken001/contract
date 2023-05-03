@@ -12,8 +12,7 @@ export async function UpdateStatus(
   const updateData = {
     order_id: _order_id,
     status: _status,
-    create_time: new Date(),
-    update_time: new Date(),
+    update_time:new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }),
     updater: "system",
     creator: "system",
     buyer: _buyer,
