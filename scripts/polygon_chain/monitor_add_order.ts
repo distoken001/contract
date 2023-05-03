@@ -7,6 +7,7 @@ import {
   tokenContractABI,
   opContract,
   opIface,
+  opProviderWss,
 } from "./config";
 import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
@@ -16,7 +17,7 @@ async function op_monitor_add_order() {
     address: opContractAddress,
     topics: [topic1],
   };
-  opProviderHttps.on(filter, async (result) => {
+  opProviderWss.on(filter, async (result) => {
     console.log(result);
     const data = result.data;
     const topics = result.topics;
