@@ -1,9 +1,17 @@
 import { ethers } from "ethers";
-require("dotenv").config();
+const dotenv = require('dotenv');
+
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production' });
+} else if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: '.env.development' });
+}
+
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 let opContractAddress: string = process.env.MAIN_CONTRACT_ADDRESS!;
 let opMonitorWss: string = process.env.API_WSS_MAIN!;
 let opMonitorHttps: string = process.env.API_HTTP_MAIN!;
+
 // 将 JSON 字符串解析为对象
 const dbConfig = JSON.parse(process.env.DB_CONFIG!);
 const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);

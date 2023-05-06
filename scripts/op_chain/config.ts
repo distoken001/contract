@@ -1,5 +1,11 @@
 import { ethers } from "ethers";
-require("dotenv").config();
+const dotenv = require('dotenv');
+
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production' });
+} else if (process.env.NODE_ENV === 'development') {
+  dotenv.config({ path: '.env.development' });
+}
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 const tokenContractABI = require("../../artifacts/contracts/Token.sol/Token.json").abi;
 let opContractAddress: string = process.env.OP_CONTRACT_ADDRESS!;

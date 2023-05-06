@@ -8,7 +8,7 @@ module.exports = {
         watch: false,
         max_memory_restart: '512M',
         env: {
-          NODE_ENV: 'dev',
+          NODE_ENV: 'production',
         }
       },
       {
@@ -19,7 +19,7 @@ module.exports = {
         watch: false,
         max_memory_restart: '512M',
         env: {
-          NODE_ENV: 'dev',
+          NODE_ENV: 'production',
         }
       },
       {
@@ -30,7 +30,7 @@ module.exports = {
         watch: false,
         max_memory_restart: '512M',
         env: {
-          NODE_ENV: 'dev',
+          NODE_ENV: 'production',
         }
       },
       {
@@ -41,7 +41,18 @@ module.exports = {
         watch: false,
         max_memory_restart: '512M',
         env: {
-          NODE_ENV: 'dev',
+          NODE_ENV: 'production',
+        }
+      },
+      {
+        name: 'monitor_bsc',
+        script: 'node ./dist/bsc_chain/start.js',
+        instances: 1,
+        autorestart: true,
+        watch: false,
+        max_memory_restart: '512M',
+        env: {
+          NODE_ENV: 'production',
         }
       }
     ]

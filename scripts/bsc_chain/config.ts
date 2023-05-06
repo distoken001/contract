@@ -6,13 +6,11 @@ if (process.env.NODE_ENV === 'production') {
 } else if (process.env.NODE_ENV === 'development') {
   dotenv.config({ path: '.env.development' });
 }
-
-
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 const tokenContractABI = require("../../artifacts/contracts/Token.sol/Token.json").abi;
-let opContractAddress: string = process.env.POLYGON_CONTRACT_ADDRESS!;
-let opMonitorWss: string = process.env.API_WSS_POLYGON!;
-let opMonitorHttps: string = process.env.API_HTTP_POLYGON!;
+let opContractAddress: string = process.env.BSC_CONTRACT_ADDRESS!;
+let opMonitorWss: string = process.env.API_WSS_BSC!;
+let opMonitorHttps: string = process.env.API_HTTP_BSC!;
 // 将 JSON 字符串解析为对象
 const dbConfig = JSON.parse(process.env.DB_CONFIG!);
 const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);

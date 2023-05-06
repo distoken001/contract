@@ -1,5 +1,8 @@
 require("@nomicfoundation/hardhat-toolbox");
-require('dotenv').config();
+const dotenv = require("dotenv");
+
+dotenv.config({ path: ".env.development" });
+
 // set proxy
 // const { ProxyAgent, setGlobalDispatcher } = require("undici");
 // const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
@@ -14,7 +17,6 @@ module.exports = {
     },
     arb: {
       url: process.env.API_HTTP_ARB,
-      
       accounts: [process.env.PRIVATE_KEY],
     },
     mainnet: {
@@ -25,7 +27,6 @@ module.exports = {
       url: process.env.API_HTTP_POLYGON,
       accounts: [process.env.PRIVATE_KEY],
     },
-
   },
   etherscan: {
     apiKey: {
@@ -36,7 +37,7 @@ module.exports = {
       arbitrumOne: process.env.ARBITRUM_KEY,
       mainnet: process.env.MAIN_KEY,
       polygon: process.env.POLYGON_KEY,
-      polygonMumbai:process.env.POLYGON_KEY,
+      polygonMumbai: process.env.POLYGON_KEY,
     },
   },
 };
