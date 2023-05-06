@@ -38,6 +38,7 @@ module.exports = {
       mainnet: process.env.MAIN_KEY,
       polygon: process.env.POLYGON_KEY,
       polygonMumbai: process.env.POLYGON_KEY,
+      bsc: process.env.BSC_KEY,
     },
   },
 };
