@@ -64,18 +64,22 @@ contract Ebay is Ownable {
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
 
+    //创建订单事件
     event AddOrder(
-        address indexed seller,
-        address indexed buyer,
-        uint256 indexed orderId
-    ); //创建订单事件
+        address indexed defaulter,
+        uint256 indexed orderId,
+        Status indexed status,
+        address seller,
+        address buyer
+    );
+    //修改状态事件
     event SetStatus(
         address indexed defaulter,
         uint256 indexed orderId,
         Status indexed status,
         address seller,
         address buyer
-    ); //修改状态事件
+    );
 
     constructor(
         uint256 _buyerRate,
@@ -176,7 +180,7 @@ contract Ebay is Ownable {
         isContact[_orderId][_user] = true;
         total[_token] += _seller_pledge; //更新总质押代币数量
         sellerList[_user].push(_orderId);
-        emit AddOrder(_user, _buyer, _orderId);
+        emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
     }
 
     //买家下单
@@ -193,7 +197,8 @@ contract Ebay is Ownable {
             "Non designated buyer"
         );
         //4、将订单更新为已下单状态
-        order.status = Status.Ordered;
+        Status _status = Status.Ordered;
+        order.status = _status;
         uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
             order.buyer_ex
         );
@@ -210,13 +215,7 @@ contract Ebay is Ownable {
         order.buyer_pledge = _buyer_pledge;
         contact[_orderId].buyer = _buyerContact;
         isContact[_orderId][_msgSender()] = true;
-        emit SetStatus(
-            _user,
-            _orderId,
-            Status.Ordered,
-            order.seller,
-            order.buyer
-        );
+        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     function cancel(uint256 _orderId) external {
