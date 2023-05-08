@@ -67,13 +67,24 @@ contract Ebay is Ownable {
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
 
-    event AddOrder(address indexed seller, uint256 indexed orderId); //创建订单事件
+    event AddOrder(
+        address indexed seller,
+        address indexed buyer,
+        uint256 indexed orderId
+    ); //创建订单事件
     event SetStatus(
         address indexed defaulter,
         uint256 indexed orderId,
-        Status indexed status
-    );
-    event Confirm(address indexed defaulter, uint256 indexed orderId); //确认订单事件
+        Status indexed status,
+        address seller,
+        address buyer
+    );//修改状态事件
+    // event Confirm(
+    //     address indexed defaulter,
+    //     uint256 indexed orderId,
+    //     address seller,
+    //     address buyer
+    // ); //确认订单事件
 
     constructor(
         uint256 _buyerRate,
@@ -183,7 +194,7 @@ contract Ebay is Ownable {
         isContact[_orderId][_msgSender()] = true;
         total[_token] += _seller_pledge; //更新总质押代币数量
         sellerList[_msgSender()].push(_orderId);
-        emit AddOrder(_msgSender(), _orderId);
+        emit AddOrder(_msgSender(),_buyer, _orderId);
     }
 
     //买家下单
@@ -220,7 +231,7 @@ contract Ebay is Ownable {
         order.buyer_pledge = _buyer_pledge;
         contact[_orderId].buyer = _buyerContact;
         isContact[_orderId][_msgSender()] = true;
-        emit SetStatus(_user, _orderId, Status.Ordered);
+        emit SetStatus(_user, _orderId, Status.Ordered,order.seller,order.buyer);
     }
 
     function cancel(uint256 _orderId) external {
@@ -240,7 +251,7 @@ contract Ebay is Ownable {
         //3、将订单更新为取消状态
         order.status = _status;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
-        emit SetStatus(_user, _orderId, _status);
+        emit SetStatus(_user, _orderId, _status,order.seller,order.buyer);
     }
 
     //确认订单
@@ -279,8 +290,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-
-        emit Confirm(_msgSender(), _orderId);
+        emit SetStatus(_msgSender(), _orderId, order.status,order.seller,order.buyer);
     }
 
     //发起取消
@@ -301,7 +311,7 @@ contract Ebay is Ownable {
         if (order.seller == _msgSender()) {
             _status = Status.SellerLanchCancel;
         }
-        emit SetStatus(_msgSender(), _orderId, _status);
+        emit SetStatus(_msgSender(), _orderId, _status,order.seller,order.buyer);
     }
 
     //拒绝取消
@@ -330,7 +340,7 @@ contract Ebay is Ownable {
         }
         //3、将订单更新为拒绝取消状态
         order.status = _status;
-        emit SetStatus(_msgSender(), _orderId, _status);
+        emit SetStatus(_msgSender(), _orderId, _status,order.seller,order.buyer);
     }
 
     //确认取消
@@ -371,7 +381,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].cancelTimestamp = block.timestamp;
-        emit SetStatus(_msgSender(), _orderId, _status);
+        emit SetStatus(_msgSender(), _orderId, _status,order.seller,order.buyer);
     }
 
     //争议订单取消强制双方返还
@@ -404,7 +414,7 @@ contract Ebay is Ownable {
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminCancelTimestamp = block.timestamp;
         dateTime[_orderId].cancelTimestamp = block.timestamp;
-        emit SetStatus(_msgSender(), _orderId, _status);
+        emit SetStatus(_msgSender(), _orderId, _status,order.seller,order.buyer);
     }
 
     //争议订单强制确认
@@ -436,7 +446,7 @@ contract Ebay is Ownable {
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminConfirmTimestamp = block.timestamp;
-        emit Confirm(_msgSender(), _orderId);
+        emit SetStatus(_msgSender(), _orderId, order.status,order.seller,order.buyer);
     }
 
     function adminBreak(uint256 _orderId) external onlyOwner {
@@ -451,7 +461,7 @@ contract Ebay is Ownable {
         );
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         dateTime[_orderId].adminBreakTimestamp = block.timestamp;
-        emit SetStatus(_msgSender(), _orderId, _status);
+        emit SetStatus(_msgSender(), _orderId, _status,order.seller,order.buyer);
     }
 
     function getContact(
