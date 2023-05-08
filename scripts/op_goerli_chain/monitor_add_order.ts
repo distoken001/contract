@@ -13,7 +13,7 @@ import { insertOrder } from "./logic_insert_order";
 async function op_monitor_add_order() {
   console.log("function:op_monitor_add_order is loading");
   const topic = ethers.utils.id(
-    "AddOrder(address,uint256,unit8,address,address)"
+    "AddOrder(address,uint256,uint8,address,address)"
   );
   let filter = {
     address: opContractAddress,

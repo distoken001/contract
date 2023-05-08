@@ -6,11 +6,13 @@ import { opContractAddress, opProviderWss, opIface, opChainId } from "./config";
 async function op_monitor_add_event() {
   console.log("function:op_monitor_event  is loading");
   const topic1 = ethers.utils.id(
-    "AddOrder(address,uint256,unit8,address,address)"
+    "AddOrder(address,uint256,uint8,address,address)"
   );
+  console.log("topic1", topic1);
   const topic2 = ethers.utils.id(
     "SetStatus(address,uint256,unit8,address,address)"
   );
+  console.log("topic2", topic2);
   let filters = [
     {
       address: opContractAddress,

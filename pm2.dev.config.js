@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
       {
-        name: 'monitor_op',
+        name: 'monitor_op_goerli',
         script: ' node ./dist/op_goerli_chain/start.js',
         instances: 1,
         autorestart: true,

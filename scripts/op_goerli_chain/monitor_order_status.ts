@@ -12,7 +12,7 @@ async function op_monitor_order_status() {
   console.log("function:op_monitor_order_status is loading");
 
  const topic = ethers.utils.id(
-    "SetStatus(address,uint256,unit8,address,address)"
+    "SetStatus(address,uint256,uint8,address,address)"
   );
   let filter = {
     address: opContractAddress,
