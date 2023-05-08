@@ -99,6 +99,8 @@ library EbayLib {
             uint256 buyerBack
         )
     {
+        require(price != 0, "price can not be zero");
+        require(amount != 0, "amount can not be zero");
         buyerFee = price.mul(amount).mul(buyerRate).div(10000);
         if (buyerEx < buyerFee) {
             buyerFee = buyerEx;
