@@ -487,11 +487,12 @@ contract Ebay is Ownable {
     function renounceOwnership() public pure override {}
 
     function validate(uint256 _orderId, bool isValidateSender) internal view {
+        address _user = _msgSender();
         Order memory order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
         if (isValidateSender) {
             require(
-                order.buyer == _msgSender() || order.seller == _msgSender(),
+                order.buyer == _user || order.seller == _user,
                 "No permissions"
             );
         }
