@@ -10,7 +10,7 @@ npm run clean
 
 # 编译项目
 #echo "Compiling the project..."
-#npx hardhat compile
+npx hardhat compile
 
 
 # 使用 TypeScript 编译器编译项目
