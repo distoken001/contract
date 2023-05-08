@@ -139,6 +139,7 @@ contract Ebay is Ownable {
         uint256 _amount,
         uint256 _sellerRatio
     ) external {
+        address _user = _msgSender();
         //1、校验
         require(
             bytes(_contactSeller).length != 0,
@@ -153,7 +154,6 @@ contract Ebay is Ownable {
             _amount,
             _sellerRatio
         );
-        address _user = _msgSender();
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(_user, address(this), _seller_pledge);
 
