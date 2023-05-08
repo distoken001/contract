@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 library EbayLib {
     using SafeMath for uint256;
-        enum Status {
+    enum Status {
         Initial, //待购买0
         Ordered, //被下单1
         Completed, //已完成2
@@ -18,12 +18,15 @@ library EbayLib {
         BuyerRejectCancel, //买家拒绝取消9
         ConsultCancelCompleted //协商取消完成10
     }
+
     function calculateSellerPledge(
         uint256 price,
         uint256 amount,
         uint256 sellerRatio,
         uint256 sellerRate
     ) internal pure returns (uint256 sellerPledge, uint256 sellerTxFee) {
+        require(price != 0, "price can not be zero");
+        require(amount != 0, "amount can not be zero");
         sellerPledge = price.mul(amount).mul(sellerRatio).div(10000);
         sellerTxFee = price.mul(amount).mul(sellerRate).div(10000);
         if (sellerPledge < sellerTxFee) {

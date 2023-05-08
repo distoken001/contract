@@ -52,12 +52,11 @@ contract Ebay is Ownable {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
     }
-    mapping(address => bool) public buyerWhiteList;
-    mapping(address => bool) public sellerWhiteList;
+    mapping(address => bool) public WhiteList;
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
-    uint256 public buyerIncRatio; //买家比卖家质押增量比例
-    uint256 public sellerRatio = 10000; //卖家质押数量是商品总价的百分比/分母10000
+    uint256 public buyerIncRatio; //买家比商品总价值质押增量比例
+    //uint256 public sellerRatio = 10000; //卖家质押数量是商品总价的百分比/分母10000
     address public lockAddr;
 
     Order[] public orders;
@@ -80,20 +79,21 @@ contract Ebay is Ownable {
         uint256 _buyerRate,
         uint256 _sellerRate,
         uint256 _buyerIncRatio,
-        uint256 _sellerRatio,
+        // uint256 _sellerRatio,
         address _lockAddr
     ) {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
         buyerIncRatio = _buyerIncRatio;
         lockAddr = _lockAddr;
-        sellerRatio = _sellerRatio;
+        // sellerRatio = _sellerRatio;
     }
 
     //计算卖家质押
     function calculateSellerPledge(
         uint256 price,
-        uint256 amount
+        uint256 amount,
+        uint256 sellerRatio
     ) public view returns (uint256 sellerPledge, uint256 sellerTxFee) {
         (sellerPledge, sellerTxFee) = EbayLib.calculateSellerPledge(
             price,
@@ -101,9 +101,6 @@ contract Ebay is Ownable {
             sellerRatio,
             sellerRate
         );
-        if (isWhite(_msgSender(), false)) {
-            sellerPledge = sellerTxFee;
-        }
     }
 
     //计算买家质押
@@ -121,7 +118,7 @@ contract Ebay is Ownable {
             buyerRate,
             buyerIncRatio
         );
-        if (isWhite(_msgSender(), true)) {
+        if (isWhite(_msgSender())) {
             buyerExcess = buyerTxFee;
         }
         buyerPledge = buyerExcess.add(price.mul(amount));
@@ -136,18 +133,25 @@ contract Ebay is Ownable {
         address _buyer,
         address _token,
         uint256 _price,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _sellerRatio
     ) external {
-        //1、卖家联系方式不能为空
+        //1、校验
         require(
             bytes(_contactSeller).length != 0,
             "Seller contact can not be null"
         );
+        require(_price != 0, "price can not be zero");
+        require(_amount != 0, "amount can not be zero");
         //2、验证代币合约是否有效
         require(EbayLib.verifyByAddress(_token) == 20, "Invalid contract");
         //3.质押数量
 
-        (uint256 _seller_pledge, ) = calculateSellerPledge(_price, _amount);
+        (uint256 _seller_pledge, ) = calculateSellerPledge(
+            _price,
+            _amount,
+            _sellerRatio
+        );
 
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(
@@ -197,7 +201,7 @@ contract Ebay is Ownable {
         );
         //4、将订单更新为已下单状态
         order.status = Status.Ordered;
-        if (isWhite(_user, true)) {
+        if (isWhite(_user)) {
             order.buyer_ex = order.price.mul(order.amount).mul(buyerRate);
         }
         uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
@@ -466,13 +470,16 @@ contract Ebay is Ownable {
     function setRate(
         uint256 _buyerRate,
         uint256 _sellerRate,
-        uint256 _buyerIncRatio,
-        uint256 _sellerRatio
-    ) external onlyOwner {
+        uint256 _buyerIncRatio
+    )
+        external
+        //uint256 _sellerRatio
+        onlyOwner
+    {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
         buyerIncRatio = _buyerIncRatio;
-        sellerRatio = _sellerRatio;
+        // sellerRatio = _sellerRatio;
     }
 
     //set lockAddr
@@ -481,33 +488,18 @@ contract Ebay is Ownable {
     }
 
     // 添加一个地址到白名单
-    function addToWhite(address _address, bool isBuyer) public onlyOwner {
-        if (isBuyer) {
-            buyerWhiteList[_address] = true;
-        } else {
-            sellerWhiteList[_address] = true;
-        }
+    function addToWhite(address _address) public onlyOwner {
+        WhiteList[_address] = true;
     }
 
     // 从白名单中删除一个地址
-    function remove(address _address, bool isBuyer) public onlyOwner {
-        if (isBuyer) {
-            buyerWhiteList[_address] = false;
-        } else {
-            sellerWhiteList[_address] = false;
-        }
+    function remove(address _address) public onlyOwner {
+        WhiteList[_address] = false;
     }
 
     // 检查一个地址是否在白名单中
-    function isWhite(
-        address _address,
-        bool isBuyer
-    ) public view returns (bool) {
-        if (isBuyer) {
-            return buyerWhiteList[_address];
-        } else {
-            return sellerWhiteList[_address];
-        }
+    function isWhite(address _address) public view returns (bool) {
+        return WhiteList[_address];
     }
 
     function renounceOwnership() public pure override {}
