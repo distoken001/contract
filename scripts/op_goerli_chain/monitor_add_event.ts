@@ -1,37 +1,35 @@
 import { ethers } from "ethers";
 import { Status } from "./enum_all";
 import { insertLog } from "./logic_insert_log";
-import { opContractAddress, opProviderWss, opIface, opChainId } from "./config";
+import { contractAddress, providerWss, iface, chainId } from "./config";
 
-async function op_monitor_add_event() {
+async function monitor_add_event() {
   console.log("function:op_monitor_event  is loading");
   const topic1 = ethers.utils.id(
     "AddOrder(address,uint256,uint8,address,address)"
   );
-  console.log("topic1", topic1);
   const topic2 = ethers.utils.id(
-    "SetStatus(address,uint256,unit8,address,address)"
+    "SetStatus(address,uint256,uint8,address,address)"
   );
-  console.log("topic2", topic2);
   let filters = [
     {
-      address: opContractAddress,
+      address: contractAddress,
       topics: [topic1],
     },
     {
-      address: opContractAddress,
+      address: contractAddress,
       topics: [topic2],
     },
   ];
   filters.forEach((filter) => {
-    opProviderWss.on(filter, async (result) => {
+    providerWss.on(filter, async (result) => {
       console.log(result);
       let transactionHashsh: string = result.transactionHash;
       let blockHash: string = result.blockHash;
       let contractAddress: string = result.address;
       const data = result.data;
       const topics = result.topics;
-      const resultParse = opIface.parseLog({ data, topics });
+      const resultParse = iface.parseLog({ data, topics });
       console.log(
         "Parse Log Data op_monitor_event->resultParse->",
         resultParse
@@ -51,14 +49,14 @@ async function op_monitor_add_event() {
         data,
         status,
         transactionHashsh,
-        await opChainId,
+        await chainId,
         seller,
         buyer
       );
     });
   });
 }
-export { op_monitor_add_event };
+export { monitor_add_event };
 //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
 //let aaa=ethers.utils.formatEther(iface.parseLog({ data, topics }).args[1]);
 //console.log("Parse Log Data Args->", aaa);
