@@ -254,8 +254,9 @@ contract Ebay is Ownable {
             "Order cannot be confirmed"
         );
         require(order.buyer == _user, "No permissions");
+        Status _status = Status.Completed;
         //更新状态
-        order.status = Status.Completed;
+        order.status = _status;
         (
             uint256 sellerFee,
             uint256 buyerFee,
@@ -275,13 +276,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
         dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        emit SetStatus(
-            _user,
-            _orderId,
-            order.status,
-            order.seller,
-            order.buyer
-        );
+        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     //发起取消
