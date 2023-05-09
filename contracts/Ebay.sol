@@ -184,7 +184,11 @@ contract Ebay is Ownable {
     }
 
     //买家下单
-    function place(uint256 _orderId, string memory _buyerContact) external {
+    function place(
+        uint256 _orderId,
+        string memory _buyerContact,
+        uint256 _amount
+    ) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         validate(_orderId, false);
@@ -196,26 +200,67 @@ contract Ebay is Ownable {
             order.buyer == address(0) || order.buyer == _user,
             "Non designated buyer"
         );
-        //4、将订单更新为已下单状态
         Status _status = Status.Ordered;
-        order.status = _status;
-        uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
-            order.buyer_ex
-        );
-        //5、将代币转入到合约地址
-        order.token.transferFrom(_user, address(this), _buyer_pledge);
-        buyerList[_user].push(_orderId);
-        total[address(order.token)] = total[address(order.token)].add(
-            _buyer_pledge
-        );
-        buyerList[_user].push(_orderId);
+        if (_amount == order.amount) {
+            //4、将订单更新为已下单状态
+            order.status = _status;
+            uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
+                order.buyer_ex
+            );
+            //5、将代币转入到合约地址
+            order.token.transferFrom(_user, address(this), _buyer_pledge);
+            buyerList[_user].push(_orderId);
+            total[address(order.token)] = total[address(order.token)].add(
+                _buyer_pledge
+            );
 
-        dateTime[_orderId].placeTimestamp = block.timestamp;
-        order.buyer = _user;
-        order.buyer_pledge = _buyer_pledge;
-        contact[_orderId].buyer = _buyerContact;
-        isContact[_orderId][_msgSender()] = true;
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+            dateTime[_orderId].placeTimestamp = block.timestamp;
+            order.buyer = _user;
+            order.buyer_pledge = _buyer_pledge;
+            contact[_orderId].buyer = _buyerContact;
+            isContact[_orderId][_msgSender()] = true;
+            emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        } else if (_amount < order.amount) {
+            uint256 dividerF = divider(_amount, order.amount);
+            uint256 _seller_pledge_new = dividerF.mul(order.seller_pledge).div(
+                10 ** 4
+            );
+            uint256 _buyer_ex_new = dividerF.mul(order.buyer_ex).div(10 ** 4);
+            uint256 _buyer_pledge_new = _amount.mul(order.price).add(
+                _buyer_ex_new
+            );
+            orders.push(
+                Order({
+                    name: order.name,
+                    seller: order.seller,
+                    buyer: _user,
+                    token: order.token,
+                    amount: _amount,
+                    seller_pledge: _seller_pledge_new,
+                    buyer_pledge: _buyer_pledge_new,
+                    buyer_ex: _buyer_ex_new,
+                    status: Status.Ordered,
+                    description: order.description,
+                    img: order.img,
+                    price: order.price
+                })
+            );
+            order.token.transferFrom(_user, address(this), _buyer_pledge_new);
+            total[address(order.token)] = total[address(order.token)].add(
+                _buyer_pledge_new
+            );
+            uint256 _order_id_new = orders.length - 1;
+            buyerList[_user].push(_order_id_new);
+            dateTime[_order_id_new].placeTimestamp = block.timestamp;
+            contact[_order_id_new].buyer = _buyerContact;
+            contact[_order_id_new].seller =  contact[_orderId].seller;
+            isContact[_order_id_new][_msgSender()] = true;
+            isContact[_order_id_new][order.seller] = true;
+            order.amount-=_amount;
+            order.buyer_ex-=_buyer_ex_new;
+            order.seller_pledge-=_seller_pledge_new;
+            emit AddOrder(_user, _order_id_new, Status.Ordered, order.seller, _user);
+        }
     }
 
     function cancel(uint256 _orderId) external {
@@ -496,5 +541,15 @@ contract Ebay is Ownable {
                 "No permissions"
             );
         }
+    }
+
+    function divider(
+        uint numerator,
+        uint denominator
+    ) public pure returns (uint) {
+        return
+            (numerator.mul(uint(10) ** uint(5)) / denominator + 5).div(
+                uint(10)
+            );
     }
 }
