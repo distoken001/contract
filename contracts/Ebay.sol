@@ -178,10 +178,7 @@ contract Ebay is Ownable {
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else {
-            uint256 dividerF = EbayLib.divider(_amount, order.amount);
-            uint256 _seller_pledge_new = dividerF.mul(order.seller_pledge).div(
-                10 ** 6
-            );
+            uint256 _seller_pledge_new = EbayLib.divider(_amount, order.amount,order.seller_pledge);
             orders.push(
                 Order({
                     name: order.name,

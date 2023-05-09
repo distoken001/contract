@@ -164,9 +164,11 @@ library EbayLib {
     }
 
     function divider(
-        uint numerator,
-        uint denominator
+        uint256 numerator,
+        uint256 denominator,
+        uint256 pledge
     ) internal pure returns (uint) {
-        return numerator.mul(uint(10) ** uint(6)).div(denominator);
+        uint256 dividerF = numerator.mul(10 ** 6).div(denominator);
+        return dividerF.mul(pledge).div(10 ** 6);
     }
 }
