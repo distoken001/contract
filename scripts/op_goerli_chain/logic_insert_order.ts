@@ -1,14 +1,14 @@
 import { executeQuery } from "./db";
 
 export const insertOrder = async (
-    orderId: number,
+    order_id: number,
     name: string,
     desc: string,
     amount: number,
     price: number,
     img: string,
-    sellerPledge: number,
-    buyerPledge: number,
+    seller_pledge: number,
+    buyer_pledge: number,
     //sellerContact: string,
     //buyerContact: string,
     status: number,
@@ -17,8 +17,8 @@ export const insertOrder = async (
     seller: string,
     buyer: string,
     token:string,
-    chainId :number,
-    buyerEx:number,
+    chain_id :number,
+    buyer_ex:number,
     contract:string,
     decimals :number
   ) => {
@@ -51,14 +51,14 @@ export const insertOrder = async (
     `;
   
     const values = [
-      orderId,
+      order_id,
       name,
       desc,
       amount,
       price,
       img,
-      sellerPledge,
-      buyerPledge,
+      seller_pledge,
+      buyer_pledge,
       //sellerContact,
       //buyerContact,
       status,
@@ -69,8 +69,8 @@ export const insertOrder = async (
       seller,
       buyer,
       token,
-      chainId,
-      buyerEx,
+      chain_id,
+      buyer_ex,
       contract,
       decimals
     ];

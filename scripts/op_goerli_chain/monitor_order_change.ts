@@ -42,7 +42,8 @@ async function monitor_order_change() {
         orderDetail["buyer_pledge"].toNumber(),
         orderDetail["amount"].toNumber(),
         orderDetail["seller_pledge"].toNumber(),
-        await chainId
+        await chainId,
+        contractAddress
       );
     });
 }

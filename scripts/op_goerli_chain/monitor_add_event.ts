@@ -51,7 +51,8 @@ async function monitor_add_event() {
         transactionHashsh,
         await chainId,
         seller,
-        buyer
+        buyer,
+        contractAddress
       );
     });
   });

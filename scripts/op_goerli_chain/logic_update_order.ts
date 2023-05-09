@@ -9,7 +9,8 @@ export async function logic_update_order(
   _buyer_pledge:number,
   _amount:number,
   _seller_pledge:number,
-  _chain_id :number
+  _chain_id :number,
+  _contract_address:string
 ) {
   const updateData = {
     order_id: _order_id,
@@ -22,10 +23,11 @@ export async function logic_update_order(
     buyer_ex:_buyer_ex,
     buyer_pledge:_buyer_pledge,
     seller_pledge:_seller_pledge,
-    amount:_amount
+    amount:_amount,
+    contract_address:_contract_address
   };
   const query =
-    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=?";
+    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
 
   const values = [
     updateData.status,
@@ -36,7 +38,8 @@ export async function logic_update_order(
     updateData.seller_pledge,
     updateData.amount,
     updateData.order_id,
-    updateData.chain_id
+    updateData.chain_id,
+    updateData.contract_address
   ];
 
   const [rows, fields] = await executeQuery(query, values);
