@@ -52,7 +52,6 @@ contract Ebay is Ownable {
     }
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
-    uint256 public buyerIncRatio; //买家比商品总价值质押增量比例
     //uint256 public sellerRatio = 10000; //卖家质押数量是商品总价的百分比/分母10000
     address public lockAddr;
 
@@ -81,18 +80,10 @@ contract Ebay is Ownable {
         address buyer
     );
 
-    constructor(
-        uint256 _buyerRate,
-        uint256 _sellerRate,
-        uint256 _buyerIncRatio,
-        // uint256 _sellerRatio,
-        address _lockAddr
-    ) {
+    constructor(uint256 _buyerRate, uint256 _sellerRate, address _lockAddr) {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
-        buyerIncRatio = _buyerIncRatio;
         lockAddr = _lockAddr;
-        // sellerRatio = _sellerRatio;
     }
 
     //计算卖家质押
@@ -122,7 +113,7 @@ contract Ebay is Ownable {
             price,
             amount,
             buyerRate,
-            buyerIncRatio
+            0
         );
         buyerPledge = buyerExcess.add(price.mul(amount));
     }
@@ -253,13 +244,19 @@ contract Ebay is Ownable {
             buyerList[_user].push(_order_id_new);
             dateTime[_order_id_new].placeTimestamp = block.timestamp;
             contact[_order_id_new].buyer = _buyerContact;
-            contact[_order_id_new].seller =  contact[_orderId].seller;
+            contact[_order_id_new].seller = contact[_orderId].seller;
             isContact[_order_id_new][_msgSender()] = true;
             isContact[_order_id_new][order.seller] = true;
-            order.amount-=_amount;
-            order.buyer_ex-=_buyer_ex_new;
-            order.seller_pledge-=_seller_pledge_new;
-            emit AddOrder(_user, _order_id_new, Status.Ordered, order.seller, _user);
+            order.amount -= _amount;
+            order.buyer_ex -= _buyer_ex_new;
+            order.seller_pledge -= _seller_pledge_new;
+            emit AddOrder(
+                _user,
+                _order_id_new,
+                Status.Ordered,
+                order.seller,
+                _user
+            );
         }
     }
 
@@ -516,12 +513,10 @@ contract Ebay is Ownable {
     //set Rate
     function setRate(
         uint256 _buyerRate,
-        uint256 _sellerRate,
-        uint256 _buyerIncRatio
+        uint256 _sellerRate
     ) external onlyOwner {
         buyerRate = _buyerRate;
         sellerRate = _sellerRate;
-        buyerIncRatio = _buyerIncRatio;
     }
 
     //set lockAddr
@@ -548,7 +543,7 @@ contract Ebay is Ownable {
         uint denominator
     ) public pure returns (uint) {
         return
-            (numerator.mul(uint(10) ** uint(5)) / denominator + 5).div(
+            (numerator.mul(uint(10) ** uint(5)).div(denominator) + 5).div(
                 uint(10)
             );
     }
