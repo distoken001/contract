@@ -48,7 +48,6 @@ contract Ebay is Ownable {
 
     Order[] public orders;
     mapping(uint256 => Contact) contact;
-    mapping(uint256 => mapping(address => bool)) isContact;
     mapping(address => uint256[]) public sellerList; //卖家订单
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
@@ -146,7 +145,6 @@ contract Ebay is Ownable {
         );
         uint256 _orderId = orders.length - 1;
         contact[_orderId].seller = _contactSeller;
-        isContact[_orderId][_user] = true;
         total[_token] += _seller_pledge; //更新总质押代币数量
         sellerList[_user].push(_orderId);
         emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
@@ -185,7 +183,6 @@ contract Ebay is Ownable {
             order.buyer = _user;
             order.buyer_pledge = _buyer_pledge;
             contact[_orderId].buyer = _buyerContact;
-            isContact[_orderId][_msgSender()] = true;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else if (_amount < order.amount) {
             uint256 dividerF = divider(_amount, order.amount);
@@ -221,8 +218,6 @@ contract Ebay is Ownable {
             buyerList[_user].push(_order_id_new);
             contact[_order_id_new].buyer = _buyerContact;
             contact[_order_id_new].seller = contact[_orderId].seller;
-            isContact[_order_id_new][_msgSender()] = true;
-            isContact[_order_id_new][order.seller] = true;
             order.amount -= _amount;
             order.buyer_ex -= _buyer_ex_new;
             order.seller_pledge -= _seller_pledge_new;
@@ -474,7 +469,7 @@ contract Ebay is Ownable {
         if (_user == owner()) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
-        } else if (isContact[_orderId][_user] == true) {
+        } else if (EbayLib.contains(sellerList[_user], _orderId)||EbayLib.contains(buyerList[_user], _orderId)) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
         }

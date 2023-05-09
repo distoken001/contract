@@ -39,7 +39,7 @@ library EbayLib {
         uint256 price,
         uint256 amount,
         uint256 buyerRate
-    ) internal pure returns (uint256 buyerPledge,uint256 buyerTxFee) {
+    ) internal pure returns (uint256 buyerPledge, uint256 buyerTxFee) {
         buyerTxFee = price.mul(amount).mul(buyerRate).div(10000);
         buyerPledge = buyerTxFee.add(price.mul(amount));
     }
@@ -149,5 +149,17 @@ library EbayLib {
             "Status SellerCancelWithoutDuty"
         );
         require(status != Status.SellerBreak, "Status SellerBreak");
+    }
+
+    function contains(
+        uint256[] storage array,
+        uint256 value
+    ) internal view returns (bool) {
+        for (uint256 i = 0; i < array.length; i++) {
+            if (array[i] == value) {
+                return true;
+            }
+        }
+        return false;
     }
 }
