@@ -38,14 +38,6 @@ contract Ebay is Ownable {
         Status status; //订单状态
     }
 
-    struct DateTime {
-        uint256 createTimestamp; //订单创建时间
-        uint256 finishedTimestamp; //订单完成时间
-        uint256 cancelTimestamp; //订单取消时间
-        uint256 placeTimestamp; //买家下单时间
-        uint256 adminBreakTimestamp; //管理员强制认定违约时间
-    }
-
     struct Contact {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
@@ -55,7 +47,6 @@ contract Ebay is Ownable {
     address public lockAddr;
 
     Order[] public orders;
-    mapping(uint256 => DateTime) public dateTime;
     mapping(uint256 => Contact) contact;
     mapping(uint256 => mapping(address => bool)) isContact;
     mapping(address => uint256[]) public sellerList; //卖家订单
@@ -133,7 +124,7 @@ contract Ebay is Ownable {
             _amount,
             _sellerRatio
         );
-        //4、将代币转入到合约地址
+        //3、将代币转入到合约地址
         IERC20(_token).transferFrom(_user, address(this), _seller_pledge);
 
         (, uint256 _buyer_tx_fee) = calculateBuyerPledge(_price, _amount);
@@ -154,7 +145,6 @@ contract Ebay is Ownable {
             })
         );
         uint256 _orderId = orders.length - 1;
-        dateTime[_orderId].createTimestamp = block.timestamp;
         contact[_orderId].seller = _contactSeller;
         isContact[_orderId][_user] = true;
         total[_token] += _seller_pledge; //更新总质押代币数量
@@ -192,8 +182,6 @@ contract Ebay is Ownable {
             total[address(order.token)] = total[address(order.token)].add(
                 _buyer_pledge
             );
-
-            dateTime[_orderId].placeTimestamp = block.timestamp;
             order.buyer = _user;
             order.buyer_pledge = _buyer_pledge;
             contact[_orderId].buyer = _buyerContact;
@@ -229,8 +217,8 @@ contract Ebay is Ownable {
                 _buyer_pledge_new
             );
             uint256 _order_id_new = orders.length - 1;
+            sellerList[order.seller].push(_order_id_new);
             buyerList[_user].push(_order_id_new);
-            dateTime[_order_id_new].placeTimestamp = block.timestamp;
             contact[_order_id_new].buyer = _buyerContact;
             contact[_order_id_new].seller = contact[_orderId].seller;
             isContact[_order_id_new][_msgSender()] = true;
@@ -264,7 +252,6 @@ contract Ebay is Ownable {
         );
         //3、将订单更新为取消状态
         order.status = _status;
-        dateTime[_orderId].cancelTimestamp = block.timestamp;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
@@ -304,7 +291,6 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.seller, sellerBack); //转给卖家
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
-        dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
@@ -399,7 +385,6 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.buyer, buyerBack);
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        dateTime[_orderId].cancelTimestamp = block.timestamp;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
@@ -432,7 +417,6 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.buyer, buyerBack);
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        dateTime[_orderId].cancelTimestamp = block.timestamp;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
@@ -464,7 +448,6 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.seller, sellerBack); //转给卖家
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
-        dateTime[_orderId].finishedTimestamp = block.timestamp;
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
@@ -481,7 +464,6 @@ contract Ebay is Ownable {
             order.buyer_pledge + order.seller_pledge
         );
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        dateTime[_orderId].adminBreakTimestamp = block.timestamp;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
