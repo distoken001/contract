@@ -23,6 +23,10 @@ module.exports = {
       url: process.env.API_HTTP_ARB,
       accounts: [process.env.PRIVATE_KEY],
     },
+    arb_goerli: {
+      url: process.env.API_HTTP_ARB_GOERLI,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     mainnet: {
       url: process.env.API_HTTP_MAIN,
       accounts: [process.env.PRIVATE_KEY],
