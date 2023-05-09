@@ -156,8 +156,7 @@ contract Ebay is Ownable {
         string memory _buyerContact
     ) external {
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
-        validate(_orderId, false);
+        Order storage order =  validate(_orderId, false);
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         address _user = _msgSender();
@@ -223,8 +222,7 @@ contract Ebay is Ownable {
 
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
-        validate(_orderId, true);
+        Order storage order =  validate(_orderId, true);
         //2、校验订单状态是否可以取消
         address _user = _msgSender();
         require(order.seller == _user, "No permissions");
@@ -244,8 +242,7 @@ contract Ebay is Ownable {
     function confirm(uint256 _orderId) external {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
-        validate(_orderId, true);
+        Order storage order =  validate(_orderId, true);
         //2、校验订单状态是否可以确认
         require(
             order.status == Status.Ordered ||
@@ -284,8 +281,7 @@ contract Ebay is Ownable {
     function launchCancel(uint256 _orderId) external {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
-        validate(_orderId, true);
+        Order storage order =  validate(_orderId, true);
         //2、校验订单状态是否可以取消
         require(
             order.status == Status.Ordered ||
@@ -306,8 +302,7 @@ contract Ebay is Ownable {
     function rejectCancel(uint256 _orderId) external {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
-        validate(_orderId, true);
+        Order storage order = validate(_orderId, true);
         Status _status = Status.BuyerRejectCancel;
         if (order.buyer == _user) {
             require(
@@ -330,8 +325,7 @@ contract Ebay is Ownable {
     function confirmCancel(uint256 _orderId) external {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = orders[_orderId];
-        validate(_orderId, true);
+        Order storage order = validate(_orderId, true);
         //默认协商取消完成
         Status _status = Status.ConsultCancelCompleted;
         if (order.buyer == _user) {
@@ -371,8 +365,7 @@ contract Ebay is Ownable {
     function adminCancel(uint256 _orderId) external onlyOwner {
         address _user = _msgSender();
         //1、校验订单是否存在
-        validate(_orderId, false);
-        Order storage order = orders[_orderId];
+        Order storage order =  validate(_orderId, false);
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
@@ -403,8 +396,7 @@ contract Ebay is Ownable {
     function adminConfirm(uint256 _orderId) external onlyOwner {
         address _user = _msgSender();
         //1、校验订单是否存在
-        validate(_orderId, false);
-        Order storage order = orders[_orderId];
+        Order storage order =  validate(_orderId, false);
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单被确认
         Status _status = Status.Completed;
@@ -433,8 +425,7 @@ contract Ebay is Ownable {
 
     function adminBreak(uint256 _orderId) external onlyOwner {
         address _user = _msgSender();
-        validate(_orderId, false);
-        Order storage order = orders[_orderId];
+        Order storage order = validate(_orderId, false);
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         Status _status = Status.SellerBreak;
         order.status = _status;
@@ -476,9 +467,9 @@ contract Ebay is Ownable {
 
     function renounceOwnership() public pure override {}
 
-    function validate(uint256 _orderId, bool isValidateSender) internal view {
+    function validate(uint256 _orderId, bool isValidateSender) internal view returns (Order storage order)   {
         address _user = _msgSender();
-        Order memory order = orders[_orderId];
+        order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
         if (isValidateSender) {
             require(
