@@ -152,9 +152,9 @@ library EbayLib {
     }
 
     function contains(
-        uint256[] storage array,
+        uint256[] memory array,
         uint256 value
-    ) internal view returns (bool) {
+    ) internal pure returns (bool) {
         for (uint256 i = 0; i < array.length; i++) {
             if (array[i] == value) {
                 return true;

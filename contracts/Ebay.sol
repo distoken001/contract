@@ -152,8 +152,8 @@ contract Ebay is Ownable {
     //买家下单
     function place(
         uint256 _orderId,
-        string memory _buyerContact,
-        uint256 _amount
+        uint256 _amount,
+        string memory _buyerContact
     ) external {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
@@ -308,12 +308,6 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         Order storage order = orders[_orderId];
         validate(_orderId, true);
-        //2、校验订单状态是否可以取消
-        require(
-            order.status == Status.BuyerLanchCancel ||
-                order.status == Status.SellerLanchCancel,
-            "Order cannot be canceled"
-        );
         Status _status = Status.BuyerRejectCancel;
         if (order.buyer == _user) {
             require(
@@ -327,7 +321,7 @@ contract Ebay is Ownable {
             );
             _status = Status.SellerRejectCancel;
         }
-        //3、将订单更新为拒绝取消状态
+        //2、将订单更新为拒绝取消状态
         order.status = _status;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
@@ -456,10 +450,8 @@ contract Ebay is Ownable {
         uint256 _orderId
     ) external view returns (string memory _seller, string memory _buyer) {
         address _user = _msgSender();
-        if (_user == owner()) {
-            _seller = contact[_orderId].seller;
-            _buyer = contact[_orderId].buyer;
-        } else if (
+        if (
+            _user == owner() ||
             EbayLib.contains(sellerList[_user], _orderId) ||
             EbayLib.contains(buyerList[_user], _orderId)
         ) {
