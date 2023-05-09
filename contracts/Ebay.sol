@@ -202,6 +202,7 @@ contract Ebay is Ownable {
             contact[_order_id_new].seller = contact[_orderId].seller;
             order.amount -= _amount;
             order.seller_pledge -= _seller_pledge_new;
+            emit SetStatus(_user, _orderId, Status.Initial, order.seller, order.buyer);
             emit AddOrder(
                 _user,
                 _order_id_new,
