@@ -117,7 +117,6 @@ contract Ebay is Ownable {
         //1、验证代币合约是否有效
         require(EbayLib.verifyByAddress(_token) == 20, "Invalid contract");
         //2.质押数量
-
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
             _amount,
@@ -125,7 +124,6 @@ contract Ebay is Ownable {
         );
         //3、将代币转入到合约地址
         IERC20(_token).transferFrom(_user, address(this), _seller_pledge);
-
         orders.push(
             Order({
                 name: _name,
@@ -156,9 +154,10 @@ contract Ebay is Ownable {
         string memory _buyerContact
     ) external {
         //1、校验订单是否存在
-        Order storage order =  validate(_orderId, false);
+        Order storage order = validate(_orderId, false);
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
+        require(_amount <= order.amount, "amount error");
         address _user = _msgSender();
         //3、校验订单是否指定买家
         require(
@@ -178,7 +177,7 @@ contract Ebay is Ownable {
             buyerList[_user].push(_orderId);
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
-        } else if (_amount < order.amount) {
+        } else {
             uint256 dividerF = EbayLib.divider(_amount, order.amount);
             uint256 _seller_pledge_new = dividerF.mul(order.seller_pledge).div(
                 10 ** 6
@@ -222,7 +221,7 @@ contract Ebay is Ownable {
 
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
-        Order storage order =  validate(_orderId, true);
+        Order storage order = validate(_orderId, true);
         //2、校验订单状态是否可以取消
         address _user = _msgSender();
         require(order.seller == _user, "No permissions");
@@ -242,7 +241,7 @@ contract Ebay is Ownable {
     function confirm(uint256 _orderId) external {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order =  validate(_orderId, true);
+        Order storage order = validate(_orderId, true);
         //2、校验订单状态是否可以确认
         require(
             order.status == Status.Ordered ||
@@ -254,7 +253,6 @@ contract Ebay is Ownable {
         );
         require(order.buyer == _user, "No permissions");
         Status _status = Status.Completed;
-        //更新状态
         order.status = _status;
         (
             uint256 sellerFee,
@@ -281,7 +279,7 @@ contract Ebay is Ownable {
     function launchCancel(uint256 _orderId) external {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order =  validate(_orderId, true);
+        Order storage order = validate(_orderId, true);
         //2、校验订单状态是否可以取消
         require(
             order.status == Status.Ordered ||
@@ -365,7 +363,7 @@ contract Ebay is Ownable {
     function adminCancel(uint256 _orderId) external onlyOwner {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order =  validate(_orderId, false);
+        Order storage order = validate(_orderId, false);
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
@@ -396,7 +394,7 @@ contract Ebay is Ownable {
     function adminConfirm(uint256 _orderId) external onlyOwner {
         address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order =  validate(_orderId, false);
+        Order storage order = validate(_orderId, false);
         EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
         //2、默认争议订单被确认
         Status _status = Status.Completed;
@@ -467,7 +465,10 @@ contract Ebay is Ownable {
 
     function renounceOwnership() public pure override {}
 
-    function validate(uint256 _orderId, bool isValidateSender) internal view returns (Order storage order)   {
+    function validate(
+        uint256 _orderId,
+        bool isValidateSender
+    ) internal view returns (Order storage order) {
         address _user = _msgSender();
         order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
@@ -478,6 +479,4 @@ contract Ebay is Ownable {
             );
         }
     }
-
-
 }
