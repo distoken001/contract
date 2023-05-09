@@ -126,7 +126,6 @@ contract Ebay is Ownable {
         //3、将代币转入到合约地址
         IERC20(_token).transferFrom(_user, address(this), _seller_pledge);
 
-        (, uint256 _buyer_tx_fee) = calculateBuyerPledge(_price, _amount);
         orders.push(
             Order({
                 name: _name,
@@ -136,7 +135,7 @@ contract Ebay is Ownable {
                 amount: _amount,
                 seller_pledge: _seller_pledge,
                 buyer_pledge: 0,
-                buyer_ex: _buyer_tx_fee,
+                buyer_ex: 0,
                 status: Status.Initial,
                 description: _description,
                 img: _img,
@@ -168,30 +167,22 @@ contract Ebay is Ownable {
             "Non designated buyer"
         );
         Status _status = Status.Ordered;
+        (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
+            order.price,
+            _amount
+        );
         if (_amount == order.amount) {
-            //4、将订单更新为已下单状态
             order.status = _status;
-            uint256 _buyer_pledge = (order.price.mul(order.amount)).add(
-                order.buyer_ex
-            );
-            //5、将代币转入到合约地址
-            order.token.transferFrom(_user, address(this), _buyer_pledge);
-            buyerList[_user].push(_orderId);
-            total[address(order.token)] = total[address(order.token)].add(
-                _buyer_pledge
-            );
-            order.buyer = _user;
             order.buyer_pledge = _buyer_pledge;
+            order.buyer_ex = _buyer_tx_fee;
+            order.buyer = _user;
+            buyerList[_user].push(_orderId);
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else if (_amount < order.amount) {
             uint256 dividerF = divider(_amount, order.amount);
             uint256 _seller_pledge_new = dividerF.mul(order.seller_pledge).div(
                 10 ** 6
-            );
-            uint256 _buyer_ex_new = dividerF.mul(order.buyer_ex).div(10 ** 6);
-            uint256 _buyer_pledge_new = _amount.mul(order.price).add(
-                _buyer_ex_new
             );
             orders.push(
                 Order({
@@ -201,17 +192,13 @@ contract Ebay is Ownable {
                     token: order.token,
                     amount: _amount,
                     seller_pledge: _seller_pledge_new,
-                    buyer_pledge: _buyer_pledge_new,
-                    buyer_ex: _buyer_ex_new,
-                    status: Status.Ordered,
+                    buyer_pledge: _buyer_pledge,
+                    buyer_ex: _buyer_tx_fee,
+                    status: _status,
                     description: order.description,
                     img: order.img,
                     price: order.price
                 })
-            );
-            order.token.transferFrom(_user, address(this), _buyer_pledge_new);
-            total[address(order.token)] = total[address(order.token)].add(
-                _buyer_pledge_new
             );
             uint256 _order_id_new = orders.length - 1;
             sellerList[order.seller].push(_order_id_new);
@@ -219,7 +206,6 @@ contract Ebay is Ownable {
             contact[_order_id_new].buyer = _buyerContact;
             contact[_order_id_new].seller = contact[_orderId].seller;
             order.amount -= _amount;
-            order.buyer_ex -= _buyer_ex_new;
             order.seller_pledge -= _seller_pledge_new;
             emit AddOrder(
                 _user,
@@ -229,6 +215,10 @@ contract Ebay is Ownable {
                 _user
             );
         }
+        order.token.transferFrom(_user, address(this), _buyer_pledge);
+        total[address(order.token)] = total[address(order.token)].add(
+            _buyer_pledge
+        );
     }
 
     function cancel(uint256 _orderId) external {
@@ -469,7 +459,10 @@ contract Ebay is Ownable {
         if (_user == owner()) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
-        } else if (EbayLib.contains(sellerList[_user], _orderId)||EbayLib.contains(buyerList[_user], _orderId)) {
+        } else if (
+            EbayLib.contains(sellerList[_user], _orderId) ||
+            EbayLib.contains(buyerList[_user], _orderId)
+        ) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
         }
