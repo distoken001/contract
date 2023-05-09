@@ -12,7 +12,6 @@ async function main() {
   const ebay = await Ebay.deploy(
     100,
     100,
-    0,
     "0xb1B8a8E9c2FFcc0B2072937d170bAe4E794f6238"
   );
   await ebay.deployed();

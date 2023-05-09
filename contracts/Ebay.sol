@@ -179,7 +179,7 @@ contract Ebay is Ownable {
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else if (_amount < order.amount) {
-            uint256 dividerF = divider(_amount, order.amount);
+            uint256 dividerF = EbayLib.divider(_amount, order.amount);
             uint256 _seller_pledge_new = dividerF.mul(order.seller_pledge).div(
                 10 ** 6
             );
@@ -479,10 +479,5 @@ contract Ebay is Ownable {
         }
     }
 
-    function divider(
-        uint numerator,
-        uint denominator
-    ) public pure returns (uint) {
-        return numerator.mul(uint(10) ** uint(6)).div(denominator);
-    }
+
 }
