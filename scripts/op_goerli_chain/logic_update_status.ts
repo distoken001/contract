@@ -7,6 +7,8 @@ export async function UpdateStatus(
   _buyer: string,
   _buyer_ex:number,
   _buyer_pledge:number,
+  _amount:number,
+  _seller_pledge:number,
   _chain_id :number
 ) {
   const updateData = {
@@ -18,10 +20,12 @@ export async function UpdateStatus(
     buyer: _buyer,
     chain_id:_chain_id,
     buyer_ex:_buyer_ex,
-    buyer_pledge:_buyer_pledge
+    buyer_pledge:_buyer_pledge,
+    seller_pledge:_seller_pledge,
+    amount:_amount
   };
   const query =
-    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?  where order_id=? and chain_id=?";
+    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=?";
 
   const values = [
     updateData.status,
@@ -29,6 +33,8 @@ export async function UpdateStatus(
     updateData.update_time,
     updateData.buyer,
     updateData.buyer_pledge,
+    updateData.seller_pledge,
+    updateData.amount,
     updateData.order_id,
     updateData.chain_id
   ];
