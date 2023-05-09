@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { UpdateStatus } from "./logic_update_status";
+import { logic_update_order } from "./logic_update_order";
 import {
   contractAddress,
   providerWss,
@@ -34,7 +34,7 @@ async function monitor_order_change() {
       //const contactData = await contract.getContact(orderId);
       console.log("订单详情：", orderDetail);
       //console.log("联系方式", contactData);
-      UpdateStatus(
+      logic_update_order(
         orderId,
         orderDetail["status"],
         orderDetail["buyer"],

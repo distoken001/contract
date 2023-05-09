@@ -1,7 +1,7 @@
 import { Status } from "./enum_all";
 import { executeQuery } from "./db";
 
-export async function UpdateStatus(
+export async function logic_update_order(
   _order_id: number,
   _status: Status,
   _buyer: string,
