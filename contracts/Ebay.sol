@@ -52,7 +52,6 @@ contract Ebay is Ownable {
     }
     uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
     uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
-    //uint256 public sellerRatio = 10000; //卖家质押数量是商品总价的百分比/分母10000
     address public lockAddr;
 
     Order[] public orders;
@@ -101,21 +100,15 @@ contract Ebay is Ownable {
     }
 
     //计算买家质押
-    function calculateBuyerTxFeeAndExcess(
+    function calculateBuyerPledge(
         uint256 price,
         uint256 amount
-    )
-        public
-        view
-        returns (uint256 buyerTxFee, uint256 buyerExcess, uint256 buyerPledge)
-    {
-        (buyerTxFee, buyerExcess) = EbayLib.calculateBuyerTxFeeAndExcess(
+    ) public view returns (uint256 buyerPledge, uint256 buyerTxFee) {
+        (buyerPledge, buyerTxFee) = EbayLib.calculateBuyerTxFeeAndPledge(
             price,
             amount,
-            buyerRate,
-            0
+            buyerRate
         );
-        buyerPledge = buyerExcess.add(price.mul(amount));
     }
 
     //创建订单
@@ -131,14 +124,9 @@ contract Ebay is Ownable {
         uint256 _sellerRatio
     ) external {
         address _user = _msgSender();
-        //1、校验
-        require(
-            bytes(_contactSeller).length != 0,
-            "Seller contact can not be null"
-        );
-        //2、验证代币合约是否有效
+        //1、验证代币合约是否有效
         require(EbayLib.verifyByAddress(_token) == 20, "Invalid contract");
-        //3.质押数量
+        //2.质押数量
 
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
@@ -148,7 +136,7 @@ contract Ebay is Ownable {
         //4、将代币转入到合约地址
         IERC20(_token).transferFrom(_user, address(this), _seller_pledge);
 
-        (, uint256 _buyer_ex, ) = calculateBuyerTxFeeAndExcess(_price, _amount);
+        (, uint256 _buyer_tx_fee) = calculateBuyerPledge(_price, _amount);
         orders.push(
             Order({
                 name: _name,
@@ -158,7 +146,7 @@ contract Ebay is Ownable {
                 amount: _amount,
                 seller_pledge: _seller_pledge,
                 buyer_pledge: 0,
-                buyer_ex: _buyer_ex,
+                buyer_ex: _buyer_tx_fee,
                 status: Status.Initial,
                 description: _description,
                 img: _img,
@@ -214,9 +202,9 @@ contract Ebay is Ownable {
         } else if (_amount < order.amount) {
             uint256 dividerF = divider(_amount, order.amount);
             uint256 _seller_pledge_new = dividerF.mul(order.seller_pledge).div(
-                10 ** 4
+                10 ** 6
             );
-            uint256 _buyer_ex_new = dividerF.mul(order.buyer_ex).div(10 ** 4);
+            uint256 _buyer_ex_new = dividerF.mul(order.buyer_ex).div(10 ** 6);
             uint256 _buyer_pledge_new = _amount.mul(order.price).add(
                 _buyer_ex_new
             );
@@ -542,9 +530,6 @@ contract Ebay is Ownable {
         uint numerator,
         uint denominator
     ) public pure returns (uint) {
-        return
-            (numerator.mul(uint(10) ** uint(5)).div(denominator) + 5).div(
-                uint(10)
-            );
+        return numerator.mul(uint(10) ** uint(6)).div(denominator);
     }
 }

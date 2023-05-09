@@ -35,18 +35,13 @@ library EbayLib {
         return (sellerPledge, sellerTxFee);
     }
 
-    function calculateBuyerTxFeeAndExcess(
+    function calculateBuyerTxFeeAndPledge(
         uint256 price,
         uint256 amount,
-        uint256 buyerRate,
-        uint256 buyerIncRatio
-    ) internal pure returns (uint256 buyerTxFee, uint256 buyerExcess) {
+        uint256 buyerRate
+    ) internal pure returns (uint256 buyerPledge,uint256 buyerTxFee) {
         buyerTxFee = price.mul(amount).mul(buyerRate).div(10000);
-        buyerExcess = price.mul(amount).mul(buyerIncRatio).div(10000);
-        if (buyerTxFee > buyerExcess) {
-            buyerExcess = buyerTxFee;
-        }
-        return (buyerTxFee, buyerExcess);
+        buyerPledge = buyerTxFee.add(price.mul(amount));
     }
 
     function confirmCalculateRefunds(
