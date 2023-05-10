@@ -4,7 +4,7 @@ import { insertLog } from "./logic_insert_log";
 import { contractAddress, providerWss, iface, chainId } from "./config";
 
 async function monitor_add_event() {
-  console.log("function:op_monitor_event  is loading");
+  console.log("function:monitor_add_event  is loading");
   const topic1 = ethers.utils.id(
     "AddOrder(address,uint256,uint8,address,address)"
   );
