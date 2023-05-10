@@ -1,47 +1,45 @@
 import { ethers } from "ethers";
 import {
-  opContractAddress,
-  contractABI,
-  opProviderHttps,
-  opChainId,
+  contractAddress,
+  providerHttps,
+  chainId,
   tokenContractABI,
-  opContract,
-  opIface,
-  opProviderWss,
+  contract,
+  iface,
+  providerWss,
 } from "./config";
 import { insertOrder } from "./logic_insert_order";
-async function op_monitor_add_order() {
-  console.log("function:op_monitor_add_order is loading");
-  const topic1 = ethers.utils.id("AddOrder(address,uint256)");
+async function monitor_add_order() {
+  console.log("function:monitor_add_order is loading");
+  const topic = ethers.utils.id(
+    "AddOrder(address,uint256,uint8,address,address)"
+  );
   let filter = {
-    address: opContractAddress,
-    topics: [topic1],
+    address: contractAddress,
+    topics: [topic],
   };
-  opProviderWss.on(filter, async (result) => {
+  providerWss.on(filter, async (result) => {
     console.log(result);
     const data = result.data;
     const topics = result.topics;
-    const resultParse = opIface.parseLog({ data, topics });
+    const resultParse = iface.parseLog({ data, topics });
 
     const _args = resultParse.args;
     console.log(
-      "Parse Log Data op_monitor_add_order->resultParse->_args->",
+      "Parse Log Data monitor_add_order->resultParse->_args->",
       _args
     );
     const orderId = _args["orderId"].toNumber();
-    const orderDetail = await opContract.orders(orderId);
+    const orderDetail = await contract.orders(orderId);
     console.log("订单详情:", orderDetail);
-    // const contactData = await opContract.getContact(orderId);
-    // console.log("联系方式:", contactData);
-    const token= orderDetail["token"];
+    const token = orderDetail["token"];
     const tokenContract = new ethers.Contract(
       token,
       tokenContractABI,
-      opProviderHttps
+      providerHttps
     );
-    const decimals =await tokenContract.decimals();
+    const decimals = await tokenContract.decimals();
 
-   
     insertOrder(
       orderId,
       orderDetail["name"],
@@ -59,11 +57,11 @@ async function op_monitor_add_order() {
       orderDetail["seller"],
       orderDetail["buyer"],
       orderDetail["token"],
-      await opChainId,
+      await chainId,
       orderDetail["buyer_ex"].toNumber(),
-      opContractAddress,
+      contractAddress,
       decimals
     );
   });
 }
-export { op_monitor_add_order };
+export { monitor_add_order };
