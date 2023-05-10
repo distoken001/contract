@@ -6,36 +6,34 @@ if (process.env.NODE_ENV === 'production') {
 } else if (process.env.NODE_ENV === 'development') {
   dotenv.config({ path: '.env.development' });
 }
-
-
 const contractABI = require("../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
 const tokenContractABI = require("../../artifacts/contracts/Token.sol/Token.json").abi;
-let opContractAddress: string = process.env.POLYGON_CONTRACT_ADDRESS!;
-let opMonitorWss: string = process.env.API_WSS_POLYGON!;
-let opMonitorHttps: string = process.env.API_HTTP_POLYGON!;
+let contractAddress: string = process.env.POLYGON_CONTRACT_ADDRESS!;
+let monitorWss: string = process.env.API_WSS_POLYGON!;
+let monitorHttps: string = process.env.API_HTTP_POLYGON!;
 // 将 JSON 字符串解析为对象
 const dbConfig = JSON.parse(process.env.DB_CONFIG!);
-const opProviderWss = new ethers.providers.WebSocketProvider(opMonitorWss);
-const opProviderHttps = new ethers.providers.StaticJsonRpcProvider(
-  opMonitorHttps
+const providerWss = new ethers.providers.WebSocketProvider(monitorWss);
+const providerHttps = new ethers.providers.StaticJsonRpcProvider(
+  monitorHttps
 );
-const opIface = new ethers.utils.Interface(contractABI);
-const opChainId = opProviderHttps
+const iface = new ethers.utils.Interface(contractABI);
+const chainId = providerHttps
   .getNetwork()
   .then((network) => network.chainId);
-const opContract = new ethers.Contract(
-  opContractAddress,
+const contract = new ethers.Contract(
+  contractAddress,
   contractABI,
-  opProviderHttps
+  providerHttps
 );
 export {
-  opContractAddress,
+  contractAddress,
   dbConfig,
   contractABI,
-  opProviderWss,
-  opProviderHttps,
-  opChainId,
-  opContract,
-  opIface,
+  providerWss,
+  providerHttps,
+  chainId,
+  contract,
+  iface,
   tokenContractABI
 };
