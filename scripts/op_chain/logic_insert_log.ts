@@ -4,7 +4,7 @@ import { executeQuery } from "./db";
 export async function insertLog(
   _event_name: string,
   _operater: string,
-  _order_id: string,
+  _order_id: any,
   _data: string,
   _status: Status,
   _hash: string,
@@ -18,7 +18,7 @@ export async function insertLog(
     id: null,
     event_name: _event_name,
     operater: _operater,
-    order_id: _order_id,
+    order_id: _order_id.toString(),
     data: _data,
     status: _status,
     create_time: new Date().toLocaleString("zh-CN", {

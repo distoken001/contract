@@ -38,10 +38,10 @@ async function monitor_order_change() {
         orderId,
         orderDetail["status"],
         orderDetail["buyer"],
-        orderDetail["buyer_ex"].toNumber(),
-        orderDetail["buyer_pledge"].toNumber(),
+        orderDetail["buyer_ex"],
+        orderDetail["buyer_pledge"],
         orderDetail["amount"].toNumber(),
-        orderDetail["seller_pledge"].toNumber(),
+        orderDetail["seller_pledge"],
         await chainId,
         contractAddress
       );

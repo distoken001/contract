@@ -5,10 +5,10 @@ export async function logic_update_order(
   _order_id: number,
   _status: Status,
   _buyer: string,
-  _buyer_ex:number,
-  _buyer_pledge:number,
-  _amount:number,
-  _seller_pledge:number,
+  _buyer_ex:any,
+  _buyer_pledge:any,
+  _amount:any,
+  _seller_pledge:any,
   _chain_id :number,
   _contract_address:string
 ) {
@@ -20,10 +20,10 @@ export async function logic_update_order(
     creator: "system",
     buyer: _buyer,
     chain_id:_chain_id,
-    buyer_ex:_buyer_ex,
-    buyer_pledge:_buyer_pledge,
-    seller_pledge:_seller_pledge,
-    amount:_amount,
+    buyer_ex:_buyer_ex.toString(),
+    buyer_pledge:_buyer_pledge.toString(),
+    seller_pledge:_seller_pledge.toString(),
+    amount:_amount.toString(),
     contract_address:_contract_address
   };
   const query =

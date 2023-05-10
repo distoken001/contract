@@ -38,7 +38,7 @@ async function monitor_add_event() {
       const _args = resultParse.args;
       let eventName = resultParse.name;
       let operater = _args["defaulter"];
-      let orderId = _args["orderId"].toNumber();
+      let orderId = _args["orderId"];
       let status = _args["status"];
       let seller = _args["seller"];
       let buyer = _args["buyer"];

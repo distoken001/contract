@@ -1,14 +1,14 @@
 import { executeQuery } from "./db";
-
+import { ethers } from "ethers";
 export const insertOrder = async (
     order_id: number,
     name: string,
     desc: string,
-    amount: number,
-    price: number,
+    amount: any,
+    price: any,
     img: string,
-    seller_pledge: number,
-    buyer_pledge: number,
+    seller_pledge: any,
+    buyer_pledge: any,
     //sellerContact: string,
     //buyerContact: string,
     status: number,
@@ -18,7 +18,7 @@ export const insertOrder = async (
     buyer: string,
     token:string,
     chain_id :number,
-    buyer_ex:number,
+    buyer_ex:any,
     contract:string,
     decimals :number
   ) => {
@@ -54,11 +54,11 @@ export const insertOrder = async (
       order_id,
       name,
       desc,
-      amount,
-      price,
+      amount.toString(),
+      price.toString(),
       img,
-      seller_pledge,
-      buyer_pledge,
+      seller_pledge.toString(),
+      buyer_pledge.toString(),
       //sellerContact,
       //buyerContact,
       status,
@@ -70,7 +70,7 @@ export const insertOrder = async (
       buyer,
       token,
       chain_id,
-      buyer_ex,
+      buyer_ex.toString(),
       contract,
       decimals
     ];
