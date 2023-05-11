@@ -11,30 +11,30 @@ setGlobalDispatcher(proxyAgent);
 module.exports = {
   solidity: "0.8.19",
   networks: {
-    op: {
-      url: process.env.API_HTTP_OP,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+    // op: {
+    //   url: process.env.API_HTTP_OP,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
     op_goerli: {
       url: process.env.API_HTTP_OP_GOERLI,
       accounts: [process.env.PRIVATE_KEY],
     },
-    arb: {
-      url: process.env.API_HTTP_ARB,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+    // arb: {
+    //   url: process.env.API_HTTP_ARB,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
     arb_goerli: {
       url: process.env.API_HTTP_ARB_GOERLI,
       accounts: [process.env.PRIVATE_KEY],
     },
-    mainnet: {
-      url: process.env.API_HTTP_MAIN,
-      accounts: [process.env.PRIVATE_KEY],
-    },
-    polygon: {
-      url: process.env.API_HTTP_POLYGON,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+    // mainnet: {
+    //   url: process.env.API_HTTP_MAIN,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
+    // polygon: {
+    //   url: process.env.API_HTTP_POLYGON,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
   },
   etherscan: {
     apiKey: {
