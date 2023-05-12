@@ -255,7 +255,7 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
         //2、校验订单状态是否可以确认
-        uint8(order.status).validateConfirm;
+        uint8(order.status).validateConfirm();
         require(order.buyer == _user, "No permissions");
         Status _status = Status.Completed;
         order.status = _status;
@@ -285,7 +285,7 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以确认发货
-        uint8(order.status).validateConfirmShip;
+        uint8(order.status).validateConfirmShip();
         require(order.seller == _user, "No permissions");
         Status _status = Status.ConfirmShip;
         //3、将订单更新为发货状态
@@ -298,7 +298,7 @@ contract Ebay is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
         //2.校验状态
-        uint8(order.status).validateLaunchCancel;
+        uint8(order.status).validateLaunchCancel();
         Status _status = Status.BuyerLanchCancel;
         //3、将订单更新为发起取消状态
         order.status = _status;
@@ -373,7 +373,7 @@ contract Ebay is Ownable {
     function adminCancel(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
-        uint8(order.status).adminValidateStatus;
+        uint8(order.status).adminValidateStatus();
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
@@ -403,7 +403,7 @@ contract Ebay is Ownable {
     function adminConfirm(uint256 _orderId) external onlyOwner {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
-        uint8(order.status).adminValidateStatus;
+        uint8(order.status).adminValidateStatus();
         //2、默认争议订单被确认
         Status _status = Status.Completed;
         order.status = _status;
@@ -431,7 +431,7 @@ contract Ebay is Ownable {
 
     function adminBreak(uint256 _orderId) external onlyOwner {
         (Order storage order, address _user) = validate(_orderId, false);
-        uint8(order.status).adminValidateStatus;
+        uint8(order.status).adminValidateStatus();
         Status _status = Status.SellerBreak;
         order.status = _status;
         order.token.safeTransfer(
