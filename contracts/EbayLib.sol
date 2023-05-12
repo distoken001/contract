@@ -9,7 +9,7 @@ library EbayLib {
         Initial, //待购买0
         Ordered, //被下单1
         Completed, //已完成2
-        BuyerBreak, //买家毁约3
+        ConfirmShip, //卖家发货3
         SellerBreak, //卖家毁约4
         SellerCancelWithoutDuty, //卖家无责取消5
         BuyerLanchCancel, //买家发起取消6
@@ -135,20 +135,6 @@ library EbayLib {
                 return 1155;
             }
         }
-    }
-
-    function validateStatus(Status status) internal pure {
-        require(status != Status.Initial, "Status Initial");
-        require(
-            status != Status.ConsultCancelCompleted,
-            "Status ConsultCancelCompleted"
-        );
-        require(status != Status.Completed, "Status Completed");
-        require(
-            status != Status.SellerCancelWithoutDuty,
-            "Status SellerCancelWithoutDuty"
-        );
-        require(status != Status.SellerBreak, "Status SellerBreak");
     }
 
     function contains(

@@ -5,15 +5,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./EbayLib.sol";
+import "./Validate.sol";
 
 contract Ebay is Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
+    using Validate for uint8;
     enum Status {
         Initial, //待购买0
         Ordered, //被下单1
         Completed, //已完成2
-        BuyerBreak, //买家毁约3
+        ConfirmShip, //卖家发货3
         SellerBreak, //卖家毁约4
         SellerCancelWithoutDuty, //卖家无责取消5
         BuyerLanchCancel, //买家发起取消6
@@ -114,8 +116,6 @@ contract Ebay is Ownable {
         uint256 _sellerRatio
     ) external {
         address _user = _msgSender();
-        //1、验证代币合约是否有效
-        require(EbayLib.verifyByAddress(_token) == 20, "Invalid contract");
         //2.质押数量
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
@@ -154,11 +154,10 @@ contract Ebay is Ownable {
         string memory _buyerContact
     ) external {
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, false);
+        (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         require(_amount <= order.amount, "amount error");
-        address _user = _msgSender();
         //3、校验订单是否指定买家
         require(
             order.buyer == address(0) || order.buyer == _user,
@@ -178,7 +177,11 @@ contract Ebay is Ownable {
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else {
-            uint256 _seller_pledge_new = EbayLib.divider(_amount, order.amount,order.seller_pledge);
+            uint256 _seller_pledge_new = EbayLib.divider(
+                _amount,
+                order.amount,
+                order.seller_pledge
+            );
             orders.push(
                 Order({
                     name: order.name,
@@ -202,7 +205,13 @@ contract Ebay is Ownable {
             contact[_order_id_new].seller = contact[_orderId].seller;
             order.amount -= _amount;
             order.seller_pledge -= _seller_pledge_new;
-            emit SetStatus(_user, _orderId, Status.Initial, order.seller, order.buyer);
+            emit SetStatus(
+                _user,
+                _orderId,
+                Status.Initial,
+                order.seller,
+                order.buyer
+            );
             emit AddOrder(
                 _user,
                 _order_id_new,
@@ -219,12 +228,10 @@ contract Ebay is Ownable {
 
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, true);
+        (Order storage order, address _user) = validate(_orderId, true);
         //2、校验订单状态是否可以取消
-        address _user = _msgSender();
         require(order.seller == _user, "No permissions");
         require(order.status == Status.Initial, "Order status error");
-
         Status _status = Status.SellerCancelWithoutDuty;
         order.token.safeTransfer(order.seller, order.seller_pledge); // 转给卖家 卖家质押数量
         total[address(order.token)] = total[address(order.token)].sub(
@@ -237,18 +244,10 @@ contract Ebay is Ownable {
 
     //确认订单
     function confirm(uint256 _orderId) external {
-        address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, true);
+        (Order storage order, address _user) = validate(_orderId, true);
         //2、校验订单状态是否可以确认
-        require(
-            order.status == Status.Ordered ||
-                order.status == Status.BuyerLanchCancel ||
-                order.status == Status.SellerLanchCancel ||
-                order.status == Status.SellerRejectCancel ||
-                order.status == Status.BuyerRejectCancel,
-            "Order cannot be confirmed"
-        );
+        uint8(order.status).validateConfirm;
         require(order.buyer == _user, "No permissions");
         Status _status = Status.Completed;
         order.status = _status;
@@ -273,18 +272,25 @@ contract Ebay is Ownable {
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
+    //确认发货
+    function ConfirmShip(uint256 _orderId) external {
+        //1、校验订单是否存在
+        (Order storage order, address _user) = validate(_orderId, false);
+        //2、校验订单状态是否可以确认发货
+        uint8(order.status).validateConfirmShip;
+        require(order.seller == _user, "No permissions");
+        Status _status = Status.ConfirmShip;
+        //3、将订单更新为发货状态
+        order.status = _status;
+        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+    }
+
     //发起取消
     function launchCancel(uint256 _orderId) external {
-        address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, true);
-        //2、校验订单状态是否可以取消
-        require(
-            order.status == Status.Ordered ||
-                order.status == Status.SellerRejectCancel ||
-                order.status == Status.BuyerRejectCancel,
-            "Order cannot be launched"
-        );
+        (Order storage order, address _user) = validate(_orderId, true);
+        //2.校验状态
+        uint8(order.status).validateLaunchCancel;
         Status _status = Status.BuyerLanchCancel;
         //3、将订单更新为发起取消状态
         order.status = _status;
@@ -296,9 +302,8 @@ contract Ebay is Ownable {
 
     //拒绝取消
     function rejectCancel(uint256 _orderId) external {
-        address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, true);
+        (Order storage order, address _user) = validate(_orderId, true);
         Status _status = Status.BuyerRejectCancel;
         if (order.buyer == _user) {
             require(
@@ -319,9 +324,8 @@ contract Ebay is Ownable {
 
     //确认取消
     function confirmCancel(uint256 _orderId) external {
-        address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, true);
+        (Order storage order, address _user) = validate(_orderId, true);
         //默认协商取消完成
         Status _status = Status.ConsultCancelCompleted;
         if (order.buyer == _user) {
@@ -359,10 +363,9 @@ contract Ebay is Ownable {
 
     //争议订单取消强制双方返还
     function adminCancel(uint256 _orderId) external onlyOwner {
-        address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, false);
-        EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
+        (Order storage order, address _user) = validate(_orderId, false);
+        uint8(order.status).adminValidateStatus;
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
@@ -390,10 +393,9 @@ contract Ebay is Ownable {
 
     //争议订单强制确认
     function adminConfirm(uint256 _orderId) external onlyOwner {
-        address _user = _msgSender();
         //1、校验订单是否存在
-        Order storage order = validate(_orderId, false);
-        EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
+        (Order storage order, address _user) = validate(_orderId, false);
+        uint8(order.status).adminValidateStatus;
         //2、默认争议订单被确认
         Status _status = Status.Completed;
         order.status = _status;
@@ -420,9 +422,8 @@ contract Ebay is Ownable {
     }
 
     function adminBreak(uint256 _orderId) external onlyOwner {
-        address _user = _msgSender();
-        Order storage order = validate(_orderId, false);
-        EbayLib.validateStatus(EbayLib.Status(uint(order.status)));
+        (Order storage order, address _user) = validate(_orderId, false);
+        uint8(order.status).adminValidateStatus;
         Status _status = Status.SellerBreak;
         order.status = _status;
         order.token.safeTransfer(
@@ -466,13 +467,13 @@ contract Ebay is Ownable {
     function validate(
         uint256 _orderId,
         bool isValidateSender
-    ) internal view returns (Order storage order) {
-        address _user = _msgSender();
+    ) internal view returns (Order storage order, address user) {
+        user = _msgSender();
         order = orders[_orderId];
         require(_orderId < orders.length, "Order does not exist");
         if (isValidateSender) {
             require(
-                order.buyer == _user || order.seller == _user,
+                order.buyer == user || order.seller == user,
                 "No permissions"
             );
         }
