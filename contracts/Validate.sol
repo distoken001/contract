@@ -6,7 +6,7 @@ library Validate {
         Initial, //待购买0
         Ordered, //被下单1
         Completed, //已完成2
-        ConfirmShip, //买家毁约3
+        ConfirmShip, //确认发货3
         SellerBreak, //卖家毁约4
         SellerCancelWithoutDuty, //卖家无责取消5
         BuyerLanchCancel, //买家发起取消6
@@ -36,33 +36,24 @@ library Validate {
         require(
             status == Status.Ordered ||
                 status == Status.SellerRejectCancel ||
-                status == Status.BuyerRejectCancel ||
-                status == Status.ConfirmShip,
+                status == Status.BuyerRejectCancel,
             "Order cannot be launched"
         );
     }
 
     function validateConfirm(uint8 num) internal pure {
         Status status = Status(num);
-        require(
-            status == Status.Ordered ||
-                status == Status.BuyerLanchCancel ||
-                status == Status.SellerLanchCancel ||
-                status == Status.SellerRejectCancel ||
-                status == Status.BuyerRejectCancel ||
-                status == Status.ConfirmShip,
-            "Order cannot be confirmed"
-        );
+        require(status == Status.ConfirmShip, "Order cannot be confirmed");
     }
 
     function validateConfirmShip(uint8 num) internal pure {
         Status status = Status(num);
         require(
             status == Status.Ordered ||
-                status == Status.BuyerLanchCancel ||
-                status == Status.SellerLanchCancel ||
                 status == Status.SellerRejectCancel ||
-                status == Status.BuyerRejectCancel,
+                status == Status.BuyerRejectCancel ||
+                status == Status.BuyerLanchCancel ||
+                status == Status.SellerLanchCancel,
             "Order cannot be confirmed"
         );
     }

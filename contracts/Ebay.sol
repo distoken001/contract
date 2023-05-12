@@ -116,13 +116,17 @@ contract Ebay is Ownable {
         uint256 _sellerRatio
     ) external {
         address _user = _msgSender();
-        //2.质押数量
+        require(
+            bytes(_contactSeller).length != 0,
+            "Seller contact can not be null"
+        );
+        //1.质押数量
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
             _amount,
             _sellerRatio
         );
-        //3、将代币转入到合约地址
+        //2、将代币转入到合约地址
         IERC20(_token).transferFrom(_user, address(this), _seller_pledge);
         orders.push(
             Order({
@@ -142,7 +146,7 @@ contract Ebay is Ownable {
         );
         uint256 _orderId = orders.length - 1;
         contact[_orderId].seller = _contactSeller;
-        total[_token] += _seller_pledge; //更新总质押代币数量
+        total[_token] += _seller_pledge;
         sellerList[_user].push(_orderId);
         emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
     }
@@ -155,6 +159,10 @@ contract Ebay is Ownable {
     ) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
+        require(
+            bytes(_buyerContact).length != 0,
+            "Seller contact can not be null"
+        );
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         require(_amount <= order.amount, "amount error");
@@ -233,7 +241,7 @@ contract Ebay is Ownable {
         require(order.seller == _user, "No permissions");
         require(order.status == Status.Initial, "Order status error");
         Status _status = Status.SellerCancelWithoutDuty;
-        order.token.safeTransfer(order.seller, order.seller_pledge); // 转给卖家 卖家质押数量
+        order.token.safeTransfer(order.seller, order.seller_pledge);
         total[address(order.token)] = total[address(order.token)].sub(
             order.seller_pledge
         );
@@ -326,7 +334,7 @@ contract Ebay is Ownable {
     function confirmCancel(uint256 _orderId) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
-        //默认协商取消完成
+        //2、默认协商取消完成
         Status _status = Status.ConsultCancelCompleted;
         if (order.buyer == _user) {
             require(
@@ -387,7 +395,7 @@ contract Ebay is Ownable {
         order.token.safeTransfer(order.seller, sellerBack);
         order.token.safeTransfer(order.buyer, buyerBack);
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
-        total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
+        total[address(order.token)] -= order.buyer_pledge + order.seller_pledge;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
