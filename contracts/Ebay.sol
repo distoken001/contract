@@ -300,11 +300,11 @@ contract Ebay is Ownable {
         //2.校验状态
         uint8(order.status).validateLaunchCancel();
         Status _status = Status.BuyerLanchCancel;
-        //3、将订单更新为发起取消状态
-        order.status = _status;
         if (order.seller == _user) {
             _status = Status.SellerLanchCancel;
         }
+        //3、将订单更新为发起取消状态
+        order.status = _status;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
