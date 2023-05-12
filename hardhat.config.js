@@ -4,29 +4,29 @@ const dotenv = require("dotenv");
 dotenv.config({ path: ".env.development" });
 
 // set proxy
-const { ProxyAgent, setGlobalDispatcher } = require("undici");
-const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
-setGlobalDispatcher(proxyAgent);
+// const { ProxyAgent, setGlobalDispatcher } = require("undici");
+// const proxyAgent = new ProxyAgent(process.env.PROXY_URL);
+// setGlobalDispatcher(proxyAgent);
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.19",
   networks: {
-    // op: {
-    //   url: process.env.API_HTTP_OP,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
     op_goerli: {
       url: process.env.API_HTTP_OP_GOERLI,
       accounts: [process.env.PRIVATE_KEY],
     },
-    // arb: {
-    //   url: process.env.API_HTTP_ARB,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
     arb_goerli: {
       url: process.env.API_HTTP_ARB_GOERLI,
       accounts: [process.env.PRIVATE_KEY],
     },
+    // op: {
+    //   url: process.env.API_HTTP_OP,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
+    // arb: {
+    //   url: process.env.API_HTTP_ARB,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
     // mainnet: {
     //   url: process.env.API_HTTP_MAIN,
     //   accounts: [process.env.PRIVATE_KEY],
