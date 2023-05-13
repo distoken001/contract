@@ -333,8 +333,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/de-market/contract/contracts/Ebay.sol": {
-      "lastModificationDate": 1683902382232,
-      "contentHash": "3976aef135f6d3a9210d4273a75a4a76",
+      "lastModificationDate": 1683942150319,
+      "contentHash": "0487fa46e7320c9781f226779098ae13",
       "sourceName": "contracts/Ebay.sol",
       "solcConfig": {
         "version": "0.8.19",

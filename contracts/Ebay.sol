@@ -281,7 +281,7 @@ contract Ebay is Ownable {
     }
 
     //确认发货
-    function ConfirmShip(uint256 _orderId) external {
+    function confirmShip(uint256 _orderId) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以确认发货
