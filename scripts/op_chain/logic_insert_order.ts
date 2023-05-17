@@ -1,5 +1,6 @@
 import { executeQuery } from "./db";
 import { ethers } from "ethers";
+import { sendemail } from "./send_email";
 export const insertOrder = async (
     order_id: number,
     name: string,
@@ -75,5 +76,6 @@ export const insertOrder = async (
       decimals
     ];
     const [rows, fields] = await executeQuery (sql, values);
+    sendemail(chain_id,contract,order_id);
     return [rows,fields];
   }
