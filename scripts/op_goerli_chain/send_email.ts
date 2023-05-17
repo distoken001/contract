@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function sendemail(chain_id:number,contract:string,order_id:number) {
   try {
-    const url = 'https://api-dev.de-market.com/api/sendemail';
+    const url = 'https://api-dev.de-market.com/api/notice/sendemail';
     const data = {
       chain_id: chain_id,
       contract: contract,
