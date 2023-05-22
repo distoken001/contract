@@ -12,11 +12,12 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 
 contract DeMarket is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, Pausable, ERC20Permit, ERC20Votes, ERC20FlashMint {
     constructor() ERC20("De-Market", "DMA") ERC20Permit("De-Market") {}
-
     function snapshot() public onlyOwner {
         _snapshot();
     }
-
+    function decimals() public pure  override returns (uint8) {
+        return 0;
+    }
     function pause() public onlyOwner {
         _pause();
     }
