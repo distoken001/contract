@@ -1303,6 +1303,44 @@
       "artifacts": [
         "StorageSlot"
       ]
+    },
+    "/Users/buqun/Documents/GitHub/de-market/contract/contracts/AirDrop.sol": {
+      "lastModificationDate": 1684741464749,
+      "contentHash": "4b081289ae3401e1f4cc8f5d0c6ca638",
+      "sourceName": "contracts/AirDrop.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.4"
+      ],
+      "artifacts": [
+        "Airdrop",
+        "ERC20"
+      ]
     }
   }
 }
