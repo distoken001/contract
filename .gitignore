@@ -43,3 +43,5 @@ yarn 2.lock
 .env.production
 .env.local
 dist/
+artifacts/
+cache/
