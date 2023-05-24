@@ -7,14 +7,14 @@ export async function sendemail(
 ) {
   if (process.env.NODE_ENV == "production"||process.env.NODE_ENV == "developmnent") {
     try {
-      const url = "https://api.de-market.com/api/notice/sendemail";
+      const url =process.env.SEND_EMAIL_URL;
       const data = {
         chain_id: chain_id,
         contract: contract,
         order_id: order_id,
       };
 
-      const response = await axios.post(url, data);
+      const response = await axios.post(url!, data);
       console.log(response.data);
     } catch (error) {
       console.error(error);
