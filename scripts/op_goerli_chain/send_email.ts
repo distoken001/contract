@@ -5,7 +5,7 @@ export async function sendemail(
   contract: string,
   order_id: number
 ) {
-  if (process.env.NODE_ENV == "production"||process.env.NODE_ENV == "developmnent") {
+  if (process.env.NODE_ENV == "production"||process.env.NODE_ENV == "development") {
     try {
       const url =process.env.SEND_EMAIL_URL;
       const data = {
