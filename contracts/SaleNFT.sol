@@ -13,10 +13,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // OpenSea上预览或出售NFTS
 
 contract SaleNFTs is ERC721, Ownable {
-
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
-    
+
     IERC20 dma;
     Counters.Counter private _tokenIdCounter;
     //0.9 dma price
@@ -30,19 +29,23 @@ contract SaleNFTs is ERC721, Ownable {
         return "ipfs://QmcLNHGoGbihs6iTk84BsXCBstRUu8kz5nHJ3L2dTGoSLK/";
     }
 
-    function safeMint(address to) internal  {
+    function safeMint(address to) internal {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
     }
 
-     // 1 dma 购买
+    function mint(address to) external onlyOwner {
+        safeMint(to);
+    }
+
+    // 1 dma 购买
     function mintWithDma(uint256 _amount) public {
-        require(_amount >= price,"Dma amount error");
+        require(_amount >= price, "Dma amount error");
         dma.safeTransferFrom(msg.sender, address(this), _amount);
         safeMint(msg.sender);
     }
-    
+
     //设置价格
     function setPrice(uint256 _price) public onlyOwner {
         price = _price;
@@ -53,10 +56,9 @@ contract SaleNFTs is ERC721, Ownable {
         return dma.balanceOf(address(this));
     }
 
-     //提现Dma
-    function withraw() public onlyOwner{
+    //提现Dma
+    function withraw() public onlyOwner {
         uint256 amount = dma.balanceOf(address(this));
         dma.safeTransfer(owner(), amount);
     }
 }
-
