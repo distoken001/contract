@@ -26,7 +26,7 @@ contract DeMarketNFT is ERC721, Ownable {
     }
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://ipfs.io/ipfs/Qmd1EhQdu3ephKNLAttcJmqR7LoLksfCtNaqd2xTmQ5ijq/";
+        return "ipfs://Qmd1EhQdu3ephKNLAttcJmqR7LoLksfCtNaqd2xTmQ5ijq/";
     }
 
     function safeMint(address to) internal {
