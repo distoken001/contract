@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // 使用Hardhat工具部署合约到optimism网络，并且Verify代码，方便用户在etherscan上直接够NFTs
 // OpenSea上预览或出售NFTS
 
-contract SaleNFTs is ERC721, Ownable {
+contract DeMarketNft is ERC721, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
 
