@@ -20,14 +20,23 @@ contract DeMarketNFT is ERC721, Ownable {
     Counters.Counter private _tokenIdCounter;
     //0.9 dma price
     uint256 public price = 900000;
+    string private baseURI =
+        "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/";
 
     constructor(address _dma) ERC721("DeMarket NFT", "DMA NFT") {
         dma = IERC20(_dma);
     }
 
-    function _baseURI() internal pure override returns (string memory) {
-        return
-            "https://ipfs.io/ipfs/QmU3Ey6Hmnndha2CtUpgYV4BCEBQq9fBTo9FStP11dtHiS/";
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
+    }
+
+    function _setBaseURI(string memory baseURI_) internal virtual {
+        baseURI = baseURI_;
+    }
+
+    function setBaseURI(string memory baseURI_) public onlyOwner {
+        _setBaseURI(baseURI_);
     }
 
     function safeMint(address to) internal {
