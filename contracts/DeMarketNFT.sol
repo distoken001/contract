@@ -7,11 +7,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-// 准备NFTs的图片与Metadata属性文件，并上传到IPFS。参考文档 https://docs.ipfs.tech/how-to/desktop-app/#install-ipfs-desktop
-// 编写合约
-// 使用Hardhat工具部署合约到optimism网络，并且Verify代码，方便用户在etherscan上直接够NFTs
-// OpenSea上预览或出售NFTS
-
 contract DeMarketAvatarNFT is ERC721, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
