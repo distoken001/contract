@@ -25,7 +25,7 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
-    function _setDma(address _token) public onlyOwner {
+    function _setToken(address _token) public onlyOwner {
         token = IERC20(_token);
     }
     function _setBaseURI(string memory baseURI_) internal virtual {
@@ -48,7 +48,7 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
 
     // 购买
     function mintWithToken(uint256 _amount) public {
-        require(_amount >= price, "Dma amount error");
+        require(_amount >= price, "Token amount error");
         token.safeTransferFrom(msg.sender, address(this), _amount);
         safeMint(msg.sender);
     }
@@ -59,7 +59,7 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
     }
 
     //获取余额
-    function getDmaBalance() public view returns (uint256) {
+    function getTokenBalance() public view returns (uint256) {
         return token.balanceOf(address(this));
     }
 
