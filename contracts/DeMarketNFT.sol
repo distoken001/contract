@@ -19,7 +19,7 @@ contract DeMarketNFT is ERC721, Ownable {
     IERC20 dma;
     Counters.Counter private _tokenIdCounter;
     //0.9 dma price
-    uint256 public price = 900000;
+    uint256 public price = 20000000;
     string private baseURI =
         "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/";
 
