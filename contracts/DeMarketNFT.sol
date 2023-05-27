@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // 使用Hardhat工具部署合约到optimism网络，并且Verify代码，方便用户在etherscan上直接够NFTs
 // OpenSea上预览或出售NFTS
 
-contract DeMarketNFT is ERC721, Ownable {
+contract DeMarketAvatarNFT is ERC721, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
 
@@ -21,9 +21,9 @@ contract DeMarketNFT is ERC721, Ownable {
     //0.9 dma price
     uint256 public price = 20000000;
     string private baseURI =
-        "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/";
+        "ipfs://QmaKYYkBxHmgaw4tLKjZ9JJW1GcjsDcdk3PLTYYMSBgM1s/";
 
-    constructor(address _dma) ERC721("DeMarket NFT", "DMA NFT") {
+    constructor(address _dma) ERC721("DeMarket Avatar NFT", "DeMarket") {
         dma = IERC20(_dma);
     }
 
