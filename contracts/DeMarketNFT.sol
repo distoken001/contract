@@ -25,7 +25,7 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
-    function _setToken(address _token) public onlyOwner {
+    function setToken(address _token) public onlyOwner {
         token = IERC20(_token);
     }
     function _setBaseURI(string memory baseURI_) internal virtual {
