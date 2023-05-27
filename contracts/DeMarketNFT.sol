@@ -11,21 +11,23 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
 
-    IERC20 dma;
+    IERC20 token;
     Counters.Counter private _tokenIdCounter;
-    //0.9 dma price
+    //0.9 token price
     uint256 public price = 20000000;
     string private baseURI =
         "ipfs://QmaKYYkBxHmgaw4tLKjZ9JJW1GcjsDcdk3PLTYYMSBgM1s/";
 
-    constructor(address _dma) ERC721("DeMarket Avatar NFT", "DeMarket") {
-        dma = IERC20(_dma);
+    constructor(address _token) ERC721("DeMarket Avatar NFT", "DeMarket") {
+        token = IERC20(_token);
     }
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
-
+    function _setDma(address _token) public onlyOwner {
+        token = IERC20(_token);
+    }
     function _setBaseURI(string memory baseURI_) internal virtual {
         baseURI = baseURI_;
     }
@@ -44,10 +46,10 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
         safeMint(to);
     }
 
-    // 1 dma 购买
-    function mintWithDma(uint256 _amount) public {
+    // 购买
+    function mintWithToken(uint256 _amount) public {
         require(_amount >= price, "Dma amount error");
-        dma.safeTransferFrom(msg.sender, address(this), _amount);
+        token.safeTransferFrom(msg.sender, address(this), _amount);
         safeMint(msg.sender);
     }
 
@@ -56,14 +58,14 @@ contract DeMarketAvatarNFT is ERC721, Ownable {
         price = _price;
     }
 
-    //获取Dma余额
+    //获取余额
     function getDmaBalance() public view returns (uint256) {
-        return dma.balanceOf(address(this));
+        return token.balanceOf(address(this));
     }
 
-    //提现Dma
+    //提现
     function withraw() public onlyOwner {
-        uint256 amount = dma.balanceOf(address(this));
-        dma.safeTransfer(owner(), amount);
+        uint256 amount = token.balanceOf(address(this));
+        token.safeTransfer(owner(), amount);
     }
 }
