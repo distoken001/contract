@@ -22,7 +22,7 @@ contract DeMarket is
 {
     constructor() ERC20("DeMarket", "DMA") ERC20Permit("DeMarket") {}
 
-    uint256 public constant MAX_SUPPLY = 1000000 * 10**18; // 总供应量上限为500万枚
+    uint256 public constant MAX_SUPPLY = 10000000 * 10**18; // 总供应量上限为1000w枚
 
     function snapshot() public onlyOwner {
         _snapshot();
