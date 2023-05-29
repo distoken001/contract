@@ -22,6 +22,8 @@ contract DeMarket is
 {
     constructor() ERC20("DeMarket", "DMA") ERC20Permit("DeMarket") {}
 
+    uint256 public constant MAX_SUPPLY = 1000000 * 10**18; // 总供应量上限为500万枚
+
     function snapshot() public onlyOwner {
         _snapshot();
     }
@@ -35,6 +37,7 @@ contract DeMarket is
     }
 
     function mint(address to, uint256 amount) public onlyOwner {
+        require(totalSupply() + amount <= MAX_SUPPLY, "Exceeded maximum supply");
         _mint(to, amount);
     }
 
@@ -68,11 +71,5 @@ contract DeMarket is
         uint256 amount
     ) internal override(ERC20, ERC20Votes) {
         super._burn(account, amount);
-    }
-
-    function renounceOwnership() public pure override {}
-
-    function decimals() public pure override returns (uint8) {
-        return 6;
     }
 }
