@@ -21,12 +21,8 @@ export async function insertLog(
     order_id: _order_id.toString(),
     data: _data,
     status: _status,
-    create_time: new Date().toLocaleString("zh-CN", {
-      timeZone: "Asia/Shanghai",
-    }),
-    update_time: new Date().toLocaleString("zh-CN", {
-      timeZone: "Asia/Shanghai",
-    }),
+    create_time: new Date(),
+    update_time: new Date(),
     updater: "system",
     creator: "system",
     hash: _hash,

@@ -16,9 +16,7 @@ export async function logic_update_order(
   const updateData = {
     order_id: _order_id,
     status: _status,
-    update_time: new Date().toLocaleString("zh-CN", {
-      timeZone: "Asia/Shanghai",
-    }),
+    update_time: new Date(),
     updater: "system",
     creator: "system",
     buyer: _buyer,
