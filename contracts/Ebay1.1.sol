@@ -164,6 +164,7 @@ contract Ebay is Ownable {
         uint256 _amount
     ) external {
         (Order storage order, address _user) = validate(_orderId, false);
+        require(order.status == Status.Initial, "Order Status Error");
         require(order.seller == _user, "No permissions");
         order.name = _name;
         order.description = _description;
@@ -176,13 +177,7 @@ contract Ebay is Ownable {
             require(order.seller_pledge == 0, "seller_pledge must be zero");
             order.token = IERC20(_token);
         }
-        emit SetStatus(
-            _user,
-            _orderId,
-            order.status,
-            order.seller,
-            order.buyer
-        );
+        emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
     }
 
     //买家下单
