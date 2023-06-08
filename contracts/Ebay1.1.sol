@@ -164,8 +164,14 @@ contract Ebay is Ownable {
         uint256 _amount
     ) external {
         (Order storage order, address _user) = validate(_orderId, false);
-        require(order.status == Status.Initial, "Order Status Error");
-        require(order.seller == _user, "No permissions");
+        require(
+            order.seller == _user && order.status == Status.Initial,
+            "No permissions"
+        );
+        require(
+            bytes(_contactSeller).length != 0,
+            "Seller contact can not be null"
+        );
         order.name = _name;
         order.description = _description;
         order.img = _img;

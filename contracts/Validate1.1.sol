@@ -18,17 +18,14 @@ library Validate {
 
     function adminValidateStatus(uint8 num) internal pure {
         Status status = Status(num);
-        require(status != Status.Initial, "Status Initial");
         require(
-            status != Status.ConsultCancelCompleted,
-            "Status ConsultCancelCompleted"
+            status != Status.Initial &&
+                status != Status.ConsultCancelCompleted &&
+                status != Status.Completed &&
+                status != Status.SellerCancelWithoutDuty &&
+                status != Status.SellerBreak,
+            "Status Error"
         );
-        require(status != Status.Completed, "Status Completed");
-        require(
-            status != Status.SellerCancelWithoutDuty,
-            "Status SellerCancelWithoutDuty"
-        );
-        require(status != Status.SellerBreak, "Status SellerBreak");
     }
 
     function validateLaunchCancel(uint8 num) internal pure {
