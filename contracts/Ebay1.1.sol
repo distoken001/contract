@@ -348,23 +348,8 @@ contract Ebay is Ownable {
             );
         }
         order.status = _status;
-        (
-            uint256 buyerFee,
-            uint256 sellerFee,
-            uint256 sellerBack,
-            uint256 buyerBack
-        ) = EbayLib.confirmCancelCalculateFeesAndRefunds(
-                order.buyer_pledge,
-                order.seller_pledge,
-                order.price,
-                order.amount,
-                buyerRate,
-                sellerRate,
-                order.buyer_ex
-            );
-        order.token.safeTransfer(order.seller, sellerBack);
-        order.token.safeTransfer(order.buyer, buyerBack);
-        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
+        order.token.safeTransfer(order.seller, order.seller_pledge);
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
@@ -377,24 +362,8 @@ contract Ebay is Ownable {
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
-
-        (
-            uint256 buyerFee,
-            uint256 sellerFee,
-            uint256 sellerBack,
-            uint256 buyerBack
-        ) = EbayLib.confirmCancelCalculateFeesAndRefunds(
-                order.buyer_pledge,
-                order.seller_pledge,
-                order.price,
-                order.amount,
-                buyerRate,
-                sellerRate,
-                order.buyer_ex
-            );
-        order.token.safeTransfer(order.seller, sellerBack);
-        order.token.safeTransfer(order.buyer, buyerBack);
-        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
+        order.token.safeTransfer(order.seller, order.seller_pledge);
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
