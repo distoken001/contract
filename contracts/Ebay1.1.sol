@@ -151,6 +151,40 @@ contract Ebay is Ownable {
         emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
     }
 
+    //修改订单
+    function update(
+        uint256 _orderId,
+        string memory _name,
+        string memory _contactSeller,
+        string memory _description,
+        string memory _img,
+        address _buyer,
+        address _token,
+        uint256 _price,
+        uint256 _amount
+    ) external {
+        (Order storage order, address _user) = validate(_orderId, false);
+        require(order.seller == _user, "No permissions");
+        order.name = _name;
+        order.description = _description;
+        order.img = _img;
+        order.buyer = _buyer;
+        order.price = _price;
+        order.amount = _amount;
+        contact[_orderId].seller = _contactSeller;
+        if (IERC20(_token) != order.token) {
+            require(order.seller_pledge == 0, "seller_pledge must be zero");
+            order.token = IERC20(_token);
+        }
+        emit SetStatus(
+            _user,
+            _orderId,
+            order.status,
+            order.seller,
+            order.buyer
+        );
+    }
+
     //买家下单
     function place(
         uint256 _orderId,
