@@ -473,9 +473,6 @@ contract Ebay is Ownable {
     function setLock(address _lockAddr) external onlyOwner {
         lockAddr = _lockAddr;
     }
-
-    function renounceOwnership() public pure override {}
-
     function validate(
         uint256 _orderId,
         bool isValidateSender
