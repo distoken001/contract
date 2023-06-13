@@ -148,6 +148,10 @@ contract Ebay is Ownable {
         contact[_orderId].seller = _contactSeller;
         total[_token] += _seller_pledge;
         sellerList[_user].push(_orderId);
+        if (_buyer != address(0)) {
+            buyerList[_buyer].push(_orderId);
+        }
+
         emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
     }
 
@@ -158,7 +162,6 @@ contract Ebay is Ownable {
         string memory _contactSeller,
         string memory _description,
         string memory _img,
-        address _buyer,
         address _token,
         uint256 _price,
         uint256 _amount
@@ -175,7 +178,6 @@ contract Ebay is Ownable {
         order.name = _name;
         order.description = _description;
         order.img = _img;
-        order.buyer = _buyer;
         order.price = _price;
         order.amount = _amount;
         contact[_orderId].seller = _contactSeller;
@@ -183,7 +185,7 @@ contract Ebay is Ownable {
             require(order.seller_pledge == 0, "seller_pledge must be zero");
             order.token = IERC20(_token);
         }
-        emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
+        emit AddOrder(_user, _orderId, Status.Initial, _user, order.buyer);
     }
 
     //买家下单
@@ -215,8 +217,10 @@ contract Ebay is Ownable {
             order.status = _status;
             order.buyer_pledge = _buyer_pledge;
             order.buyer_ex = _buyer_tx_fee;
+            if (order.buyer == address(0)) {
+                buyerList[_user].push(_orderId);
+            }
             order.buyer = _user;
-            buyerList[_user].push(_orderId);
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else {
@@ -473,6 +477,7 @@ contract Ebay is Ownable {
     function setLock(address _lockAddr) external onlyOwner {
         lockAddr = _lockAddr;
     }
+
     function validate(
         uint256 _orderId,
         bool isValidateSender
