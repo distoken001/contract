@@ -55,17 +55,17 @@ module.exports = {
         NODE_ENV: "productionb",
       },
     },
-    {
-      name: "monitor_conflux",
-      script: "node ./dist/conflux_chain/start.js",
-      instances: 1,
-      autorestart: true,
-      watch: false,
-      max_memory_restart: "512M",
-      env: {
-        NODE_ENV: "productionb",
-      },
-    },
+    // {
+    //   name: "monitor_conflux",
+    //   script: "node ./dist/conflux_chain/start.js",
+    //   instances: 1,
+    //   autorestart: true,
+    //   watch: false,
+    //   max_memory_restart: "512M",
+    //   env: {
+    //     NODE_ENV: "productionb",
+    //   },
+    // },
     // {
     //   name: 'monitor_main',
     //   script: 'node ./dist/main_chain/start.js',
