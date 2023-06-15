@@ -45,15 +45,26 @@ module.exports = {
       },
     },
     {
-      name: 'monitor_bsc',
-      script: 'node ./dist/bsc_chain/start.js',
+      name: "monitor_bsc",
+      script: "node ./dist/bsc_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
-      max_memory_restart: '512M',
+      max_memory_restart: "512M",
       env: {
-        NODE_ENV: 'productionb',
-      }
+        NODE_ENV: "productionb",
+      },
+    },
+    {
+      name: "monitor_conflux",
+      script: "node ./dist/conflux_chain/start.js",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "512M",
+      env: {
+        NODE_ENV: "productionb",
+      },
     },
     // {
     //   name: 'monitor_main',
