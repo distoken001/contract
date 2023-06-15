@@ -116,10 +116,6 @@ contract Ebay is Ownable {
         uint256 _sellerRatio
     ) external {
         address _user = _msgSender();
-        require(
-            bytes(_contactSeller).length != 0,
-            "Seller contact can not be null"
-        );
         //1.质押数量
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
@@ -196,10 +192,6 @@ contract Ebay is Ownable {
     ) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
-        require(
-            bytes(_buyerContact).length != 0,
-            "Seller contact can not be null"
-        );
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         require(_amount <= order.amount, "amount error");
