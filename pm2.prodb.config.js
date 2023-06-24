@@ -1,8 +1,8 @@
 module.exports = {
   apps: [
     {
-      name: "monitor_op",
-      script: " node ./dist/op_chain/start.js",
+      name: "monitor_op_prodb",
+      script: " node ./dist/master/op_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -12,8 +12,8 @@ module.exports = {
       },
     },
     {
-      name: "monitor_arb",
-      script: "node ./dist/arb_chain/start.js",
+      name: "monitor_arb_prodb",
+      script: "node ./dist/master/arb_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -23,8 +23,8 @@ module.exports = {
       },
     },
     {
-      name: "monitor_polygon",
-      script: "node ./dist/polygon_chain/start.js",
+      name: "monitor_polygon_prodb",
+      script: "node ./dist/master/polygon_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -34,8 +34,8 @@ module.exports = {
       },
     },
     {
-      name: "monitor_avax",
-      script: "node ./dist/avax_chain/start.js",
+      name: "monitor_avax_prodb",
+      script: "node ./dist/master/avax_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -45,8 +45,8 @@ module.exports = {
       },
     },
     {
-      name: "monitor_bsc",
-      script: "node ./dist/bsc_chain/start.js",
+      name: "monitor_bsc_prodb",
+      script: "node ./dist/master/bsc_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -56,8 +56,8 @@ module.exports = {
       },
     },
     {
-      name: "monitor_conflux",
-      script: "node ./dist/conflux_chain/start.js",
+      name: "monitor_conflux_prodb",
+      script: "node ./dist/master/conflux_chain/start.js",
       instances: 1,
       autorestart: true,
       watch: false,
