@@ -1,6 +1,5 @@
 import mysql, { Pool, RowDataPacket, FieldPacket, OkPacket, ResultSetHeader } from 'mysql2/promise';
-import { dbConfig } from './db_config';
-
+const dbConfig = JSON.parse(process.env.DB_CONFIG!);
 const pool = mysql.createPool(dbConfig);
 
 async function executeQuery(query: string, values: any[] = []): Promise<[RowDataPacket[], FieldPacket[]]> {
