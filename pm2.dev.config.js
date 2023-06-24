@@ -2,7 +2,7 @@ module.exports = {
     apps: [
       {
         name: 'monitor_op_goerli',
-        script: ' node ./dist/dev/op_goerli_chain/start.js',
+        script: ' node ./dist/dev/v1/op_goerli_chain/start.js',
         instances: 1,
         autorestart: true,
         watch: false,
@@ -13,7 +13,7 @@ module.exports = {
       },
       {
         name: 'monitor_arb_goerli',
-        script: ' node ./dist/dev/arb_goerli_chain/start.js',
+        script: ' node ./dist/dev/v1/arb_goerli_chain/start.js',
         instances: 1,
         autorestart: true,
         watch: false,
