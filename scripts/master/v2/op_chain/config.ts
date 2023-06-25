@@ -11,9 +11,9 @@ if (process.env.NODE_ENV === "production") {
 const contractABI = require("../../../../artifacts/contracts/EbayV2.sol/Ebay.json").abi;
 const tokenContractABI =
   require("../../../../artifacts/contracts/Token.sol/Token.json").abi;
-let contractAddress: string = process.env.CONFLUX_CONTRACT_ADDRESS_V2!;
-let monitorWss: string = process.env.API_WSS_CONFLUX!;
-let monitorHttps: string = process.env.API_HTTP_CONFLUX!;
+let contractAddress: string = process.env.OP_CONTRACT_ADDRESS_V2!;
+let monitorWss: string = process.env.API_WSS_OP!;
+let monitorHttps: string = process.env.API_HTTP_OP!;
 // 将 JSON 字符串解析为对象
 const dbConfig = JSON.parse(process.env.DB_CONFIG!);
 const providerWss = new ethers.providers.WebSocketProvider(monitorWss);

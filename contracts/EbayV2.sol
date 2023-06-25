@@ -4,8 +4,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./EbayLib1.1.sol";
-import "./Validate1.1.sol";
+import "./EbayLibV2.sol";
+import "./ValidateV2.sol";
 
 contract Ebay is Ownable {
     using SafeERC20 for IERC20;
