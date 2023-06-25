@@ -67,7 +67,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_op_prodb",
+      name: "v2_monitor_op_prodb",
       script: "node ./dist/master/v2/op_chain/start.js",
       instances: 1,
       autorestart: true,
