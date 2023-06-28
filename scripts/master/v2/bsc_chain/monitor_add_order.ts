@@ -10,7 +10,7 @@ import {
 } from "./config";
 import { insertOrder } from "../../common/logic_insert_order";
 async function monitor_add_order() {
-  console.log("function:monitor_add_order is loading");
+  console.log("monitor_add_order is loading");
   const topic = ethers.utils.id(
     "AddOrder(address,uint256,uint8,address,address)"
   );
@@ -25,13 +25,13 @@ async function monitor_add_order() {
     const resultParse = iface.parseLog({ data, topics });
 
     const _args = resultParse.args;
-    console.log(
-      "Parse Log Data monitor_add_order->resultParse->_args->",
-      _args
-    );
+    // console.log(
+    //   "Parse Log Data monitor_add_order->resultParse->_args->",
+    //   _args
+    // );
     const orderId = _args["orderId"].toNumber();
     const orderDetail = await contract.orders(orderId);
-    console.log("订单详情:", orderDetail);
+    console.log("monitor_add_order订单详情:", orderDetail);
     const token = orderDetail["token"];
     const tokenContract = new ethers.Contract(
       token,
@@ -63,5 +63,6 @@ async function monitor_add_order() {
       decimals
     );
   });
+  console.log("monitor_add_order is ok");
 }
 export { monitor_add_order };

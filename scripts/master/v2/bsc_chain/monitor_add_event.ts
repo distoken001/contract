@@ -3,7 +3,7 @@ import { insertLog } from "../../common/logic_insert_log";
 import { contractAddress, providerWss, iface, chainId } from "./config";
 
 async function monitor_add_event() {
-  console.log("function:monitor_add_event  is loading");
+  console.log("monitor_add_event  is loading");
   const topic1 = ethers.utils.id(
     "AddOrder(address,uint256,uint8,address,address)"
   );
@@ -29,10 +29,10 @@ async function monitor_add_event() {
       const data = result.data;
       const topics = result.topics;
       const resultParse = iface.parseLog({ data, topics });
-      console.log(
-        "Parse Log Data op_monitor_event->resultParse->",
-        resultParse
-      );
+      // console.log(
+      //   "Parse Log Data op_monitor_event->resultParse->",
+      //   resultParse
+      // );
 
       const _args = resultParse.args;
       let eventName = resultParse.name;
@@ -55,6 +55,7 @@ async function monitor_add_event() {
       );
     });
   });
+  console.log("monitor_add_event  is ok");
 }
 export { monitor_add_event };
 //console.log("Parse Log Data Args->", iface.parseLog({ data, topics }).args[1]);
