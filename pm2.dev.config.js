@@ -6,6 +6,7 @@ module.exports = {
         instances: 1,
         autorestart: true,
         watch: false,
+        cron_restart: '0 0 * * *', // 每天午夜重启一次
         max_memory_restart: '512M',
         env: {
           NODE_ENV: 'development',
@@ -17,6 +18,7 @@ module.exports = {
         instances: 1,
         autorestart: true,
         watch: false,
+        cron_restart: '0 0 * * *', // 每天午夜重启一次
         max_memory_restart: '512M',
         env: {
           NODE_ENV: 'development',
@@ -28,6 +30,7 @@ module.exports = {
         instances: 1,
         autorestart: true,
         watch: false,
+        cron_restart: '0 0 * * *', // 每天午夜重启一次
         max_memory_restart: '512M',
         env: {
           NODE_ENV: 'development',
