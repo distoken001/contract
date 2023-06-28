@@ -22,7 +22,7 @@ async function monitor_add_event() {
   ];
   filters.forEach((filter) => {
     providerWss.on(filter, async (result) => {
-      console.log(result);
+      console.log("monitor_add_event日志详情：",result);
       let transactionHashsh: string = result.transactionHash;
       let blockHash: string = result.blockHash;
       let contractAddress: string = result.address;
