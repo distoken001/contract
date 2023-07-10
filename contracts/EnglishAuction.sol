@@ -181,10 +181,11 @@ contract EnglishAuction is Ownable {
                 orderTime[_orderId].endTime >= block.timestamp,
             "Order has expired"
         );
-        order.token.safeTransfer(order.buyer, order.buyer_pledge);
-        total[address(order.token)] -= order.buyer_pledge;
-
-        emit RefundDeposit(_user, _orderId, order.seller, order.buyer);
+        if (order.buyer != address(0)) {
+            order.token.safeTransfer(order.buyer, order.buyer_pledge);
+            total[address(order.token)] -= order.buyer_pledge;
+            emit RefundDeposit(_user, _orderId, order.seller, order.buyer);
+        }
         Status _status = Status.Bid;
         order.price = _price;
         (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
