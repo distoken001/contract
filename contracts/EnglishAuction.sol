@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./AuctionLib.sol";
+import "./EnglishAuctionLib.sol";
 
 contract EnglishAuction is Ownable {
     using SafeERC20 for IERC20;
@@ -81,7 +81,7 @@ contract EnglishAuction is Ownable {
         uint256 amount,
         uint256 sellerRatio
     ) public view returns (uint256 sellerPledge, uint256 sellerTxFee) {
-        (sellerPledge, sellerTxFee) = AuctionLib.calculateSellerPledge(
+        (sellerPledge, sellerTxFee) = EnglishAuctionLib.calculateSellerPledge(
             price,
             amount,
             sellerRatio,
@@ -94,7 +94,7 @@ contract EnglishAuction is Ownable {
         uint256 price,
         uint256 amount
     ) public view returns (uint256 buyerPledge, uint256 buyerTxFee) {
-        (buyerPledge, buyerTxFee) = AuctionLib.calculateBuyerTxFeeAndPledge(
+        (buyerPledge, buyerTxFee) = EnglishAuctionLib.calculateBuyerTxFeeAndPledge(
             price,
             amount,
             buyerRate
@@ -253,7 +253,7 @@ contract EnglishAuction is Ownable {
             uint256 buyerFee,
             uint256 sellerBack,
             uint256 buyerBack
-        ) = AuctionLib.confirmCalculateRefunds(
+        ) = EnglishAuctionLib.confirmCalculateRefunds(
                 order.seller_pledge,
                 order.buyer_pledge,
                 order.price,
@@ -310,7 +310,7 @@ contract EnglishAuction is Ownable {
             uint256 buyerFee,
             uint256 sellerBack,
             uint256 buyerBack
-        ) = AuctionLib.confirmCalculateRefunds(
+        ) = EnglishAuctionLib.confirmCalculateRefunds(
                 order.seller_pledge,
                 order.buyer_pledge,
                 order.price,
@@ -345,8 +345,8 @@ contract EnglishAuction is Ownable {
         address _user = _msgSender();
         if (
             _user == owner() ||
-            AuctionLib.contains(sellerList[_user], _orderId) ||
-            AuctionLib.contains(buyerList[_user], _orderId)
+            EnglishAuctionLib.contains(sellerList[_user], _orderId) ||
+            EnglishAuctionLib.contains(buyerList[_user], _orderId)
         ) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;

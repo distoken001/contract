@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-library AuctionLib {
+library EnglishAuctionLib {
     using SafeMath for uint256;
     enum Status {
         Initial, //待购买0
