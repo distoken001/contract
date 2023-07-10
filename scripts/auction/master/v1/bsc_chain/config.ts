@@ -8,9 +8,9 @@ if (process.env.NODE_ENV === "production") {
 } else if (process.env.NODE_ENV === "productionb") {
   dotenv.config({ path: ".env.productionb" });
 }
-const contractABI = require("../../../../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
+const contractABI = require("../../../../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json").abi;
 const tokenContractABI =
-  require("../../../../../artifacts/contracts/Token.sol/Token.json").abi;
+  require("../../../../artifacts/contracts/Token.sol/Token.json").abi;
 let contractAddress: string = process.env.BSC_CONTRACT_ADDRESS!;
 let monitorWss: string = process.env.API_WSS_BSC!;
 let monitorHttps: string = process.env.API_HTTP_BSC!;

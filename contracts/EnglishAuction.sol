@@ -53,6 +53,14 @@ contract EnglishAuction is Ownable {
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
 
+    //创建订单事件
+    event AddOrder(
+        address indexed defaulter,
+        uint256 indexed orderId,
+        Status indexed status,
+        address seller,
+        address buyer
+    );
     //修改状态事件
     event SetStatus(
         address indexed defaulter,
@@ -148,7 +156,7 @@ contract EnglishAuction is Ownable {
         contact[_orderId].seller = _contactSeller;
         total[_token] += _seller_pledge;
         sellerList[_user].push(_orderId);
-        emit SetStatus(
+        emit AddOrder(
             _user,
             _orderId,
             Status.Initial,

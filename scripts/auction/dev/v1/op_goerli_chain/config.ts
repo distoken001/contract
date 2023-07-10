@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === 'production') {
 } else if (process.env.NODE_ENV === 'development') {
   dotenv.config({ path: '.env.development' });
 }
-const contractABI = require("../../../../artifacts/contracts/Ebay.sol/Ebay.json").abi;
+const contractABI = require("../../../../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json").abi;
 const tokenContractABI =
   require("../../../../artifacts/contracts/Token.sol/Token.json").abi;
 let contractAddress: string = process.env.OP_GOERLI_CONTRACT_ADDRESS!;
