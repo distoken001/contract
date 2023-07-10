@@ -6,17 +6,19 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./AuctionLib.sol";
 
-contract Auction is Ownable {
+contract EnglishAuction is Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
     enum Status {
-        Initial, //待购买0
-        Ordered, //被下单1
-        Completed, //已完成2
-        ConfirmShip, //卖家发货3
-        SellerBreak, //卖家毁约4
-        SellerCancelWithoutDuty, //卖家无责取消5
-        ConsultCancelCompleted //协商取消完成6
+        Initial, //初始化
+        Start, //开始拍卖
+        Bid, //已经被拍
+        End, //结束拍卖
+        Completed, //已完成
+        ConfirmShip, //卖家发货
+        SellerBreak, //卖家毁约
+        SellerCancelWithoutDuty, //卖家无责取消
+        ConsultCancelCompleted //协商取消完成
     }
     struct Order {
         address seller; //卖家
@@ -32,7 +34,11 @@ contract Auction is Ownable {
         uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
     }
+    // mapping(uint256 => DateTime) public dateTime;
 
+    // struct DateTime {
+    //     uint256 createTimestamp; //订单创建时间
+    // }
     struct Contact {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
@@ -47,19 +53,18 @@ contract Auction is Ownable {
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
 
-    //创建订单事件
-    event AddOrder(
+    //修改状态事件
+    event SetStatus(
         address indexed defaulter,
         uint256 indexed orderId,
         Status indexed status,
         address seller,
         address buyer
     );
-    //修改状态事件
-    event SetStatus(
+    //退回押金事件
+    event RefundDeposit(
         address indexed defaulter,
         uint256 indexed orderId,
-        Status indexed status,
         address seller,
         address buyer
     );
@@ -140,7 +145,7 @@ contract Auction is Ownable {
         contact[_orderId].seller = _contactSeller;
         total[_token] += _seller_pledge;
         sellerList[_user].push(_orderId);
-        emit AddOrder(
+        emit SetStatus(
             _user,
             _orderId,
             Status.Initial,
@@ -158,17 +163,18 @@ contract Auction is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         require(_price > order.price, "_price is error");
-        order.price = _price;
+
         require(
             bytes(_buyerContact).length != 0,
             "Seller contact can not be null"
         );
         //2、校验订单状态是否可以拍
-        require(
-            order.status == Status.Initial || order.status == Status.Ordered,
-            "Order has expired"
-        );
-        Status _status = Status.Ordered;
+        require(order.status == Status.Start, "Order has expired");
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
+        total[address(order.token)] -= order.buyer_pledge;
+        emit RefundDeposit(_user, _orderId, order.seller, order.buyer);
+        Status _status = Status.Bid;
+        order.price = _price;
         (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
             order.price,
             order.amount
@@ -191,7 +197,10 @@ contract Auction is Ownable {
         (Order storage order, address _user) = validate(_orderId, true);
         //2、校验订单状态是否可以取消
         require(order.seller == _user, "No permissions");
-        require(order.status == Status.Initial, "Order status error");
+        require(
+            order.status == Status.Initial || order.status == Status.Start,
+            "Order status error"
+        );
         Status _status = Status.SellerCancelWithoutDuty;
         order.token.safeTransfer(order.seller, order.seller_pledge);
         total[address(order.token)] = total[address(order.token)].sub(
@@ -240,7 +249,7 @@ contract Auction is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以确认发货
-        require(order.status == Status.Ordered, "Order cannot be confirmed");
+        require(order.status == Status.End, "Order cannot be confirmed");
         require(order.seller == _user, "No permissions");
         Status _status = Status.ConfirmShip;
         //3、将订单更新为发货状态
@@ -350,7 +359,7 @@ contract Auction is Ownable {
 
     function adminValidateStatus(Status status) internal pure {
         require(
-            status == Status.Ordered || status == Status.ConfirmShip,
+            status == Status.Bid || status == Status.ConfirmShip,
             "Status Error"
         );
     }
