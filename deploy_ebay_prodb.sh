@@ -19,4 +19,4 @@ tsc
   
 # 使用 PM2 启动项目
 echo "Starting the application with PM2..."
-pm2 start pm2.prod.config.js
+pm2 start pm2.ebay.prodb.config.js
