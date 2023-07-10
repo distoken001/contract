@@ -205,7 +205,7 @@ contract EnglishAuction is Ownable {
         );
     }
 
-    //标记拍卖结束
+    //设定拍卖结束
     function end(uint256 _orderId) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
@@ -217,6 +217,17 @@ contract EnglishAuction is Ownable {
         order.status = _status;
         buyerList[_user].push(_orderId);
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+    }
+
+    function check(uint256 _orderId) external {
+        //1、校验订单是否存在
+        (Order storage order, address _user) = validate(_orderId, false);
+        require(order.status == Status.Bid, "Order status error");
+        if (block.timestamp > orderTime[_orderId].endTime) {
+            Status _status = Status.End;
+            order.status = _status;
+            emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        }
     }
 
     function cancel(uint256 _orderId) external {
