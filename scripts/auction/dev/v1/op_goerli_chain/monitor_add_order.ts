@@ -31,6 +31,7 @@ async function monitor_add_order() {
     );
     const orderId = _args["orderId"].toNumber();
     const orderDetail = await contract.orders(orderId);
+    const orderTime = await contract.orderTime(orderId);
     console.log("订单详情:", orderDetail);
     const token = orderDetail["token"];
     const tokenContract = new ethers.Contract(
@@ -60,7 +61,9 @@ async function monitor_add_order() {
       await chainId,
       orderDetail["buyer_ex"],
       contractAddress,
-      decimals
+      decimals,
+      orderTime["startTime"],
+      orderTime["endTime"]
     );
   });
 }

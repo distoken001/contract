@@ -21,7 +21,9 @@ export const insertOrder = async (
     chain_id :number,
     buyer_ex:any,
     contract:string,
-    decimals :number
+    decimals :number,
+    start_time:any,
+    end_time:any
   ) => {
     const create_time = new Date();
     const update_time = create_time;
@@ -47,8 +49,10 @@ export const insertOrder = async (
         chain_id,
         buyer_ex,
         contract,
-        decimals
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+        decimals,
+        start_time,
+        end_time
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
     `;
   
     const values = [
@@ -73,7 +77,9 @@ export const insertOrder = async (
       chain_id,
       buyer_ex.toString(),
       contract,
-      decimals
+      decimals,
+      start_time.toString(),
+      end_time.toString()
     ];
     const [rows, fields] = await executeQuery (sql, values);
     // sendemail(chain_id,contract,order_id);
