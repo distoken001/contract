@@ -18,7 +18,7 @@ contract EnglishAuction is Ownable {
         SellerBreak, //卖家毁约
         SellerCancelWithoutDuty, //卖家无责取消
         ConsultCancelCompleted, //协商取消完成
-        RefundDeposit//给上一个拍的人退押金，只是记录一下日志用
+        RefundDeposit //给上一个拍的人退押金，只是记录一下日志用
     }
     struct Order {
         address seller; //卖家
@@ -194,7 +194,13 @@ contract EnglishAuction is Ownable {
         if (order.buyer != address(0)) {
             order.token.safeTransfer(order.buyer, order.buyer_pledge);
             total[address(order.token)] -= order.buyer_pledge;
-            emit RefundDeposit(_user, _orderId,Status.RefundDeposit, order.seller, order.buyer);
+            emit RefundDeposit(
+                _user,
+                _orderId,
+                Status.RefundDeposit,
+                order.seller,
+                order.buyer
+            );
         }
         Status _status = Status.Bid;
         order.price = _price;
@@ -225,7 +231,7 @@ contract EnglishAuction is Ownable {
         Status _status = Status.End;
         //3、将订单更新为结束拍卖状态
         order.status = _status;
-        buyerList[_user].push(_orderId);
+        buyerList[order.buyer].push(_orderId);
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
@@ -236,6 +242,7 @@ contract EnglishAuction is Ownable {
         if (block.timestamp > orderTime[_orderId].endTime) {
             Status _status = Status.End;
             order.status = _status;
+            buyerList[order.buyer].push(_orderId);
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         }
     }
