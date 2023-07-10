@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "monitor_op",
+      name: "ebay_op",
       script: " node ./dist/ebay/master/v1/op_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -13,7 +13,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_arb",
+      name: "ebay_arb",
       script: "node ./dist/ebay/master/v1/arb_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -25,7 +25,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_polygon",
+      name: "ebay_polygon",
       script: "node ./dist/ebay/master/v1/polygon_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -37,7 +37,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_avax",
+      name: "ebay_avax",
       script: "node ./dist/ebay/master/v1/avax_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -49,7 +49,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_bsc",
+      name: "ebay_bsc",
       script: "node ./dist/ebay/master/v1/bsc_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -61,7 +61,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_conflux",
+      name: "ebay_v2_conflux",
       script: "node ./dist/ebay/master/v2/conflux_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -73,7 +73,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_op",
+      name: "ebay_v2_op",
       script: "node ./dist/ebay/master/v2/op_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -85,7 +85,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_arb",
+      name: "ebay_v2_arb",
       script: "node ./dist/ebay/master/v2/arb_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -97,7 +97,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_polygon",
+      name: "ebay_v2_polygon",
       script: "node ./dist/ebay/master/v2/polygon_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -109,7 +109,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_avax",
+      name: "ebay_v2_avax",
       script: "node ./dist/ebay/master/v2/avax_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -121,7 +121,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_bsc",
+      name: "ebay_v2_bsc",
       script: "node ./dist/ebay/master/v2/bsc_chain/start.js",
       instances: 1,
       autorestart: true,

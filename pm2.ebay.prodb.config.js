@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "monitor_op_prodb",
+      name: "ebay_op_prodb",
       script: " node ./dist/ebay/master/v1/op_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -13,7 +13,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_arb_prodb",
+      name: "ebay_arb_prodb",
       script: "node ./dist/ebay/master/v1/arb_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -25,7 +25,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_polygon_prodb",
+      name: "ebay_polygon_prodb",
       script: "node ./dist/ebay/master/v1/polygon_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -37,7 +37,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_avax_prodb",
+      name: "ebay_avax_prodb",
       script: "node ./dist/ebay/master/v1/avax_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -49,7 +49,7 @@ module.exports = {
       },
     },
     {
-      name: "monitor_bsc_prodb",
+      name: "ebay_bsc_prodb",
       script: "node ./dist/ebay/master/v1/bsc_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -61,7 +61,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_conflux_prodb",
+      name: "ebay_v2_conflux_prodb",
       script: "node ./dist/ebay/master/v2/conflux_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -73,7 +73,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_op_prodb",
+      name: "ebay_v2_op_prodb",
       script: "node ./dist/ebay/master/v2/op_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -85,7 +85,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_arb_prodb",
+      name: "ebay_v2_arb_prodb",
       script: "node ./dist/ebay/master/v2/arb_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -97,7 +97,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_polygon_prodb",
+      name: "ebay_v2_polygon_prodb",
       script: "node ./dist/ebay/master/v2/polygon_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -109,7 +109,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_avax_prodb",
+      name: "ebay_v2_avax_prodb",
       script: "node ./dist/ebay/master/v2/avax_chain/start.js",
       instances: 1,
       autorestart: true,
@@ -121,7 +121,7 @@ module.exports = {
       },
     },
     {
-      name: "v2_monitor_bsc_prodb",
+      name: "ebay_v2_bsc_prodb",
       script: "node ./dist/ebay/master/v2/bsc_chain/start.js",
       instances: 1,
       autorestart: true,
