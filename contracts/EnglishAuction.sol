@@ -94,11 +94,8 @@ contract EnglishAuction is Ownable {
         uint256 price,
         uint256 amount
     ) public view returns (uint256 buyerPledge, uint256 buyerTxFee) {
-        (buyerPledge, buyerTxFee) = EnglishAuctionLib.calculateBuyerTxFeeAndPledge(
-            price,
-            amount,
-            buyerRate
-        );
+        (buyerPledge, buyerTxFee) = EnglishAuctionLib
+            .calculateBuyerTxFeeAndPledge(price, amount, buyerRate);
     }
 
     //创建拍卖订单
@@ -119,6 +116,7 @@ contract EnglishAuction is Ownable {
             bytes(_contactSeller).length != 0,
             "Seller contact can not be null"
         );
+        require(_endTime > _startTime, "Time Error");
         //1.质押数量
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
