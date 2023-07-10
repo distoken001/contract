@@ -11,9 +11,8 @@ contract EnglishAuction is Ownable {
     using SafeMath for uint256;
     enum Status {
         Initial, //初始化
-        Start, //开始拍卖
-        Bid, //已经被拍
-        End, //结束拍卖
+        Bid, //已经有拍的
+        End, //已经结束
         Completed, //已完成
         ConfirmShip, //卖家发货
         SellerBreak, //卖家毁约
@@ -34,11 +33,12 @@ contract EnglishAuction is Ownable {
         uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
     }
-    // mapping(uint256 => DateTime) public dateTime;
+    mapping(uint256 => DateTime) public orderTime;
 
-    // struct DateTime {
-    //     uint256 createTimestamp; //订单创建时间
-    // }
+    struct DateTime {
+        uint256 startTime; //拍卖开始时间
+        uint256 endTime; //拍卖结束时间
+    }
     struct Contact {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
@@ -110,6 +110,8 @@ contract EnglishAuction is Ownable {
         address _token,
         uint256 _price,
         uint256 _amount,
+        uint256 _startTime,
+        uint256 _endTime,
         uint256 _sellerRatio
     ) external {
         address _user = _msgSender();
@@ -141,7 +143,10 @@ contract EnglishAuction is Ownable {
                 price: _price
             })
         );
+
         uint256 _orderId = orders.length - 1;
+        orderTime[_orderId].startTime = _startTime;
+        orderTime[_orderId].endTime = _endTime;
         contact[_orderId].seller = _contactSeller;
         total[_token] += _seller_pledge;
         sellerList[_user].push(_orderId);
@@ -169,9 +174,18 @@ contract EnglishAuction is Ownable {
             "Seller contact can not be null"
         );
         //2、校验订单状态是否可以拍
-        require(order.status == Status.Start, "Order has expired");
+        require(
+            order.status == Status.Initial || order.status == Status.Bid,
+            "Order status error"
+        );
+        require(
+            orderTime[_orderId].startTime <= block.timestamp &&
+                orderTime[_orderId].endTime >= block.timestamp,
+            "Order has expired"
+        );
         order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] -= order.buyer_pledge;
+
         emit RefundDeposit(_user, _orderId, order.seller, order.buyer);
         Status _status = Status.Bid;
         order.price = _price;
@@ -183,7 +197,7 @@ contract EnglishAuction is Ownable {
         order.buyer_pledge = _buyer_pledge;
         order.buyer_ex = _buyer_tx_fee;
         order.buyer = _user;
-        buyerList[_user].push(_orderId);
+        // buyerList[_user].push(_orderId);
         contact[_orderId].buyer = _buyerContact;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         order.token.transferFrom(_user, address(this), _buyer_pledge);
@@ -192,15 +206,26 @@ contract EnglishAuction is Ownable {
         );
     }
 
+    //标记拍卖结束
+    function end(uint256 _orderId) external {
+        //1、校验订单是否存在
+        (Order storage order, address _user) = validate(_orderId, true);
+        //2、校验订单状态是否可以结束
+        require(order.seller == _user, "No permissions");
+        require(order.status == Status.Bid, "Order status error");
+        Status _status = Status.End;
+        //3、将订单更新为结束拍卖状态
+        order.status = _status;
+        buyerList[_user].push(_orderId);
+        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+    }
+
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
         //2、校验订单状态是否可以取消
         require(order.seller == _user, "No permissions");
-        require(
-            order.status == Status.Initial || order.status == Status.Start,
-            "Order status error"
-        );
+        require(order.status == Status.Initial, "Order status error");
         Status _status = Status.SellerCancelWithoutDuty;
         order.token.safeTransfer(order.seller, order.seller_pledge);
         total[address(order.token)] = total[address(order.token)].sub(
@@ -249,7 +274,7 @@ contract EnglishAuction is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以确认发货
-        require(order.status == Status.End, "Order cannot be confirmed");
+        require(order.status == Status.Bid, "Order cannot be confirmed");
         require(order.seller == _user, "No permissions");
         Status _status = Status.ConfirmShip;
         //3、将订单更新为发货状态
