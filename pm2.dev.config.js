@@ -2,7 +2,7 @@ module.exports = {
     apps: [
       {
         name: 'monitor_op_goerli',
-        script: ' node ./dist/dev/v1/op_goerli_chain/start.js',
+        script: ' node ./dist/ebay/dev/v1/op_goerli_chain/start.js',
         instances: 1,
         autorestart: true,
         watch: false,
@@ -14,7 +14,7 @@ module.exports = {
       },
       {
         name: 'monitor_arb_goerli',
-        script: ' node ./dist/dev/v1/arb_goerli_chain/start.js',
+        script: ' node ./dist/ebay/dev/v1/arb_goerli_chain/start.js',
         instances: 1,
         autorestart: true,
         watch: false,
@@ -26,7 +26,7 @@ module.exports = {
       },
       {
         name: 'v2_monitor_op_goerli',
-        script: ' node ./dist/dev/v2/op_goerli_chain/start.js',
+        script: ' node ./dist/ebay/dev/v2/op_goerli_chain/start.js',
         instances: 1,
         autorestart: true,
         watch: false,
