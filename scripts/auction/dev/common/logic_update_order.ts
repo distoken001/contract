@@ -28,7 +28,7 @@ export async function logic_update_order(
     contract_address: _contract_address,
   };
   const query =
-    "update orders_auction SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
+    "update orders_auction SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,price=?  where order_id=? and chain_id=? and contract=?";
 
   const values = [
     updateData.status,
