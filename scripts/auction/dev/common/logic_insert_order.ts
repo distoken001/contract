@@ -27,7 +27,7 @@ export const insertOrder = async (
     const update_time = create_time;
   
     const sql = `
-      INSERT INTO orders (
+      INSERT INTO orders_auction (
         order_id,
         name,
         description,
@@ -76,6 +76,6 @@ export const insertOrder = async (
       decimals
     ];
     const [rows, fields] = await executeQuery (sql, values);
-    sendemail(chain_id,contract,order_id);
+    // sendemail(chain_id,contract,order_id);
     return [rows,fields];
   }

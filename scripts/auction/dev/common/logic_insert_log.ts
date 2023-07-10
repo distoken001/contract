@@ -32,7 +32,7 @@ export async function insertLog(
     contract_address:_contract_address
   };
   const query =
-    "INSERT INTO event_logs SET id=?, event_name=?, operater=?, order_id=?, data=?, status=?, create_time=?, update_time=?, updater=?, creator=?, hash=?,chain_id=?,seller=?,buyer=?,contract=?";
+    "INSERT INTO event_logs_auction SET id=?, event_name=?, operater=?, order_id=?, data=?, status=?, create_time=?, update_time=?, updater=?, creator=?, hash=?,chain_id=?,seller=?,buyer=?,contract=?";
   const values = [
     insertData.id,
     insertData.event_name,

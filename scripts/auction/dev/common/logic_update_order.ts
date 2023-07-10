@@ -8,7 +8,7 @@ export async function logic_update_order(
   _buyer: string,
   _buyer_ex: any,
   _buyer_pledge: any,
-  _amount: any,
+  _price: any,
   _seller_pledge: any,
   _chain_id: number,
   _contract_address: string
@@ -24,7 +24,7 @@ export async function logic_update_order(
     buyer_ex: _buyer_ex.toString(),
     buyer_pledge: _buyer_pledge.toString(),
     seller_pledge: _seller_pledge.toString(),
-    amount: _amount.toString(),
+    price: _price.toString(),
     contract_address: _contract_address,
   };
   const query =
@@ -37,16 +37,16 @@ export async function logic_update_order(
     updateData.buyer,
     updateData.buyer_pledge,
     updateData.seller_pledge,
-    updateData.amount,
+    updateData.price,
     updateData.order_id,
     updateData.chain_id,
     updateData.contract_address,
   ];
   const [rows, fields] = await executeQuery(query, values);
-  sendemail(
-    updateData.chain_id,
-    updateData.contract_address,
-    updateData.order_id
-  );
+  // sendemail(
+  //   updateData.chain_id,
+  //   updateData.contract_address,
+  //   updateData.order_id
+  // );
   return [rows, fields];
 }
