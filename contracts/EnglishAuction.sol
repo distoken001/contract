@@ -17,7 +17,8 @@ contract EnglishAuction is Ownable {
         ConfirmShip, //卖家发货
         SellerBreak, //卖家毁约
         SellerCancelWithoutDuty, //卖家无责取消
-        ConsultCancelCompleted //协商取消完成
+        ConsultCancelCompleted, //协商取消完成
+        RefundDeposit//给上一个拍的人退押金，只是记录一下日志用
     }
     struct Order {
         address seller; //卖家
@@ -73,6 +74,7 @@ contract EnglishAuction is Ownable {
     event RefundDeposit(
         address indexed defaulter,
         uint256 indexed orderId,
+        Status indexed status,
         address seller,
         address buyer
     );
@@ -192,7 +194,7 @@ contract EnglishAuction is Ownable {
         if (order.buyer != address(0)) {
             order.token.safeTransfer(order.buyer, order.buyer_pledge);
             total[address(order.token)] -= order.buyer_pledge;
-            emit RefundDeposit(_user, _orderId, order.seller, order.buyer);
+            emit RefundDeposit(_user, _orderId,Status.RefundDeposit, order.seller, order.buyer);
         }
         Status _status = Status.Bid;
         order.price = _price;

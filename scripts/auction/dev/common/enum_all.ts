@@ -1,13 +1,10 @@
 export enum Status{
-    Initial,//待购买0
-    Ordered,//被下单1
-    Completed,//已完成2
-    BuyerBreak,//买家毁约3
-    SellerBreak,//卖家毁约4
-    SellerCancelWithoutDuty,//卖家无责取消5
-    BuyerLanchCancel,//买家发起取消6
-    SellerLanchCancel,//卖家发起取消7
-    SellerRejectCancel,//卖家拒绝取消8
-    BuyerRejectCancel,//买家拒绝取消9
-    ConsultCancelCompleted//协商取消完成10
+  Initial, //初始化
+  Bid, //已经有拍的
+  End, //已经结束
+  Completed, //已完成
+  ConfirmShip, //卖家发货
+  SellerBreak, //卖家毁约
+  SellerCancelWithoutDuty, //卖家无责取消
+  ConsultCancelCompleted //协商取消完成
   }    

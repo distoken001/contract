@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production') {
 const contractABI = require("../../../../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json").abi;
 const tokenContractABI =
   require("../../../../artifacts/contracts/Token.sol/Token.json").abi;
-let contractAddress: string = process.env.OP_GOERLI_CONTRACT_ADDRESS!;
+let contractAddress: string = process.env.OP_GOERLI_CONTRACT_ADDRESS_AUCTION!;
 let monitorWss: string = process.env.API_WSS_OP_GOERLI!;
 let monitorHttps: string = process.env.API_HTTP_OP_GOERLI!;
 // 将 JSON 字符串解析为对象

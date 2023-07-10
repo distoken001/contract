@@ -27,45 +27,26 @@ export async function logic_update_order(
     amount: _amount.toString(),
     contract_address: _contract_address,
   };
+  const query =
+    "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
 
-  if (updateData.status == Status.Ordered) {
-    const query =
-      "update orders SET status=?,buyer_ex=?,create_time=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
-
-    const values = [
-      updateData.status,
-      updateData.buyer_ex,
-      updateData.update_time,
-      updateData.update_time,
-      updateData.buyer,
-      updateData.buyer_pledge,
-      updateData.seller_pledge,
-      updateData.amount,
-      updateData.order_id,
-      updateData.chain_id,
-      updateData.contract_address,
-    ];
-    const [rows, fields] = await executeQuery(query, values);
-    sendemail(updateData.chain_id,updateData.contract_address,updateData.order_id);
-    return [rows, fields];
-  } else {
-    const query =
-      "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
-
-    const values = [
-      updateData.status,
-      updateData.buyer_ex,
-      updateData.update_time,
-      updateData.buyer,
-      updateData.buyer_pledge,
-      updateData.seller_pledge,
-      updateData.amount,
-      updateData.order_id,
-      updateData.chain_id,
-      updateData.contract_address,
-    ];
-    const [rows, fields] = await executeQuery(query, values);
-    sendemail(updateData.chain_id,updateData.contract_address,updateData.order_id);
-    return [rows, fields];
-  }
+  const values = [
+    updateData.status,
+    updateData.buyer_ex,
+    updateData.update_time,
+    updateData.buyer,
+    updateData.buyer_pledge,
+    updateData.seller_pledge,
+    updateData.amount,
+    updateData.order_id,
+    updateData.chain_id,
+    updateData.contract_address,
+  ];
+  const [rows, fields] = await executeQuery(query, values);
+  sendemail(
+    updateData.chain_id,
+    updateData.contract_address,
+    updateData.order_id
+  );
+  return [rows, fields];
 }
