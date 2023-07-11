@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./EnglishAuctionLib.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EnglishAuction is Ownable {
+contract EnglishAuction is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
     enum Status {
@@ -172,11 +173,10 @@ contract EnglishAuction is Ownable {
         uint256 _orderId,
         uint256 _price,
         string memory _buyerContact
-    ) external {
+    ) external nonReentrant{
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         require(_price > order.price, "_price is error");
-
         require(
             bytes(_buyerContact).length != 0,
             "Seller contact can not be null"
