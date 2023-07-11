@@ -173,7 +173,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         uint256 _orderId,
         uint256 _price,
         string memory _buyerContact
-    ) external nonReentrant{
+    ) external nonReentrant {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
         require(_price > order.price, "_price is error");
@@ -411,7 +411,9 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
 
     function adminValidateStatus(Status status) internal pure {
         require(
-            status == Status.Bid || status == Status.ConfirmShip,
+            status == Status.Bid ||
+                status == Status.ConfirmShip ||
+                status == Status.End,
             "Status Error"
         );
     }
