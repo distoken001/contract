@@ -19,7 +19,8 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         SellerBreak, //卖家毁约
         SellerCancelWithoutDuty, //卖家无责取消
         ConsultCancelCompleted, //协商取消完成
-        RefundDeposit //给上一个拍的人退押金，只是记录一下日志用
+        RefundDeposit, //给上一个拍的人退押金，只是记录一下日志用
+        UpdateTime //修改结束时间，只是记录一下日志用
     }
     struct Order {
         address seller; //卖家
@@ -73,6 +74,14 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
     );
     //退回押金事件
     event RefundDeposit(
+        address indexed defaulter,
+        uint256 indexed orderId,
+        Status indexed status,
+        address seller,
+        address buyer
+    );
+    //修改结束时间事件
+    event UpdateTime(
         address indexed defaulter,
         uint256 indexed orderId,
         Status indexed status,
@@ -261,6 +270,26 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         //3、将订单更新为取消状态
         order.status = _status;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+    }
+
+    function updateEndTime(uint256 _orderId, uint _endTime) external {
+        //1、校验订单是否存在
+        (Order storage order, address _user) = validate(_orderId, true);
+        //2、校验订单状态是否可以取消
+        require(order.seller == _user, "No permissions");
+        require(
+            order.status == Status.Initial || order.status == Status.Bid,
+            "Order status error"
+        );
+        require(orderTime[_orderId].endTime > _endTime, "time error");
+        orderTime[_orderId].endTime = _endTime;
+        emit UpdateTime(
+            _user,
+            _orderId,
+            Status.UpdateTime,
+            order.seller,
+            order.buyer
+        );
     }
 
     //确认订单
