@@ -1643,8 +1643,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/de-market/contract/contracts/EnglishAuction.sol": {
-      "lastModificationDate": 1689131410040,
-      "contentHash": "3d597f515a556129b2a58632577fdbd1",
+      "lastModificationDate": 1689143704435,
+      "contentHash": "57261923a2a5e6e74cc1d7cc8ca4d088",
       "sourceName": "contracts/EnglishAuction.sol",
       "solcConfig": {
         "version": "0.8.19",

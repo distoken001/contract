@@ -15,7 +15,7 @@ async function monitor_order_change() {
     "SetStatus(address,uint256,uint8,address,address)"
   );
   const topic2 = ethers.utils.id(
-    "UpdateTime(address,uint256,uint8,address,address)"
+    "UpdateEndTime(address,uint256,uint8,address,address)"
   );
   let filters = [
     {

@@ -20,7 +20,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         SellerCancelWithoutDuty, //卖家无责取消
         ConsultCancelCompleted, //协商取消完成
         RefundDeposit, //给上一个拍的人退押金，只是记录一下日志用
-        UpdateTime //修改结束时间，只是记录一下日志用
+        UpdateEndTime //修改结束时间，只是记录一下日志用
     }
     struct Order {
         address seller; //卖家
@@ -81,7 +81,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         address buyer
     );
     //修改结束时间事件
-    event UpdateTime(
+    event UpdateEndTime(
         address indexed defaulter,
         uint256 indexed orderId,
         Status indexed status,
@@ -282,11 +282,12 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
             "Order status error"
         );
         require(orderTime[_orderId].endTime > _endTime, "time error");
+        require(orderTime[_orderId].startTime < _endTime, "time error");
         orderTime[_orderId].endTime = _endTime;
-        emit UpdateTime(
+        emit UpdateEndTime(
             _user,
             _orderId,
-            Status.UpdateTime,
+            Status.UpdateEndTime,
             order.seller,
             order.buyer
         );

@@ -15,7 +15,7 @@ async function monitor_add_event() {
     "RefundDeposit(address,uint256,uint8,address,address)"
   );
   const topic4 = ethers.utils.id(
-    "UpdateTime(address,uint256,uint8,address,address)"
+    "UpdateEndTime(address,uint256,uint8,address,address)"
   );
   let filters = [
     {
