@@ -5,20 +5,29 @@ import {
   providerWss,
   iface,
   contract,
-  chainId
+  chainId,
 } from "./config";
 
 async function monitor_order_change() {
   console.log("function:monitor_order_change is loading");
 
- const topic = ethers.utils.id(
+  const topic1 = ethers.utils.id(
     "SetStatus(address,uint256,uint8,address,address)"
   );
-  let filter = {
-    address: contractAddress,
-    topics: [topic],
-  };
-
+  const topic2 = ethers.utils.id(
+    "UpdateTime(address,uint256,uint8,address,address)"
+  );
+  let filters = [
+    {
+      address: contractAddress,
+      topics: [topic1],
+    },
+    {
+      address: contractAddress,
+      topics: [topic2],
+    },
+  ];
+  filters.forEach((filter) => {
     providerWss.on(filter, async (result) => {
       //console.log(result);
       let transactionHashsh: string = result.transactionHash;
@@ -31,9 +40,9 @@ async function monitor_order_change() {
 
       let orderId: number = _args["orderId"].toNumber();
       const orderDetail = await contract.orders(orderId);
-      //const contactData = await contract.getContact(orderId);
-      console.log("订单详情：", orderDetail);
-      //console.log("联系方式", contactData);
+      const orderTime = await contract.orderTime(orderId);
+      console.log("修改拍卖订单->拍卖详情：", orderDetail);
+      console.log("修改拍卖订单->拍卖时间：", orderTime);
       logic_update_order(
         orderId,
         orderDetail["status"],
@@ -42,9 +51,11 @@ async function monitor_order_change() {
         orderDetail["buyer_pledge"],
         orderDetail["price"],
         orderDetail["seller_pledge"],
+        orderTime["endTime"],
         await chainId,
         contractAddress
       );
     });
+  });
 }
 export { monitor_order_change };

@@ -26,13 +26,14 @@ async function monitor_add_order() {
 
     const _args = resultParse.args;
     console.log(
-      "Parse Log Data monitor_add_order->resultParse->_args->",
+      "添加拍卖订单->",
       _args
     );
     const orderId = _args["orderId"].toNumber();
     const orderDetail = await contract.orders(orderId);
     const orderTime = await contract.orderTime(orderId);
-    console.log("订单详情:", orderDetail);
+    console.log("添加拍卖订单->拍卖详情:", orderDetail);
+    console.log("添加拍卖订单->拍卖时间：", orderTime);
     const token = orderDetail["token"];
     const tokenContract = new ethers.Contract(
       token,
