@@ -11,6 +11,7 @@ export async function logic_update_order(
   _price: any,
   _seller_pledge: any,
   _end_time:any,
+  orderBidCount:number,
   _chain_id: number,
   _contract_address: string
 ) {
@@ -27,10 +28,11 @@ export async function logic_update_order(
     seller_pledge: _seller_pledge.toString(),
     price: _price.toString(),
     contract_address: _contract_address,
-    end_time:_end_time.toString()
+    end_time:_end_time.toString(),
+    orderBidCount:orderBidCount
   };
   const query =
-    "update orders_auction SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,price=?,end_time=?, count=count+1 where order_id=? and chain_id=? and contract=?";
+    "update orders_auction SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,price=?,end_time=?, count=? where order_id=? and chain_id=? and contract=?";
 
   const values = [
     updateData.status,
@@ -41,6 +43,7 @@ export async function logic_update_order(
     updateData.seller_pledge,
     updateData.price,
     updateData.end_time,
+    updateData.orderBidCount,
     updateData.order_id,
     updateData.chain_id,
     updateData.contract_address,

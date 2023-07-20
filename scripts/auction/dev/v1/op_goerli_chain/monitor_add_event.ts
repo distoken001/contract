@@ -9,14 +9,14 @@ async function monitor_add_event() {
     "AddOrder(address,uint256,uint8,address,address)"
   );
   const topic2 = ethers.utils.id(
-    "SetStatus(address,uint256,uint8,address,address)"
+    "SetOrderInfo(address,uint256,uint8,address,address)"
   );
   const topic3 = ethers.utils.id(
     "RefundDeposit(address,uint256,uint8,address,address)"
   );
-  const topic4 = ethers.utils.id(
-    "UpdateEndTime(address,uint256,uint8,address,address)"
-  );
+  // const topic4 = ethers.utils.id(
+  //   "UpdateEndTime(address,uint256,uint8,address,address)"
+  // );
   let filters = [
     {
       address: contractAddress,
@@ -30,10 +30,10 @@ async function monitor_add_event() {
       address: contractAddress,
       topics: [topic3],
     },
-    {
-      address: contractAddress,
-      topics: [topic4],
-    }
+    // {
+    //   address: contractAddress,
+    //   topics: [topic4],
+    // }
   ];
   filters.forEach((filter) => {
     providerWss.on(filter, async (result) => {
