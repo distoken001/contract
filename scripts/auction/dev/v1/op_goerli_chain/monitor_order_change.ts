@@ -41,7 +41,7 @@ async function monitor_order_change() {
       let orderId: number = _args["orderId"].toNumber();
       const orderDetail = await contract.orders(orderId);
       const orderTime = await contract.orderTime(orderId);
-      const orderBidCount= await contract.orderBidCount(orderId).toNumber();
+      const orderBidCount= await contract.orderBidCount(orderId);
       console.log("修改拍卖订单->拍卖详情：", orderDetail);
       console.log("修改拍卖订单->拍卖时间：", orderTime);
       console.log("修改拍卖订单->拍卖次数：", orderBidCount);
@@ -54,7 +54,7 @@ async function monitor_order_change() {
         orderDetail["price"],
         orderDetail["seller_pledge"],
         orderTime["endTime"],
-        orderBidCount,
+        orderBidCount.toNumber(),
         await chainId,
         contractAddress
       );
