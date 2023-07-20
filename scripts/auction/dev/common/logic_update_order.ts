@@ -30,7 +30,7 @@ export async function logic_update_order(
     end_time:_end_time.toString()
   };
   const query =
-    "update orders_auction SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,price=?,end_time=?  where order_id=? and chain_id=? and contract=?";
+    "update orders_auction SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,price=?,end_time=?, count=count+1 where order_id=? and chain_id=? and contract=?";
 
   const values = [
     updateData.status,
