@@ -12,15 +12,13 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     enum Status {
         Initial, //初始化
-        Bid, //已经有拍的
-        End, //已经结束
-        Completed, //已完成
+        Bid, //被拍
+        End, //拍卖结束
+        Completed, //已完成交易
         ConfirmShip, //卖家发货
         SellerBreak, //卖家毁约
         SellerCancelWithoutDuty, //卖家无责取消
-        ConsultCancelCompleted, //协商取消完成
-        RefundDeposit, //给上一个拍的人退押金，只是记录一下日志用
-        UpdateEndTime //修改结束时间，只是记录一下日志用
+        ConsultCancelCompleted //协商取消完成
     }
     struct Order {
         address seller; //卖家
@@ -36,8 +34,11 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
     }
-    mapping(uint256 => DateTime) public orderTime;
 
+    uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
+    uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
+    address public lockAddr;
+    Order[] public orders;
     struct DateTime {
         uint256 startTime; //拍卖开始时间
         uint256 endTime; //拍卖结束时间
@@ -46,12 +47,9 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
     }
-    uint256 public buyerRate; //买家需要支付服务费率 使用整数表示
-    uint256 public sellerRate; //卖家需要支付服务费率 使用整数表示
-    address public lockAddr;
-
-    Order[] public orders;
+    mapping(uint256 => DateTime) public orderTime;
     mapping(uint256 => Contact) contact;
+    mapping(uint256 => uint256) public orderBidCount;
     mapping(address => uint256[]) public sellerList; //卖家订单
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
@@ -64,8 +62,8 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         address seller,
         address buyer
     );
-    //修改状态事件
-    event SetStatus(
+    //订单信息修改
+    event SetOrderInfo(
         address indexed defaulter,
         uint256 indexed orderId,
         Status indexed status,
@@ -74,14 +72,6 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
     );
     //退回押金事件
     event RefundDeposit(
-        address indexed defaulter,
-        uint256 indexed orderId,
-        Status indexed status,
-        address seller,
-        address buyer
-    );
-    //修改结束时间事件
-    event UpdateEndTime(
         address indexed defaulter,
         uint256 indexed orderId,
         Status indexed status,
@@ -200,18 +190,18 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
                 orderTime[_orderId].endTime >= block.timestamp,
             "Order has expired"
         );
+        Status _status = Status.Bid;
         if (order.buyer != address(0)) {
             order.token.safeTransfer(order.buyer, order.buyer_pledge);
             total[address(order.token)] -= order.buyer_pledge;
             emit RefundDeposit(
                 _user,
                 _orderId,
-                Status.RefundDeposit,
+                _status,
                 order.seller,
                 order.buyer
             );
         }
-        Status _status = Status.Bid;
         order.price = _price;
         (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
             order.price,
@@ -221,9 +211,10 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         order.buyer_pledge = _buyer_pledge;
         order.buyer_ex = _buyer_tx_fee;
         order.buyer = _user;
+        orderBidCount[_orderId] = orderBidCount[_orderId] + 1;
         // buyerList[_user].push(_orderId);
         contact[_orderId].buyer = _buyerContact;
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         total[address(order.token)] = total[address(order.token)].add(
             _buyer_pledge
@@ -242,7 +233,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         order.status = _status;
         buyerList[order.buyer].push(_orderId);
         orderTime[_orderId].endTime = block.timestamp;
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     function check(uint256 _orderId) external {
@@ -253,7 +244,13 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
             Status _status = Status.End;
             order.status = _status;
             buyerList[order.buyer].push(_orderId);
-            emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+            emit SetOrderInfo(
+                _user,
+                _orderId,
+                _status,
+                order.seller,
+                order.buyer
+            );
         }
     }
 
@@ -270,7 +267,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         );
         //3、将订单更新为取消状态
         order.status = _status;
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     function updateEndTime(uint256 _orderId, uint _endTime) external {
@@ -285,10 +282,10 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         require(orderTime[_orderId].endTime > _endTime, "time error");
         require(orderTime[_orderId].startTime < _endTime, "time error");
         orderTime[_orderId].endTime = _endTime;
-        emit UpdateEndTime(
+        emit SetOrderInfo(
             _user,
             _orderId,
-            Status.UpdateEndTime,
+            order.status,
             order.seller,
             order.buyer
         );
@@ -324,7 +321,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee)); //fee
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     //确认已将商品交付
@@ -337,7 +334,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         Status _status = Status.ConfirmShip;
         //3、将订单更新为发货状态
         order.status = _status;
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     //争议订单取消强制双方返还
@@ -351,7 +348,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         order.token.safeTransfer(order.seller, order.seller_pledge);
         order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge;
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     //争议订单强制确认
@@ -381,7 +378,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         order.token.safeTransfer(order.buyer, buyerBack); //转给买家
         order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     function adminBreak(uint256 _orderId) external onlyOwner {
@@ -394,7 +391,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
             order.buyer_pledge + order.seller_pledge
         );
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
-        emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
+        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
     }
 
     function getContact(
