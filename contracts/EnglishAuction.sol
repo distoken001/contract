@@ -241,6 +241,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         //3、将订单更新为结束拍卖状态
         order.status = _status;
         buyerList[order.buyer].push(_orderId);
+        orderTime[_orderId].endTime = block.timestamp;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
 
