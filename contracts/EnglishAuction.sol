@@ -13,9 +13,8 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
     enum Status {
         Initial, //初始化
         Bid, //被拍
-        End, //拍卖结束
-        Completed, //已完成交易
         ConfirmShip, //卖家发货
+        Completed, //已完成交易
         SellerBreak, //卖家毁约
         SellerCancelWithoutDuty, //卖家无责取消
         ConsultCancelCompleted //协商取消完成
@@ -221,39 +220,6 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         );
     }
 
-    //设定拍卖结束
-    function end(uint256 _orderId) external {
-        //1、校验订单是否存在
-        (Order storage order, address _user) = validate(_orderId, true);
-        //2、校验订单状态是否可以结束
-        require(order.seller == _user, "No permissions");
-        require(order.status == Status.Bid, "Order status error");
-        Status _status = Status.End;
-        //3、将订单更新为结束拍卖状态
-        order.status = _status;
-        buyerList[order.buyer].push(_orderId);
-        orderTime[_orderId].endTime = block.timestamp;
-        emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
-    }
-
-    function check(uint256 _orderId) external {
-        //1、校验订单是否存在
-        (Order storage order, address _user) = validate(_orderId, false);
-        require(order.status == Status.Bid, "Order status error");
-        if (block.timestamp > orderTime[_orderId].endTime) {
-            Status _status = Status.End;
-            order.status = _status;
-            buyerList[order.buyer].push(_orderId);
-            emit SetOrderInfo(
-                _user,
-                _orderId,
-                _status,
-                order.seller,
-                order.buyer
-            );
-        }
-    }
-
     function cancel(uint256 _orderId) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
@@ -330,6 +296,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以确认发货
         require(order.status == Status.Bid, "Order cannot be confirmed");
+        require(orderTime[_orderId].endTime < block.timestamp, "time error");
         require(order.seller == _user, "No permissions");
         Status _status = Status.ConfirmShip;
         //3、将订单更新为发货状态
@@ -439,9 +406,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
 
     function adminValidateStatus(Status status) internal pure {
         require(
-            status == Status.Bid ||
-                status == Status.ConfirmShip ||
-                status == Status.End,
+            status == Status.Bid || status == Status.ConfirmShip,
             "Status Error"
         );
     }
