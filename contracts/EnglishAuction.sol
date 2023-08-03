@@ -365,10 +365,12 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         uint256 _orderId
     ) external view returns (string memory _seller, string memory _buyer) {
         address _user = _msgSender();
+
         if (
             _user == owner() ||
-            EnglishAuctionLib.contains(sellerList[_user], _orderId) ||
-            EnglishAuctionLib.contains(buyerList[_user], _orderId)
+            (orderTime[_orderId].endTime < block.timestamp &&
+                (EnglishAuctionLib.contains(sellerList[_user], _orderId) ||
+                    EnglishAuctionLib.contains(buyerList[_user], _orderId)))
         ) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
