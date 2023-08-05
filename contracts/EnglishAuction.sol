@@ -211,7 +211,8 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         order.buyer_ex = _buyer_tx_fee;
         order.buyer = _user;
         orderBidCount[_orderId] = orderBidCount[_orderId] + 1;
-        // buyerList[_user].push(_orderId);
+        //标志拍过
+        buyerList[_user].push(_orderId);
         contact[_orderId].buyer = _buyerContact;
         emit SetOrderInfo(_user, _orderId, _status, order.seller, order.buyer);
         order.token.transferFrom(_user, address(this), _buyer_pledge);
@@ -364,13 +365,11 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
     function getContact(
         uint256 _orderId
     ) external view returns (string memory _seller, string memory _buyer) {
-        address _user = _msgSender();
-
+        (Order storage order, address _user) = validate(_orderId, false);
         if (
             _user == owner() ||
             (orderTime[_orderId].endTime < block.timestamp &&
-                (EnglishAuctionLib.contains(sellerList[_user], _orderId) ||
-                    EnglishAuctionLib.contains(buyerList[_user], _orderId)))
+                (order.seller == _user || order.buyer == _user))
         ) {
             _seller = contact[_orderId].seller;
             _buyer = contact[_orderId].buyer;
