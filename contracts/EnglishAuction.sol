@@ -228,6 +228,7 @@ contract EnglishAuction is Ownable, ReentrancyGuard {
         require(order.seller == _user, "No permissions");
         require(order.status == Status.Initial, "Order status error");
         Status _status = Status.SellerCancelWithoutDuty;
+        orderTime[_orderId].endTime = block.timestamp;
         order.token.safeTransfer(order.seller, order.seller_pledge);
         total[address(order.token)] = total[address(order.token)].sub(
             order.seller_pledge
