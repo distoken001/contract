@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
       {
-        name: 'auction_bsc_prodb_v1',
+        name: 'auction_bsc_prod_v1',
         script: ' node ./dist/auction/master/v1/bsc/start.js',
         instances: 1,
         autorestart: true,
@@ -13,7 +13,7 @@ module.exports = {
         }
       },
       {
-        name: 'auction_op_prodb_v1',
+        name: 'auction_op_prod_v1',
         script: ' node ./dist/auction/master/v1/op/start.js',
         instances: 1,
         autorestart: true,
@@ -25,7 +25,7 @@ module.exports = {
         }
       },
       {
-        name: 'auction_arb_prodb_v1',
+        name: 'auction_arb_prod_v1',
         script: ' node ./dist/auction/master/v1/arb/start.js',
         instances: 1,
         autorestart: true,
@@ -37,7 +37,7 @@ module.exports = {
         }
       },
       {
-        name: 'auction_polygon_prodb_v1',
+        name: 'auction_polygon_prod_v1',
         script: ' node ./dist/auction/master/v1/polygon/start.js',
         instances: 1,
         autorestart: true,
