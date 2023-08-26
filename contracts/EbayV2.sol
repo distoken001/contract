@@ -251,13 +251,13 @@ contract Ebay is Ownable {
                 order.seller,
                 order.buyer
             );
-            emit AddOrder(
-                _user,
-                _order_id_new,
-                Status.Ordered,
-                order.seller,
-                _user
-            );
+            // emit AddOrder(
+            //     _user,
+            //     _order_id_new,
+            //     Status.Ordered,
+            //     order.seller,
+            //     _user
+            // );
         }
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         total[address(order.token)] = total[address(order.token)].add(
