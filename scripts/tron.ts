@@ -55,9 +55,13 @@ async function getOwnerOfNFT() {
   ];
 
   for (let i = 1; i < 4064; i++) {
+    //     let instance = await tronWeb.contract(abi,'TJzUrGwomC8WNVZh8hC07FA8cCTCXCzNHt');
+    //let res = await instance["owner0f"](1).call() ;
+    // console.log(res);
     const contract = await tronWeb.contract().at(contractAddress);
-    const owner = await contract.ownerOf(i).call();
-    console.log("owner:", owner);
+    const addr = await contract.ownerOf(i).call();
+    const owner=tronWeb.address.fromHex(addr);
+
     const sql = `
       INSERT INTO user_nft (
        address,nft,status,create_time,update_time,chain_id,contract
@@ -65,7 +69,7 @@ async function getOwnerOfNFT() {
     `;
 
     const values = [owner, i, 1, new Date(), new Date(), -1, contractAddress];
-    //const [rows, fields] = await executeQuery(sql, values);
+    const [rows, fields] = await executeQuery(sql, values);
     console.log("插入成功", i);
   }
 }
