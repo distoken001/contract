@@ -29,9 +29,6 @@ library EbayLib {
         require(amount != 0, "amount can not be zero");
         sellerPledge = price.mul(amount).mul(sellerRatio).div(10000);
         sellerTxFee = price.mul(amount).mul(sellerRate).div(10000);
-        if (sellerPledge < sellerTxFee) {
-            sellerTxFee = sellerPledge;
-        }
         return (sellerPledge, sellerTxFee);
     }
 
@@ -63,9 +60,6 @@ library EbayLib {
         )
     {
         sellerFee = price.mul(amount).mul(sellerRate).div(10000);
-        if (sellerPledge < sellerFee) {
-            sellerFee = sellerPledge;
-        }
         buyerFee = price.mul(amount).mul(buyerRate).div(10000);
         if (buyerEx < buyerFee) {
             buyerFee = buyerEx;
@@ -74,40 +68,6 @@ library EbayLib {
         buyerBack = buyerPledge.sub(price.mul(amount)).sub(buyerFee); // 返还买家数量
 
         return (sellerFee, buyerFee, sellerBack, buyerBack);
-    }
-
-    function confirmCancelCalculateFeesAndRefunds(
-        uint256 buyerPledge,
-        uint256 sellerPledge,
-        uint256 price,
-        uint256 amount,
-        uint256 buyerRate,
-        uint256 sellerRate,
-        uint256 buyerEx
-    )
-        internal
-        pure
-        returns (
-            uint256 buyerFee,
-            uint256 sellerFee,
-            uint256 sellerBack,
-            uint256 buyerBack
-        )
-    {
-        require(price != 0, "price can not be zero");
-        require(amount != 0, "amount can not be zero");
-        buyerFee = price.mul(amount).mul(buyerRate).div(10000);
-        if (buyerEx < buyerFee) {
-            buyerFee = buyerEx;
-        }
-        sellerFee = price.mul(amount).mul(sellerRate).div(10000);
-        if (sellerPledge < sellerFee) {
-            sellerFee = sellerPledge;
-        }
-        sellerBack = sellerPledge.sub(sellerFee);
-        buyerBack = buyerPledge.sub(buyerFee);
-
-        return (buyerFee, sellerFee, sellerBack, buyerBack);
     }
 
     function verifyByAddress(
