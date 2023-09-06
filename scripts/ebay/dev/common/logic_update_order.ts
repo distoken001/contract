@@ -55,7 +55,7 @@ export async function logic_update_order(
       updateData.order_id
     );
     return [rows, fields];
-  } else if (updateData.status != Status.Initial) {
+  } else {
     const query =
       "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=? ,price=?  where order_id=? and chain_id=? and contract=?";
 
@@ -73,11 +73,13 @@ export async function logic_update_order(
       updateData.contract_address,
     ];
     const [rows, fields] = await executeQuery(query, values);
-    sendemail(
-      updateData.chain_id,
-      updateData.contract_address,
-      updateData.order_id
-    );
+    if (updateData.status != Status.Initial) {
+      sendemail(
+        updateData.chain_id,
+        updateData.contract_address,
+        updateData.order_id
+      );
+    }
     return [rows, fields];
   }
 }
