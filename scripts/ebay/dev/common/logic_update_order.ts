@@ -57,7 +57,7 @@ export async function logic_update_order(
     return [rows, fields];
   } else {
     const query =
-      "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
+      "update orders SET status=?,buyer_ex=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=? ,price=?  where order_id=? and chain_id=? and contract=?";
 
     const values = [
       updateData.status,
@@ -67,6 +67,7 @@ export async function logic_update_order(
       updateData.buyer_pledge,
       updateData.seller_pledge,
       updateData.amount,
+      updateData.price,
       updateData.order_id,
       updateData.chain_id,
       updateData.contract_address,
