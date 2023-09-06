@@ -154,34 +154,31 @@ contract Ebay is Ownable {
     //修改订单
     function update(
         uint256 _orderId,
-        string memory _name,
-        string memory _contactSeller,
-        string memory _description,
-        string memory _img,
-        address _token,
         uint256 _price,
-        uint256 _amount
+        uint256 _amount,
+        uint256 _sellerRatio
     ) external {
         (Order storage order, address _user) = validate(_orderId, false);
         require(
             order.seller == _user && order.status == Status.Initial,
             "No permissions"
         );
-        require(
-            bytes(_contactSeller).length != 0,
-            "Seller contact can not be null"
+        order.token.safeTransfer(order.seller, order.seller_pledge);
+        total[address(order.token)] = total[address(order.token)].sub(
+            order.seller_pledge
         );
-        order.name = _name;
-        order.description = _description;
-        order.img = _img;
+
+        (uint256 _seller_pledge, ) = calculateSellerPledge(
+            _price,
+            _amount,
+            _sellerRatio
+        );
         order.price = _price;
         order.amount = _amount;
-        contact[_orderId].seller = _contactSeller;
-        if (IERC20(_token) != order.token) {
-            require(order.seller_pledge == 0, "seller_pledge must be zero");
-            order.token = IERC20(_token);
-        }
-        emit AddOrder(_user, _orderId, Status.Initial, _user, order.buyer);
+        order.seller_pledge=_seller_pledge;
+        order.token.transferFrom(_user, address(this), _seller_pledge);
+        total[address(order.token)] += _seller_pledge;
+        emit SetStatus(_user, _orderId, Status.Initial, _user, order.buyer);
     }
 
     //买家下单
@@ -251,13 +248,6 @@ contract Ebay is Ownable {
                 order.seller,
                 order.buyer
             );
-            // emit AddOrder(
-            //     _user,
-            //     _order_id_new,
-            //     Status.Ordered,
-            //     order.seller,
-            //     _user
-            // );
         }
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         total[address(order.token)] = total[address(order.token)].add(
