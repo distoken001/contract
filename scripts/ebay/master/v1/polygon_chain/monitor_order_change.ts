@@ -42,6 +42,7 @@ async function monitor_order_change() {
         orderDetail["buyer_pledge"],
         orderDetail["amount"].toNumber(),
         orderDetail["seller_pledge"],
+        orderDetail["price"],
         await chainId,
         contractAddress
       );

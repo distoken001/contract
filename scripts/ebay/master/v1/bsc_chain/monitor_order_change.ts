@@ -9,7 +9,7 @@ import {
 } from "./config";
 
 async function monitor_order_change() {
-  console.log("monitor_order_change is loading");
+  console.log("function:monitor_order_change is loading");
 
  const topic = ethers.utils.id(
     "SetStatus(address,uint256,uint8,address,address)"
@@ -32,7 +32,7 @@ async function monitor_order_change() {
       let orderId: number = _args["orderId"].toNumber();
       const orderDetail = await contract.orders(orderId);
       //const contactData = await contract.getContact(orderId);
-      console.log("monitor_order_change订单详情：", orderDetail);
+      console.log("订单详情：", orderDetail);
       //console.log("联系方式", contactData);
       logic_update_order(
         orderId,
@@ -42,10 +42,10 @@ async function monitor_order_change() {
         orderDetail["buyer_pledge"],
         orderDetail["amount"].toNumber(),
         orderDetail["seller_pledge"],
+        orderDetail["price"],
         await chainId,
         contractAddress
       );
     });
-    console.log("monitor_order_change is ok");
 }
 export { monitor_order_change };
