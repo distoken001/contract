@@ -116,10 +116,6 @@ contract Ebay is Ownable {
         uint256 _sellerRatio
     ) external {
         address _user = _msgSender();
-        require(
-            bytes(_contactSeller).length != 0,
-            "Seller contact can not be null"
-        );
         //1.质押数量
         (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
@@ -148,7 +144,44 @@ contract Ebay is Ownable {
         contact[_orderId].seller = _contactSeller;
         total[_token] += _seller_pledge;
         sellerList[_user].push(_orderId);
+        if (_buyer != address(0)) {
+            buyerList[_buyer].push(_orderId);
+        }
+
         emit AddOrder(_user, _orderId, Status.Initial, _user, _buyer);
+    }
+
+    //修改订单
+    function update(
+        uint256 _orderId,
+        string memory _name,
+        string memory _contactSeller,
+        string memory _description,
+        string memory _img,
+        address _token,
+        uint256 _price,
+        uint256 _amount
+    ) external {
+        (Order storage order, address _user) = validate(_orderId, false);
+        require(
+            order.seller == _user && order.status == Status.Initial,
+            "No permissions"
+        );
+        require(
+            bytes(_contactSeller).length != 0,
+            "Seller contact can not be null"
+        );
+        order.name = _name;
+        order.description = _description;
+        order.img = _img;
+        order.price = _price;
+        order.amount = _amount;
+        contact[_orderId].seller = _contactSeller;
+        if (IERC20(_token) != order.token) {
+            require(order.seller_pledge == 0, "seller_pledge must be zero");
+            order.token = IERC20(_token);
+        }
+        emit AddOrder(_user, _orderId, Status.Initial, _user, order.buyer);
     }
 
     //买家下单
@@ -159,10 +192,6 @@ contract Ebay is Ownable {
     ) external {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, false);
-        require(
-            bytes(_buyerContact).length != 0,
-            "Seller contact can not be null"
-        );
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
         require(_amount <= order.amount, "amount error");
@@ -180,8 +209,10 @@ contract Ebay is Ownable {
             order.status = _status;
             order.buyer_pledge = _buyer_pledge;
             order.buyer_ex = _buyer_tx_fee;
+            if (order.buyer == address(0)) {
+                buyerList[_user].push(_orderId);
+            }
             order.buyer = _user;
-            buyerList[_user].push(_orderId);
             contact[_orderId].buyer = _buyerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
         } else {
@@ -220,13 +251,13 @@ contract Ebay is Ownable {
                 order.seller,
                 order.buyer
             );
-            emit AddOrder(
-                _user,
-                _order_id_new,
-                Status.Ordered,
-                order.seller,
-                _user
-            );
+            // emit AddOrder(
+            //     _user,
+            //     _order_id_new,
+            //     Status.Ordered,
+            //     order.seller,
+            //     _user
+            // );
         }
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         total[address(order.token)] = total[address(order.token)].add(
@@ -348,23 +379,8 @@ contract Ebay is Ownable {
             );
         }
         order.status = _status;
-        (
-            uint256 buyerFee,
-            uint256 sellerFee,
-            uint256 sellerBack,
-            uint256 buyerBack
-        ) = EbayLib.confirmCancelCalculateFeesAndRefunds(
-                order.buyer_pledge,
-                order.seller_pledge,
-                order.price,
-                order.amount,
-                buyerRate,
-                sellerRate,
-                order.buyer_ex
-            );
-        order.token.safeTransfer(order.seller, sellerBack);
-        order.token.safeTransfer(order.buyer, buyerBack);
-        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
+        order.token.safeTransfer(order.seller, order.seller_pledge);
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge; //更新总质押代币数量
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
@@ -377,24 +393,8 @@ contract Ebay is Ownable {
         //2、默认争议订单取消
         Status _status = Status.ConsultCancelCompleted;
         order.status = _status;
-
-        (
-            uint256 buyerFee,
-            uint256 sellerFee,
-            uint256 sellerBack,
-            uint256 buyerBack
-        ) = EbayLib.confirmCancelCalculateFeesAndRefunds(
-                order.buyer_pledge,
-                order.seller_pledge,
-                order.price,
-                order.amount,
-                buyerRate,
-                sellerRate,
-                order.buyer_ex
-            );
-        order.token.safeTransfer(order.seller, sellerBack);
-        order.token.safeTransfer(order.buyer, buyerBack);
-        order.token.safeTransfer(lockAddr, sellerFee.add(buyerFee));
+        order.token.safeTransfer(order.seller, order.seller_pledge);
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] -= order.buyer_pledge + order.seller_pledge;
         emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
     }
@@ -469,8 +469,6 @@ contract Ebay is Ownable {
     function setLock(address _lockAddr) external onlyOwner {
         lockAddr = _lockAddr;
     }
-
-    function renounceOwnership() public pure override {}
 
     function validate(
         uint256 _orderId,

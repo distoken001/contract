@@ -30,7 +30,7 @@ library EbayLib {
         sellerPledge = price.mul(amount).mul(sellerRatio).div(10000);
         sellerTxFee = price.mul(amount).mul(sellerRate).div(10000);
         if (sellerPledge < sellerTxFee) {
-            sellerPledge = sellerTxFee;
+            sellerTxFee = sellerPledge;
         }
         return (sellerPledge, sellerTxFee);
     }
