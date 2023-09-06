@@ -10,6 +10,7 @@ export async function logic_update_order(
   _buyer_pledge: any,
   _amount: any,
   _seller_pledge: any,
+  _price: any,
   _chain_id: number,
   _contract_address: string
 ) {
@@ -24,13 +25,14 @@ export async function logic_update_order(
     buyer_ex: _buyer_ex.toString(),
     buyer_pledge: _buyer_pledge.toString(),
     seller_pledge: _seller_pledge.toString(),
+    price: _price.toString(),
     amount: _amount.toString(),
     contract_address: _contract_address,
   };
 
   if (updateData.status == Status.Ordered) {
     const query =
-      "update orders SET status=?,buyer_ex=?,create_time=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?  where order_id=? and chain_id=? and contract=?";
+      "update orders SET status=?,buyer_ex=?,create_time=?, update_time=?,buyer= ?,buyer_pledge= ?,seller_pledge=?,amount=?,price=?  where order_id=? and chain_id=? and contract=?";
 
     const values = [
       updateData.status,
@@ -41,12 +43,17 @@ export async function logic_update_order(
       updateData.buyer_pledge,
       updateData.seller_pledge,
       updateData.amount,
+      updateData.price,
       updateData.order_id,
       updateData.chain_id,
       updateData.contract_address,
     ];
     const [rows, fields] = await executeQuery(query, values);
-    sendemail(updateData.chain_id,updateData.contract_address,updateData.order_id);
+    sendemail(
+      updateData.chain_id,
+      updateData.contract_address,
+      updateData.order_id
+    );
     return [rows, fields];
   } else {
     const query =
@@ -65,7 +72,11 @@ export async function logic_update_order(
       updateData.contract_address,
     ];
     const [rows, fields] = await executeQuery(query, values);
-    sendemail(updateData.chain_id,updateData.contract_address,updateData.order_id);
+    sendemail(
+      updateData.chain_id,
+      updateData.contract_address,
+      updateData.order_id
+    );
     return [rows, fields];
   }
 }
