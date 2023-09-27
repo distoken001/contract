@@ -175,7 +175,7 @@ contract Ebay is Ownable {
         );
         order.price = _price;
         order.amount = _amount;
-        order.seller_pledge=_seller_pledge;
+        order.seller_pledge = _seller_pledge;
         order.token.transferFrom(_user, address(this), _seller_pledge);
         total[address(order.token)] += _seller_pledge;
         emit SetStatus(_user, _orderId, Status.Initial, _user, order.buyer);
@@ -184,6 +184,7 @@ contract Ebay is Ownable {
     //买家下单
     function place(
         uint256 _orderId,
+        uint256 _price,
         uint256 _amount,
         string memory _buyerContact
     ) external {
@@ -191,7 +192,8 @@ contract Ebay is Ownable {
         (Order storage order, address _user) = validate(_orderId, false);
         //2、校验订单状态是否可以交易
         require(order.status == Status.Initial, "Order has expired");
-        require(_amount <= order.amount, "amount error");
+        require(_price == order.price, "Price has changed");
+        require(_amount <= order.amount, "Amount error");
         //3、校验订单是否指定买家
         require(
             order.buyer == address(0) || order.buyer == _user,
@@ -248,7 +250,7 @@ contract Ebay is Ownable {
                 order.seller,
                 order.buyer
             );
-             emit AddOrder(
+            emit AddOrder(
                 _user,
                 _order_id_new,
                 Status.Ordered,
