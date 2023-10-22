@@ -31,7 +31,13 @@ export async function notice_bot(chain_id: number, name: string, user: string) {
     let url =
       " https://api.telegram.org/bot6753397970:AAGd0t3JyjNyvthf7pO14nL6R8zC_vIW1I0/sendMessage?chat_id=-1002144169559&text=";
     url =
-      url + "市场订单： 用户 " + user + "在" + a.toString() + "发布了一个新的商品 " + name;
+      url +
+      "市场订单： 用户 " +
+      user +
+      "在" +
+      a.toString() +
+      "发布了一个新的商品 " +
+      name;
     const response = await axios.get(url);
     console.log(response.data);
   }
@@ -39,7 +45,13 @@ export async function notice_bot(chain_id: number, name: string, user: string) {
     let url =
       " https://api.telegram.org/bot6753397970:AAGd0t3JyjNyvthf7pO14nL6R8zC_vIW1I0/sendMessage?chat_id=-1002144169559&text=";
     url =
-      url + "市场订单： 用户 "  + user + "在" + a.toString() + "发布了一个新的商品 " + name;
+      url +
+      "市场订单： 用户 " +
+      user +
+      "在" +
+      a.toString() +
+      "发布了一个新的商品 " +
+      name;
     const response = await axios.get(url);
     console.log(response.data);
   }
