@@ -37,7 +37,7 @@ export async function notice_bot(chain_id: number, name: string, user: string) {
       user +
       "在" +
       a.toString() +
-      "发布了一个新商品 " +
+      "链上发布了一个新商品： " +
       name;
     const response = await axios.get(url);
     console.log(response.data);
@@ -51,7 +51,7 @@ export async function notice_bot(chain_id: number, name: string, user: string) {
       user +
       "在" +
       a.toString() +
-      "发布了一个新商品 " +
+      "链上发布了一个新商品： " +
       name;
     const response = await axios.get(url);
     console.log(response.data);
