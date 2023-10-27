@@ -74,11 +74,11 @@ export async function logic_update_order(
     ];
     const [rows, fields] = await executeQuery(query, values);
     if (updateData.status != Status.Initial) {
-      sendemail(
-        updateData.chain_id,
-        updateData.contract_address,
-        updateData.order_id
-      );
+      // sendemail(
+      //   updateData.chain_id,
+      //   updateData.contract_address,
+      //   updateData.order_id
+      // );
     }
     return [rows, fields];
   }

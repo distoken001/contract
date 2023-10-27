@@ -76,7 +76,7 @@ export const insertOrder = async (
       decimals
     ];
     const [rows, fields] = await executeQuery (sql, values);
-    sendemail(chain_id,contract,order_id);
+    // sendemail(chain_id,contract,order_id);
     notice_bot(chain_id,name,seller);
     return [rows,fields];
   }
