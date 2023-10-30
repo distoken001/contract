@@ -16,6 +16,7 @@ export async function sendemail(
         chain_id: chain_id,
         contract: contract,
         order_id: order_id,
+        type:1
       };
 
       const response = await axios.post(url!, data);

@@ -82,7 +82,7 @@ export const insertOrder = async (
       end_time.toString()
     ];
     const [rows, fields] = await executeQuery (sql, values);
-    // sendemail(chain_id,contract,order_id);
-    notice_bot(chain_id,name,seller);
+    sendemail(chain_id,contract,order_id);
+    // notice_bot(chain_id,name,seller);
     return [rows,fields];
   }
