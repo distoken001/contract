@@ -1,6 +1,6 @@
 import { executeQuery } from "./db";
 import { ethers } from "ethers";
-import { notice_bot, sendemail } from "./send_email";
+import { notice_bot_auction } from "./notice";
 export const insertOrder = async (
     order_id: number,
     name: string,
@@ -82,7 +82,7 @@ export const insertOrder = async (
       end_time.toString()
     ];
     const [rows, fields] = await executeQuery (sql, values);
-    sendemail(chain_id,contract,order_id);
-    // notice_bot(chain_id,name,seller);
+    notice_bot_auction(chain_id,contract,order_id);
+
     return [rows,fields];
   }
