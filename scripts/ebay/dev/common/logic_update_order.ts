@@ -74,6 +74,7 @@ export async function logic_update_order(
     ];
     const [rows, fields] = await executeQuery(query, values);
     // if (updateData.status != Status.Initial) {
+      console.log("发送消息",updateData.chain_id,updateData.contract_address,updateData.order_id);
       sendemail(
         updateData.chain_id,
         updateData.contract_address,
