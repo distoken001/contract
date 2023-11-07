@@ -1,5 +1,6 @@
 import { Status } from "./enum_all";
 import { executeQuery } from "./db";
+import { notice_bot_auction } from "./notice";
 
 
 export async function logic_update_order(
@@ -49,5 +50,6 @@ export async function logic_update_order(
     updateData.contract_address,
   ];
   const [rows, fields] = await executeQuery(query, values);
+  notice_bot_auction(updateData.chain_id,updateData.contract_address,updateData.order_id);
   return [rows, fields];
 }
