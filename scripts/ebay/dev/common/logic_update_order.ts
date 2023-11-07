@@ -1,6 +1,6 @@
 import { Status } from "./enum_all";
 import { executeQuery } from "./db";
-import { sendemail } from "./send_email";
+import { notice_bot } from "./notice";
 
 export async function logic_update_order(
   _order_id: number,
@@ -49,7 +49,7 @@ export async function logic_update_order(
       updateData.contract_address,
     ];
     const [rows, fields] = await executeQuery(query, values);
-    sendemail(
+    notice_bot(
       updateData.chain_id,
       updateData.contract_address,
       updateData.order_id
@@ -75,7 +75,7 @@ export async function logic_update_order(
     const [rows, fields] = await executeQuery(query, values);
     // if (updateData.status != Status.Initial) {
       console.log("发送消息",updateData.chain_id,updateData.contract_address,updateData.order_id);
-      sendemail(
+      notice_bot(
         updateData.chain_id,
         updateData.contract_address,
         updateData.order_id
