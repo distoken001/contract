@@ -12,12 +12,12 @@ contract ScratchCard is Ownable {
         uint256 maxPrize;
     }
     mapping(address => uint256) public total; //代币总质押数量
+    mapping(address => uint256) public totalProfit; //所有权者获得的可以提现的税
     Card[] public availableCards;
     mapping(address => uint256) public cardBalances;
     mapping(address => mapping(string => uint256)) public cardCounts;
-    mapping(address => uint256) public winnings;
-    uint256 public profitShare = 10; // 10% profit share
-    uint256 public totalProfit;
+    uint256 public winningProbability = 10; // 10% profit share
+    uint256 public profitShare = 90; //用户赚取比例
 
     event CardPurchased(
         address indexed user,
@@ -111,22 +111,29 @@ contract ScratchCard is Ownable {
         ) % 100;
 
         uint256 prize = determinePrize(randomNumber, selectedCard);
-        winnings[msg.sender] += prize;
 
         if (prize > 0) {
             require(
-                winnings[msg.sender] <= selectedCard.maxPrize,
-                "Winnings exceed the maximum prize limit"
+                prize <= selectedCard.maxPrize,
+                "prize exceed the maximum prize limit"
+            );
+            require(
+                prize <= total[selectedCard.tokenAddress],
+                "prize exceed the total"
             );
             emit PrizeClaimed(msg.sender, cardType, prize);
             // 将奖励返还给用户
             IERC20 token = IERC20(selectedCard.tokenAddress);
+            uint256 userProfit = (prize * profitShare) / 100;
             require(
-                token.transfer(msg.sender, prize),
+                token.transfer(msg.sender, userProfit),
                 "Transfer of prize failed"
             );
             // 更新total映射的值
             total[selectedCard.tokenAddress] -= prize;
+            totalProfit[selectedCard.tokenAddress] += prize - userProfit;
+        } else {
+            totalProfit[selectedCard.tokenAddress] += selectedCard.price;
         }
     }
 
@@ -134,11 +141,11 @@ contract ScratchCard is Ownable {
         uint256 randomNumber,
         Card storage selectedCard
     ) internal returns (uint256) {
-        if (randomNumber < profitShare) {
-            uint256 profit = (selectedCard.price *
-                profitShare) / 100;
-            return profit;
+        if (randomNumber < winningProbability) {
+            uint256 maxPrize = selectedCard.maxPrize;
+            return maxPrize;
         }
+
         return 0;
     }
 
@@ -171,11 +178,11 @@ contract ScratchCard is Ownable {
         uint256 amountToWithdraw
     ) external onlyOwner {
         require(
-            total[tokenAddress] >= amountToWithdraw,
+            totalProfit[tokenAddress] >= amountToWithdraw,
             "Insufficient funds to withdraw"
         );
 
-        total[tokenAddress] -= amountToWithdraw;
+        totalProfit[tokenAddress] -= amountToWithdraw;
         IERC20 profitToken = IERC20(tokenAddress);
         require(
             profitToken.transfer(owner(), amountToWithdraw),
@@ -183,7 +190,12 @@ contract ScratchCard is Ownable {
         );
         emit ProfitWithdrawn(amountToWithdraw);
     }
+
+    function setProbability(uint256 newProbability) external onlyOwner {
+        winningProbability = newProbability;
+    }
+
     function setProfitShare(uint256 newProfitShare) external onlyOwner {
-    profitShare = newProfitShare;
-}
+        profitShare = newProfitShare;
+    }
 }
