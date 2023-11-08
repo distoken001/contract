@@ -91,7 +91,7 @@ contract ScratchCard is Ownable {
         emit CardPurchased(msg.sender, cardType, numberOfCards);
     }
 
-    function scratchCard(string calldata cardType) external {
+    function scratchCard(string calldata cardType) external returns (uint256) {
         require(cardBalances[msg.sender] > 0, "You have no cards to scratch");
         require(
             cardCounts[msg.sender][cardType] > 0,
@@ -130,17 +130,19 @@ contract ScratchCard is Ownable {
                 "Transfer of prize failed"
             );
             // 更新total映射的值
-            total[selectedCard.tokenAddress] -= prize;
+            total[selectedCard.tokenAddress] -= userProfit;
             totalProfit[selectedCard.tokenAddress] += prize - userProfit;
+            return userProfit;
         } else {
             totalProfit[selectedCard.tokenAddress] += selectedCard.price;
+            return 0;
         }
     }
 
     function determinePrize(
         uint256 randomNumber,
         Card storage selectedCard
-    ) internal returns (uint256) {
+    ) internal view returns (uint256) {
         if (randomNumber < winningProbability) {
             uint256 maxPrize = selectedCard.maxPrize;
             return maxPrize;
@@ -183,6 +185,7 @@ contract ScratchCard is Ownable {
         );
 
         totalProfit[tokenAddress] -= amountToWithdraw;
+        total[tokenAddress] -= amountToWithdraw;
         IERC20 profitToken = IERC20(tokenAddress);
         require(
             profitToken.transfer(owner(), amountToWithdraw),
