@@ -18,7 +18,7 @@ contract ScratchCard is Ownable {
     Card[] public availableCards;
     mapping(address => uint256) public cardBalances;
     mapping(address => mapping(string => uint256)) public cardCounts;
-    uint256 public profitShare = 90; //User earning ratio
+    uint256 public profitShare = 1000;
 
     event CardPurchased(
         address indexed user,
@@ -127,7 +127,8 @@ contract ScratchCard is Ownable {
         Card storage selectedCard = availableCards[cardIndex];
         cardBalances[msg.sender]--;
         cardCounts[msg.sender][cardType]--;
-
+        totalProfit[selectedCard.tokenAddress] += ((profitShare *
+            selectedCard.price) / 10000);
         uint256 randomNumber = uint256(
             keccak256(
                 abi.encodePacked(
@@ -137,33 +138,25 @@ contract ScratchCard is Ownable {
                     "demarket"
                 )
             )
-        ) % 100;
-
+        ) % 10000;
         uint256 prize = determinePrize(randomNumber, selectedCard);
 
         if (prize > 0) {
-            require(
-                prize <= selectedCard.maxPrize,
-                "prize exceed the maximum prize limit"
-            );
             require(
                 prize <= total[selectedCard.tokenAddress],
                 "prize exceed the total"
             );
             IERC20 token = IERC20(selectedCard.tokenAddress);
-            uint256 userProfit = (((prize * profitShare) / 100) *
-                randomNumber) / selectedCard.winningProbability;
-            emit PrizeClaimed(msg.sender, cardType, userProfit);
+            emit PrizeClaimed(msg.sender, cardType, prize);
 
             require(
-                token.transfer(msg.sender, userProfit),
+                token.transfer(msg.sender, prize),
                 "Transfer of prize failed"
             );
-            total[selectedCard.tokenAddress] -= userProfit;
-            totalProfit[selectedCard.tokenAddress] += prize - userProfit;
-            return userProfit;
+            total[selectedCard.tokenAddress] -= prize;
+
+            return prize;
         } else {
-            totalProfit[selectedCard.tokenAddress] += selectedCard.price;
             emit PrizeClaimed(msg.sender, cardType, 0);
             return 0;
         }
@@ -173,12 +166,22 @@ contract ScratchCard is Ownable {
         uint256 randomNumber,
         Card storage selectedCard
     ) internal view returns (uint256) {
-        if (randomNumber < selectedCard.winningProbability) {
-            uint256 maxPrize = selectedCard.maxPrize;
+        uint256 maxPrize = selectedCard.maxPrize;
+        if (randomNumber == 0) {
             return maxPrize;
+        } else if (
+            randomNumber <= ((selectedCard.winningProbability * 6) / 10)
+        ) {
+            return selectedCard.price;
+        } else if (
+            randomNumber <= ((selectedCard.winningProbability * 9) / 10)
+        ) {
+            return selectedCard.price * 2;
+        } else if (randomNumber <= selectedCard.winningProbability) {
+            return selectedCard.price * 3;
+        } else {
+            return 0;
         }
-
-        return 0;
     }
 
     function selectRandomCard() internal view returns (uint256) {
@@ -209,6 +212,7 @@ contract ScratchCard is Ownable {
         address tokenAddress,
         uint256 amountToWithdraw
     ) external onlyOwner {
+        //给用户看的，这里表示管理员无权利提取用户资金
         require(
             totalProfit[tokenAddress] >= amountToWithdraw,
             "Insufficient funds to withdraw"
@@ -217,7 +221,7 @@ contract ScratchCard is Ownable {
             total[tokenAddress] >= amountToWithdraw,
             "Insufficient funds to withdraw"
         );
-        //给用户看的，这里表示管理员无权利提取用户资金，因uint不能为负数
+
         totalProfit[tokenAddress] -= amountToWithdraw;
         total[tokenAddress] -= amountToWithdraw;
         IERC20 profitToken = IERC20(tokenAddress);
