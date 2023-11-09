@@ -124,7 +124,8 @@ contract ScratchCard is Ownable {
             emit PrizeClaimed(msg.sender, cardType, prize);
             // 将奖励返还给用户
             IERC20 token = IERC20(selectedCard.tokenAddress);
-            uint256 userProfit = (prize * profitShare) / 100;
+            uint256 userProfit = (((prize * profitShare) / 100) *
+                randomNumber) / winningProbability;
             require(
                 token.transfer(msg.sender, userProfit),
                 "Transfer of prize failed"
