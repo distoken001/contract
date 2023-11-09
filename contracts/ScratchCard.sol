@@ -130,7 +130,12 @@ contract ScratchCard is Ownable {
 
         uint256 randomNumber = uint256(
             keccak256(
-                abi.encodePacked(block.timestamp, block.difficulty, msg.sender,"demarket")
+                abi.encodePacked(
+                    block.timestamp,
+                    block.difficulty,
+                    msg.sender,
+                    "demarket"
+                )
             )
         ) % 100;
 
@@ -159,7 +164,7 @@ contract ScratchCard is Ownable {
             return userProfit;
         } else {
             totalProfit[selectedCard.tokenAddress] += selectedCard.price;
-              emit PrizeClaimed(msg.sender, cardType, 0);
+            emit PrizeClaimed(msg.sender, cardType, 0);
             return 0;
         }
     }
