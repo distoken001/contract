@@ -6,18 +6,18 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ScratchCard is Ownable {
     struct Card {
-        string cardType; // 使用字符串标识符来表示卡片类型
+        string cardType; // Use string identifiers to represent card types
         address tokenAddress;
         uint256 price;
         uint256 maxPrize;
     }
-    mapping(address => uint256) public total; //代币总质押数量
-    mapping(address => uint256) public totalProfit; //所有权者获得的可以提现的税
+    mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
+    mapping(address => uint256) public totalProfit; //Tax that the owner can withdraw
     Card[] public availableCards;
     mapping(address => uint256) public cardBalances;
     mapping(address => mapping(string => uint256)) public cardCounts;
-    uint256 public winningProbability = 20; // 20% 概率赢钱
-    uint256 public profitShare = 90; //用户赚取比例
+    uint256 public winningProbability = 20; // A 20% chance of winning
+    uint256 public profitShare = 90; //User earning ratio
 
     event CardPurchased(
         address indexed user,
@@ -33,11 +33,15 @@ contract ScratchCard is Ownable {
         uint256 maxPrize
     );
     event CardTypeRemoved(string cardType);
+    event CardGifted(
+        address indexed sender,
+        address indexed recipient,
+        string cardType,
+        uint256 numberOfCards
+    );
 
     constructor() {
-        // Initialize available cards with their parameters
         // availableCards.push(Card("CardType1", address(0x123), 5 * 10**6, 500 * 10**18));
-        // You can add more ERC-20 tokens as needed
     }
 
     function addCardType(
@@ -86,7 +90,6 @@ contract ScratchCard is Ownable {
 
         cardBalances[msg.sender] += numberOfCards;
         cardCounts[msg.sender][cardType] += numberOfCards;
-        // 更新相应代币的余额
         total[selectedCard.tokenAddress] += selectedCard.price * numberOfCards;
         emit CardPurchased(msg.sender, cardType, numberOfCards);
     }
@@ -121,16 +124,15 @@ contract ScratchCard is Ownable {
                 prize <= total[selectedCard.tokenAddress],
                 "prize exceed the total"
             );
-            emit PrizeClaimed(msg.sender, cardType, prize);
-            // 将奖励返还给用户
             IERC20 token = IERC20(selectedCard.tokenAddress);
             uint256 userProfit = (((prize * profitShare) / 100) *
                 randomNumber) / winningProbability;
+            emit PrizeClaimed(msg.sender, cardType, userProfit);
+
             require(
                 token.transfer(msg.sender, userProfit),
                 "Transfer of prize failed"
             );
-            // 更新total映射的值
             total[selectedCard.tokenAddress] -= userProfit;
             totalProfit[selectedCard.tokenAddress] += prize - userProfit;
             return userProfit;
@@ -173,7 +175,7 @@ contract ScratchCard is Ownable {
                 return i;
             }
         }
-        return 0;
+        revert("Card type not found");
     }
 
     function withdrawProfit(
@@ -182,6 +184,10 @@ contract ScratchCard is Ownable {
     ) external onlyOwner {
         require(
             totalProfit[tokenAddress] >= amountToWithdraw,
+            "Insufficient funds to withdraw"
+        );
+        require(
+            total[tokenAddress] >= amountToWithdraw,
             "Insufficient funds to withdraw"
         );
 
@@ -201,5 +207,34 @@ contract ScratchCard is Ownable {
 
     function setProfitShare(uint256 newProfitShare) external onlyOwner {
         profitShare = newProfitShare;
+    }
+
+    // 新增赠送刮刮卡的函数
+    function giftCards(
+        address recipient,
+        string calldata cardType,
+        uint256 numberOfCards
+    ) external onlyOwner {
+        require(numberOfCards > 0, "Number of cards must be greater than zero");
+        uint256 cardIndex = findCardIndex(cardType);
+
+        require(cardIndex < availableCards.length, "Invalid card type");
+        Card storage selectedCard = availableCards[cardIndex];
+
+        require(
+            cardBalances[msg.sender] >= numberOfCards,
+            "Insufficient cards to gift"
+        );
+
+        // 增加赠送的逻辑
+        cardBalances[msg.sender] -= numberOfCards;
+        cardCounts[msg.sender][cardType] -= numberOfCards;
+
+        cardBalances[recipient] += numberOfCards;
+        cardCounts[recipient][cardType] += numberOfCards;
+
+        total[selectedCard.tokenAddress] += selectedCard.price * numberOfCards;
+
+        emit CardGifted(msg.sender, recipient, cardType, numberOfCards);
     }
 }
