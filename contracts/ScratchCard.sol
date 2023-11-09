@@ -209,7 +209,6 @@ contract ScratchCard is Ownable {
         profitShare = newProfitShare;
     }
 
-    // 新增赠送刮刮卡的函数
     function giftCards(
         address recipient,
         string calldata cardType,
@@ -226,7 +225,6 @@ contract ScratchCard is Ownable {
             "Insufficient cards to gift"
         );
 
-        // 增加赠送的逻辑
         cardBalances[msg.sender] -= numberOfCards;
         cardCounts[msg.sender][cardType] -= numberOfCards;
 
