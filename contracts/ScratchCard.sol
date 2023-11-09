@@ -132,7 +132,7 @@ contract ScratchCard is Ownable {
             keccak256(
                 abi.encodePacked(
                     block.timestamp,
-                    block.prevrandao,
+                    block.difficulty,
                     msg.sender,
                     "demarket"
                 )
@@ -184,7 +184,7 @@ contract ScratchCard is Ownable {
     function selectRandomCard() internal view returns (uint256) {
         uint256 seed = uint256(
             keccak256(
-                abi.encodePacked(block.timestamp, block.prevrandao, msg.sender)
+                abi.encodePacked(block.timestamp, block.difficulty, msg.sender)
             )
         ) % availableCards.length;
         return seed;
