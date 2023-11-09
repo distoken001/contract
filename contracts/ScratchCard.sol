@@ -190,7 +190,7 @@ contract ScratchCard is Ownable {
             total[tokenAddress] >= amountToWithdraw,
             "Insufficient funds to withdraw"
         );
-
+        //给用户看的，这里表示管理员无权利提取用户资金，因uint不能为负数
         totalProfit[tokenAddress] -= amountToWithdraw;
         total[tokenAddress] -= amountToWithdraw;
         IERC20 profitToken = IERC20(tokenAddress);
