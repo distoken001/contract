@@ -10,13 +10,13 @@ contract ScratchCard is Ownable {
         address tokenAddress;
         uint256 price;
         uint256 maxPrize;
+        uint winningProbability;
     }
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
     mapping(address => uint256) public totalProfit; //Tax that the owner can withdraw
     Card[] public availableCards;
     mapping(address => uint256) public cardBalances;
     mapping(address => mapping(string => uint256)) public cardCounts;
-    uint256 public winningProbability = 20; // chance of winning
     uint256 public profitShare = 90; //User earning ratio
 
     event CardPurchased(
@@ -48,9 +48,12 @@ contract ScratchCard is Ownable {
         string calldata cardType,
         address tokenAddress,
         uint256 price,
-        uint256 maxPrize
+        uint256 maxPrize,
+        uint256 winningProbability
     ) external onlyOwner {
-        availableCards.push(Card(cardType, tokenAddress, price, maxPrize));
+        availableCards.push(
+            Card(cardType, tokenAddress, price, maxPrize, winningProbability)
+        );
         emit CardTypeAdded(cardType, tokenAddress, price, maxPrize);
     }
 
@@ -126,7 +129,7 @@ contract ScratchCard is Ownable {
             );
             IERC20 token = IERC20(selectedCard.tokenAddress);
             uint256 userProfit = (((prize * profitShare) / 100) *
-                randomNumber) / winningProbability;
+                randomNumber) / selectedCard.winningProbability;
             emit PrizeClaimed(msg.sender, cardType, userProfit);
 
             require(
@@ -146,7 +149,7 @@ contract ScratchCard is Ownable {
         uint256 randomNumber,
         Card storage selectedCard
     ) internal view returns (uint256) {
-        if (randomNumber < winningProbability) {
+        if (randomNumber < selectedCard.winningProbability) {
             uint256 maxPrize = selectedCard.maxPrize;
             return maxPrize;
         }
@@ -199,10 +202,6 @@ contract ScratchCard is Ownable {
             "Transfer failed"
         );
         emit ProfitWithdrawn(amountToWithdraw);
-    }
-
-    function setProbability(uint256 newProbability) external onlyOwner {
-        winningProbability = newProbability;
     }
 
     function setProfitShare(uint256 newProfitShare) external onlyOwner {
