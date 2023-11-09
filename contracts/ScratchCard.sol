@@ -16,7 +16,7 @@ contract ScratchCard is Ownable {
     Card[] public availableCards;
     mapping(address => uint256) public cardBalances;
     mapping(address => mapping(string => uint256)) public cardCounts;
-    uint256 public winningProbability = 20; // A 20% chance of winning
+    uint256 public winningProbability = 20; // chance of winning
     uint256 public profitShare = 90; //User earning ratio
 
     event CardPurchased(
