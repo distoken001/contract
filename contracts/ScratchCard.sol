@@ -7,10 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract ScratchCard is Ownable {
     struct Card {
         string cardType; // Use string identifiers to represent card types
+        string cardName;
         address tokenAddress;
         uint256 price;
         uint256 maxPrize;
-        uint winningProbability;
+        uint256 winningProbability;
     }
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
     mapping(address => uint256) public totalProfit; //Tax that the owner can withdraw
@@ -28,9 +29,11 @@ contract ScratchCard is Ownable {
     event ProfitWithdrawn(uint256 amount);
     event CardTypeAdded(
         string cardType,
+        string cardName,
         address tokenAddress,
         uint256 price,
-        uint256 maxPrize
+        uint256 maxPrize,
+        uint256 winningProbability
     );
     event CardTypeRemoved(string cardType);
     event CardGifted(
@@ -46,15 +49,30 @@ contract ScratchCard is Ownable {
 
     function addCardType(
         string calldata cardType,
+        string calldata cardName,
         address tokenAddress,
         uint256 price,
         uint256 maxPrize,
         uint256 winningProbability
     ) external onlyOwner {
         availableCards.push(
-            Card(cardType, tokenAddress, price, maxPrize, winningProbability)
+            Card(
+                cardType,
+                cardName,
+                tokenAddress,
+                price,
+                maxPrize,
+                winningProbability
+            )
         );
-        emit CardTypeAdded(cardType, tokenAddress, price, maxPrize);
+        emit CardTypeAdded(
+            cardType,
+            cardName,
+            tokenAddress,
+            price,
+            maxPrize,
+            winningProbability
+        );
     }
 
     function removeCardType(string calldata cardType) external onlyOwner {
@@ -141,6 +159,7 @@ contract ScratchCard is Ownable {
             return userProfit;
         } else {
             totalProfit[selectedCard.tokenAddress] += selectedCard.price;
+              emit PrizeClaimed(msg.sender, cardType, 0);
             return 0;
         }
     }
