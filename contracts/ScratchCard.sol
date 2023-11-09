@@ -130,7 +130,7 @@ contract ScratchCard is Ownable {
 
         uint256 randomNumber = uint256(
             keccak256(
-                abi.encodePacked(block.timestamp, block.difficulty, msg.sender)
+                abi.encodePacked(block.timestamp, block.difficulty, msg.sender,"demarket")
             )
         ) % 100;
 
