@@ -11,6 +11,7 @@ contract ScratchCard is Ownable {
         address tokenAddress;
         uint256 price;
         uint256 maxPrize;
+        uint256 maxPrizeProbability;
         uint256 winningProbability;
     }
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
@@ -53,6 +54,7 @@ contract ScratchCard is Ownable {
         address tokenAddress,
         uint256 price,
         uint256 maxPrize,
+        uint256 maxPrizeProbability,
         uint256 winningProbability
     ) external onlyOwner {
         availableCards.push(
@@ -62,6 +64,7 @@ contract ScratchCard is Ownable {
                 tokenAddress,
                 price,
                 maxPrize,
+                maxPrizeProbability,
                 winningProbability
             )
         );
@@ -138,8 +141,13 @@ contract ScratchCard is Ownable {
                     "demarket"
                 )
             )
-        ) % 10000;
-        uint256 prize = determinePrize(randomNumber, selectedCard);
+        );
+        uint256 prize = 0;
+        if (randomNumber % selectedCard.maxPrizeProbability == 0) {
+            prize = selectedCard.maxPrize;
+        } else {
+            prize = determinePrize(randomNumber % 10000, selectedCard);
+        }
 
         if (prize > 0) {
             require(
@@ -166,12 +174,7 @@ contract ScratchCard is Ownable {
         uint256 randomNumber,
         Card storage selectedCard
     ) internal view returns (uint256) {
-        uint256 maxPrize = selectedCard.maxPrize;
-        if (randomNumber == 0) {
-            return maxPrize;
-        } else if (
-            randomNumber <= ((selectedCard.winningProbability * 6) / 10)
-        ) {
+        if (randomNumber <= ((selectedCard.winningProbability * 6) / 10)) {
             return selectedCard.price;
         } else if (
             randomNumber <= ((selectedCard.winningProbability * 9) / 10)
