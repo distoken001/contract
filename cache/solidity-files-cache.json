@@ -2430,8 +2430,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/demarket/contract/contracts/ScratchCard.sol": {
-      "lastModificationDate": 1699583817012,
-      "contentHash": "b363330b5f237021a452d70c1624daed",
+      "lastModificationDate": 1699597221555,
+      "contentHash": "8394b36622606a9c846b637c4e03ea67",
       "sourceName": "contracts/ScratchCard.sol",
       "solcConfig": {
         "version": "0.8.19",

@@ -34,6 +34,7 @@ contract ScratchCard is Ownable {
         address tokenAddress,
         uint256 price,
         uint256 maxPrize,
+        uint256 maxPrizeProbability,
         uint256 winningProbability
     );
     event CardTypeRemoved(string cardType);
@@ -74,6 +75,7 @@ contract ScratchCard is Ownable {
             tokenAddress,
             price,
             maxPrize,
+            maxPrizeProbability,
             winningProbability
         );
     }
