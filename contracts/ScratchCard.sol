@@ -174,14 +174,18 @@ contract ScratchCard is Ownable {
         uint256 randomNumber,
         Card storage selectedCard
     ) internal view returns (uint256) {
-        if (randomNumber <= ((selectedCard.winningProbability * 6) / 10)) {
+        if (randomNumber <= ((selectedCard.winningProbability * 60) / 100)) {
             return selectedCard.price;
         } else if (
-            randomNumber <= ((selectedCard.winningProbability * 9) / 10)
+            randomNumber <= ((selectedCard.winningProbability * 90) / 100)
         ) {
             return selectedCard.price * 2;
-        } else if (randomNumber <= selectedCard.winningProbability) {
+        } else if (
+            randomNumber <= ((selectedCard.winningProbability * 95) / 100)
+        ) {
             return selectedCard.price * 3;
+        } else if (randomNumber <= selectedCard.winningProbability) {
+            return selectedCard.price * 4;
         } else {
             return 0;
         }
