@@ -239,9 +239,9 @@ contract ScratchCard is Ownable {
         emit ProfitWithdrawn(amountToWithdraw);
     }
 
-    function setProfitShare(uint256 newProfitShare) external onlyOwner {
-        profitShare = newProfitShare;
-    }
+    // function setProfitShare(uint256 newProfitShare) external onlyOwner {
+    //     profitShare = newProfitShare;
+    // }
 
     function giftCards(
         address recipient,

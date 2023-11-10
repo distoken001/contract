@@ -2428,6 +2428,44 @@
       "artifacts": [
         "Lock"
       ]
+    },
+    "/Users/buqun/Documents/GitHub/demarket/contract/contracts/ScratchCard.sol": {
+      "lastModificationDate": 1699583817012,
+      "contentHash": "b363330b5f237021a452d70c1624daed",
+      "sourceName": "contracts/ScratchCard.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ScratchCard"
+      ]
     }
   }
 }
