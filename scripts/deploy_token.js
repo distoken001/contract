@@ -7,10 +7,10 @@
 const hre = require("hardhat");
 
 async function main() {
-  const USDT = await hre.ethers.getContractFactory("TetherUS");
-  const usdt = await USDT.deploy();
-  await usdt.deployed();
-  console.log(usdt.address);
+  const Token = await hre.ethers.getContractFactory("Token");
+  const token = await Token.deploy();
+  await token.deployed();
+  console.log(token.address);
 }
 
 main().catch((error) => {
