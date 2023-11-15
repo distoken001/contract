@@ -2099,8 +2099,8 @@
       ]
     },
     "/Users/buqun/Documents/GitHub/demarket/contract/contracts/Token.sol": {
-      "lastModificationDate": 1700032126038,
-      "contentHash": "23db099e022874c5aaa6e988ab694c13",
+      "lastModificationDate": 1700032972559,
+      "contentHash": "42df3b50131f40f38ca1f827c083242d",
       "sourceName": "contracts/Token.sol",
       "solcConfig": {
         "version": "0.8.19",
@@ -2126,7 +2126,14 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/security/Pausable.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol"
       ],
       "versionPragmas": [
         "^0.8.19"
