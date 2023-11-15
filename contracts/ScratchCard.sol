@@ -208,8 +208,7 @@ contract ScratchCard is Ownable {
         for (uint256 i = 0; i < availableCards.length; i++) {
             if (
                 keccak256(abi.encodePacked(availableCards[i].cardType)) ==
-                keccak256(abi.encodePacked(cardType)) &&
-                availableCards[i].tokenAddress == address(this)
+                keccak256(abi.encodePacked(cardType))
             ) {
                 return i;
             }
