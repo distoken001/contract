@@ -58,6 +58,10 @@ contract ScratchCard is Ownable {
         uint256 maxPrizeProbability,
         uint256 winningProbability
     ) external onlyOwner {
+        require(
+            findCardIndex(cardType) < availableCards.length,
+            "Card type already exists"
+        );
         availableCards.push(
             Card(
                 cardType,
