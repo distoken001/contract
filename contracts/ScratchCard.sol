@@ -86,10 +86,9 @@ contract ScratchCard is Ownable {
                 keccak256(abi.encodePacked(availableCards[i].cardType)) ==
                 keccak256(abi.encodePacked(cardType))
             ) {
-                emit CardTypeRemoved(cardType);
                 availableCards[i] = availableCards[availableCards.length - 1];
                 availableCards.pop();
-                return;
+                emit CardTypeRemoved(cardType);
             }
         }
     }
