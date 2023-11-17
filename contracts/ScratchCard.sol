@@ -58,10 +58,14 @@ contract ScratchCard is Ownable {
         uint256 maxPrizeProbability,
         uint256 winningProbability
     ) external onlyOwner {
-        require(
-            findCardIndex(cardType) < availableCards.length,
-            "Card type already exists"
-        );
+        for (uint256 i = 0; i < availableCards.length; i++) {
+            if (
+                keccak256(abi.encodePacked(availableCards[i].cardType)) ==
+                keccak256(abi.encodePacked(cardType))
+            ) {
+                revert("Card type exist");
+            }
+        }
         availableCards.push(
             Card(
                 cardType,
