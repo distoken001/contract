@@ -255,7 +255,7 @@ contract ScratchCard is Ownable {
         address recipient,
         string calldata cardType,
         uint256 numberOfCards
-    ) external onlyOwner {
+    ) external {
         require(numberOfCards > 0, "Number of cards must be greater than zero");
         uint256 cardIndex = findCardIndex(cardType);
 
