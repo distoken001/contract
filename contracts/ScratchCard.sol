@@ -141,6 +141,7 @@ contract ScratchCard is Ownable {
 
         uint profit = (profitShare * selectedCard.price) / 10000;
         IERC20 token = IERC20(selectedCard.tokenAddress);
+        total[selectedCard.tokenAddress] -= profit;
         token.transfer(lockAddr, profit); //fee
         uint256 randomNumber = uint256(
             keccak256(
