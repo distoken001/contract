@@ -227,7 +227,7 @@ contract ScratchCard is Ownable {
         address tokenAddress,
         uint256 amountToWithdraw
     ) external onlyOwner {
-        //给用户看的，这里表示管理员无权利提取用户资金
+        //For users' viewing: Here it is stated that the administrator does not have the authority to withdraw user funds.
         require(
             totalProfit[tokenAddress] >= amountToWithdraw,
             "Insufficient funds to withdraw"
