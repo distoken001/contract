@@ -15,19 +15,18 @@ contract ScratchCard is Ownable {
         uint256 winningProbability;
     }
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
-    mapping(address => uint256) public totalProfit; //Tax that the owner can withdraw
     Card[] public availableCards;
     mapping(address => uint256) public cardBalances;
     mapping(address => mapping(string => uint256)) public cardCounts;
     uint256 public profitShare = 1000;
-
+    address public lockAddr;
     event CardPurchased(
         address indexed user,
         string cardType,
         uint256 numberOfCards
     );
     event PrizeClaimed(address indexed user, string cardType, uint256 prize);
-    event ProfitWithdrawn(uint256 amount);
+
     event CardTypeAdded(
         string cardType,
         string cardName,
@@ -45,8 +44,8 @@ contract ScratchCard is Ownable {
         uint256 numberOfCards
     );
 
-    constructor() {
-        // availableCards.push(Card("CardType1", address(0x123), 5 * 10**6, 500 * 10**18));
+    constructor(address _lockAddr) {
+        lockAddr = _lockAddr;
     }
 
     function addCardType(
@@ -139,8 +138,10 @@ contract ScratchCard is Ownable {
         Card storage selectedCard = availableCards[cardIndex];
         cardBalances[msg.sender]--;
         cardCounts[msg.sender][cardType]--;
-        totalProfit[selectedCard.tokenAddress] += ((profitShare *
-            selectedCard.price) / 10000);
+
+        uint profit = (profitShare * selectedCard.price) / 10000;
+        IERC20 token = IERC20(selectedCard.tokenAddress);
+        token.transfer(lockAddr, profit); //fee
         uint256 randomNumber = uint256(
             keccak256(
                 abi.encodePacked(
@@ -163,13 +164,12 @@ contract ScratchCard is Ownable {
                 prize <= total[selectedCard.tokenAddress],
                 "prize exceed the total"
             );
-            IERC20 token = IERC20(selectedCard.tokenAddress);
-            emit PrizeClaimed(msg.sender, cardType, prize);
-
             require(
                 token.transfer(msg.sender, prize),
                 "Transfer of prize failed"
             );
+            emit PrizeClaimed(msg.sender, cardType, prize);
+
             total[selectedCard.tokenAddress] -= prize;
 
             return prize;
@@ -227,29 +227,16 @@ contract ScratchCard is Ownable {
         address tokenAddress,
         uint256 amountToWithdraw
     ) external onlyOwner {
-        //For users' viewing: Here it is stated that the administrator does not have the authority to withdraw user funds.
-        require(
-            totalProfit[tokenAddress] >= amountToWithdraw,
-            "Insufficient funds to withdraw"
-        );
-        require(
-            total[tokenAddress] >= amountToWithdraw,
-            "Insufficient funds to withdraw"
-        );
-
-        totalProfit[tokenAddress] -= amountToWithdraw;
-        total[tokenAddress] -= amountToWithdraw;
         IERC20 profitToken = IERC20(tokenAddress);
         require(
             profitToken.transfer(owner(), amountToWithdraw),
             "Transfer failed"
         );
-        emit ProfitWithdrawn(amountToWithdraw);
     }
 
-    // function setProfitShare(uint256 newProfitShare) external onlyOwner {
-    //     profitShare = newProfitShare;
-    // }
+    function setProfitShare(uint256 newProfitShare) external onlyOwner {
+        profitShare = newProfitShare;
+    }
 
     function giftCards(
         address recipient,
