@@ -1,89 +1,89 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+// // SPDX-License-Identifier: MIT
+// pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
+// import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+// import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+// import "@openzeppelin/contracts/access/Ownable.sol";
+// import "@openzeppelin/contracts/utils/Counters.sol";
+// import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 
-contract DeMarketNFT is ERC721, ERC721Pausable, Ownable {
-    using SafeERC20 for IERC20;
-    using Counters for Counters.Counter;
-    address public lockAddr;
-    IERC20 token;
-    Counters.Counter private _tokenIdCounter;
-    uint256 public price = 100000000000000000000;
-    string private baseURI =
-        "ipfs://QmcdDLrvhPeqrmXYDoVkrKTxZQBqrnCnQxgK2DRPCCDVAp/";
+// contract DeMarketNFT is ERC721, ERC721Pausable, Ownable {
+//     using SafeERC20 for IERC20;
+//     using Counters for Counters.Counter;
+//     address public lockAddr;
+//     IERC20 token;
+//     Counters.Counter private _tokenIdCounter;
+//     uint256 public price = 100000000000000000000;
+//     string private baseURI =
+//         "ipfs://QmcdDLrvhPeqrmXYDoVkrKTxZQBqrnCnQxgK2DRPCCDVAp/";
 
-    constructor() ERC721("DeMarket NFT", "DeMarket") {}
+//     constructor() ERC721("DeMarket NFT", "DeMarket") {}
 
-    function pause() public onlyOwner {
-        _pause();
-    }
+//     function pause() public onlyOwner {
+//         _pause();
+//     }
 
-    function unpause() public onlyOwner {
-        _unpause();
-    }
+//     function unpause() public onlyOwner {
+//         _unpause();
+//     }
 
-    // The following functions are overrides required by Solidity.
+//     // The following functions are overrides required by Solidity.
 
-    function _update(
-        address to,
-        uint256 tokenId,
-        address auth
-    ) internal override(ERC721, ERC721Pausable) returns (address) {
-        return super._update(to, tokenId, auth);
-    }
+//     function _update(
+//         address to,
+//         uint256 tokenId,
+//         address auth
+//     ) internal override(ERC721, ERC721Pausable) returns (address) {
+//         return super._update(to, tokenId, auth);
+//     }
 
-    function _baseURI() internal view override returns (string memory) {
-        return baseURI;
-    }
+//     function _baseURI() internal view override returns (string memory) {
+//         return baseURI;
+//     }
 
-    function setToken(address _token) public onlyOwner {
-        token = IERC20(_token);
-    }
+//     function setToken(address _token) public onlyOwner {
+//         token = IERC20(_token);
+//     }
 
-    function _setBaseURI(string memory baseURI_) internal virtual {
-        baseURI = baseURI_;
-    }
+//     function _setBaseURI(string memory baseURI_) internal virtual {
+//         baseURI = baseURI_;
+//     }
 
-    function setBaseURI(string memory baseURI_) public onlyOwner {
-        _setBaseURI(baseURI_);
-    }
+//     function setBaseURI(string memory baseURI_) public onlyOwner {
+//         _setBaseURI(baseURI_);
+//     }
 
-    function safeMint(address to) internal {
-        uint256 tokenId = _tokenIdCounter.current();
-        _tokenIdCounter.increment();
-        _safeMint(to, tokenId);
-    }
+//     function safeMint(address to) internal {
+//         uint256 tokenId = _tokenIdCounter.current();
+//         _tokenIdCounter.increment();
+//         _safeMint(to, tokenId);
+//     }
 
-    function mint(address to) external onlyOwner {
-        safeMint(to);
-    }
+//     function mint(address to) external onlyOwner {
+//         safeMint(to);
+//     }
 
-    function mintWithToken(uint256 _amount) public {
-        require(_amount >= price, "Token amount error");
-        token.safeTransferFrom(msg.sender, address(lockAddr), _amount);
-        safeMint(msg.sender);
-    }
+//     function mintWithToken(uint256 _amount) public {
+//         require(_amount >= price, "Token amount error");
+//         token.safeTransferFrom(msg.sender, address(lockAddr), _amount);
+//         safeMint(msg.sender);
+//     }
 
-    function setPrice(uint256 _price) public onlyOwner {
-        price = _price;
-    }
+//     function setPrice(uint256 _price) public onlyOwner {
+//         price = _price;
+//     }
 
-    function getTokenBalance() public view returns (uint256) {
-        return token.balanceOf(address(this));
-    }
+//     function getTokenBalance() public view returns (uint256) {
+//         return token.balanceOf(address(this));
+//     }
 
-    function withraw() public onlyOwner {
-        uint256 amount = token.balanceOf(address(this));
-        token.safeTransfer(owner(), amount);
-    }
+//     function withraw() public onlyOwner {
+//         uint256 amount = token.balanceOf(address(this));
+//         token.safeTransfer(owner(), amount);
+//     }
 
-    function setLock(address _lockAddr) external onlyOwner {
-        lockAddr = _lockAddr;
-    }
-}
+//     function setLock(address _lockAddr) external onlyOwner {
+//         lockAddr = _lockAddr;
+//     }
+// }
