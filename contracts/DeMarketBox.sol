@@ -21,7 +21,7 @@ contract DeMarketBox is Ownable {
     mapping(address => mapping(string => uint256)) public BoxCounts;
     uint256 public profitShare = 1000;
     address public lockAddr;
-    event BoxPurchased(
+    event BoxMinted(
         address indexed user,
         string BoxType,
         uint256 numberOfBoxs
@@ -122,7 +122,7 @@ contract DeMarketBox is Ownable {
         BoxBalances[msg.sender] += numberOfBoxs;
         BoxCounts[msg.sender][BoxType] += numberOfBoxs;
         total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
-        emit BoxPurchased(msg.sender, BoxType, numberOfBoxs);
+        emit BoxMinted(msg.sender, BoxType, numberOfBoxs);
     }
 
     function openBox(string calldata BoxType) external returns (uint256) {
