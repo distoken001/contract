@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract DeMarketBox is Ownable {
     struct Box {
-        string BoxType; // Use string identifiers to represent Box types
-        string BoxName;
+        string boxType; // Use string identifiers to represent Box types
+        string boxName;
         address tokenAddress;
         uint256 price;
         uint256 maxPrize;
@@ -29,19 +29,19 @@ contract DeMarketBox is Ownable {
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
 
     event BoxTypeAdded(
-        string BoxType,
-        string BoxName,
+        string boxType,
+        string boxName,
         address tokenAddress,
         uint256 price,
         uint256 maxPrize,
         uint256 maxPrizeProbability,
         uint256 winningProbability
     );
-    event BoxTypeRemoved(string BoxType);
+    event BoxTypeRemoved(string boxType);
     event BoxGifted(
         address indexed sender,
         address indexed recipient,
-        string BoxType,
+        string boxType,
         uint256 numberOfBoxs
     );
 
@@ -50,8 +50,8 @@ contract DeMarketBox is Ownable {
     }
 
     function addBoxType(
-        string calldata BoxType,
-        string calldata BoxName,
+        string calldata boxType,
+        string calldata boxName,
         address tokenAddress,
         uint256 price,
         uint256 maxPrize,
@@ -60,16 +60,16 @@ contract DeMarketBox is Ownable {
     ) external onlyOwner {
         for (uint256 i = 0; i < availableBoxs.length; i++) {
             if (
-                keccak256(abi.encodePacked(availableBoxs[i].BoxType)) ==
-                keccak256(abi.encodePacked(BoxType))
+                keccak256(abi.encodePacked(availableBoxs[i].boxType)) ==
+                keccak256(abi.encodePacked(boxType))
             ) {
                 revert("Box type exist");
             }
         }
         availableBoxs.push(
             Box(
-                BoxType,
-                BoxName,
+                boxType,
+                boxName,
                 tokenAddress,
                 price,
                 maxPrize,
@@ -78,8 +78,8 @@ contract DeMarketBox is Ownable {
             )
         );
         emit BoxTypeAdded(
-            BoxType,
-            BoxName,
+            boxType,
+            boxName,
             tokenAddress,
             price,
             maxPrize,
@@ -88,26 +88,26 @@ contract DeMarketBox is Ownable {
         );
     }
 
-    function removeBoxType(string calldata BoxType) external onlyOwner {
+    function removeBoxType(string calldata boxType) external onlyOwner {
         for (uint256 i = 0; i < availableBoxs.length; i++) {
             if (
-                keccak256(abi.encodePacked(availableBoxs[i].BoxType)) ==
-                keccak256(abi.encodePacked(BoxType))
+                keccak256(abi.encodePacked(availableBoxs[i].boxType)) ==
+                keccak256(abi.encodePacked(boxType))
             ) {
                 availableBoxs[i] = availableBoxs[availableBoxs.length - 1];
                 availableBoxs.pop();
-                emit BoxTypeRemoved(BoxType);
+                emit BoxTypeRemoved(boxType);
             }
         }
     }
 
-    function mintBoxs(string calldata BoxType, uint256 numberOfBoxs) external {
+    function mintBoxs(string calldata boxType, uint256 numberOfBoxs) external {
         require(isOk, "Contract is not open.");
         require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
-        uint256 BoxIndex = findBoxIndex(BoxType);
+        uint256 boxIndex = findBoxIndex(boxType);
 
-        require(BoxIndex < availableBoxs.length, "Invalid Box type");
-        Box storage selectedBox = availableBoxs[BoxIndex];
+        require(boxIndex < availableBoxs.length, "Invalid Box type");
+        Box storage selectedBox = availableBoxs[boxIndex];
         IERC20 token = IERC20(selectedBox.tokenAddress);
 
         require(
@@ -120,23 +120,23 @@ contract DeMarketBox is Ownable {
         );
 
         BoxBalances[msg.sender] += numberOfBoxs;
-        BoxCounts[msg.sender][BoxType] += numberOfBoxs;
+        BoxCounts[msg.sender][boxType] += numberOfBoxs;
         total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
-        emit BoxMinted(msg.sender, BoxType, numberOfBoxs);
+        emit BoxMinted(msg.sender, boxType, numberOfBoxs);
     }
 
-    function openBox(string calldata BoxType) external returns (uint256) {
+    function openBox(string calldata boxType) external returns (uint256) {
         require(BoxBalances[msg.sender] > 0, "You have no Boxs to open");
         require(
-            BoxCounts[msg.sender][BoxType] > 0,
+            BoxCounts[msg.sender][boxType] > 0,
             "You have no Boxs of this type"
         );
-        uint256 BoxIndex = findBoxIndex(BoxType);
+        uint256 BoxIndex = findBoxIndex(boxType);
 
         require(BoxIndex < availableBoxs.length, "Invalid Box type");
         Box storage selectedBox = availableBoxs[BoxIndex];
         BoxBalances[msg.sender]--;
-        BoxCounts[msg.sender][BoxType]--;
+        BoxCounts[msg.sender][boxType]--;
 
         uint profit = (profitShare * selectedBox.price) / 10000;
         IERC20 token = IERC20(selectedBox.tokenAddress);
@@ -168,13 +168,13 @@ contract DeMarketBox is Ownable {
                 token.transfer(msg.sender, prize),
                 "Transfer of prize failed"
             );
-            emit PrizeClaimed(msg.sender, BoxType, prize);
+            emit PrizeClaimed(msg.sender, boxType, prize);
 
             total[selectedBox.tokenAddress] -= prize;
 
             return prize;
         } else {
-            emit PrizeClaimed(msg.sender, BoxType, 0);
+            emit PrizeClaimed(msg.sender, boxType, 0);
             return 0;
         }
     }
@@ -210,12 +210,12 @@ contract DeMarketBox is Ownable {
     }
 
     function findBoxIndex(
-        string calldata BoxType
+        string calldata boxType
     ) internal view returns (uint256) {
         for (uint256 i = 0; i < availableBoxs.length; i++) {
             if (
-                keccak256(abi.encodePacked(availableBoxs[i].BoxType)) ==
-                keccak256(abi.encodePacked(BoxType))
+                keccak256(abi.encodePacked(availableBoxs[i].boxType)) ==
+                keccak256(abi.encodePacked(boxType))
             ) {
                 return i;
             }
@@ -244,14 +244,14 @@ contract DeMarketBox is Ownable {
 
     function giftBoxs(
         address recipient,
-        string calldata BoxType,
+        string calldata boxType,
         uint256 numberOfBoxs
     ) external {
         require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
-        uint256 BoxIndex = findBoxIndex(BoxType);
+        uint256 boxIndex = findBoxIndex(boxType);
 
-        require(BoxIndex < availableBoxs.length, "Invalid Box type");
-        Box storage selectedBox = availableBoxs[BoxIndex];
+        require(boxIndex < availableBoxs.length, "Invalid Box type");
+        Box storage selectedBox = availableBoxs[boxIndex];
 
         require(
             BoxBalances[msg.sender] >= numberOfBoxs,
@@ -259,13 +259,13 @@ contract DeMarketBox is Ownable {
         );
 
         BoxBalances[msg.sender] -= numberOfBoxs;
-        BoxCounts[msg.sender][BoxType] -= numberOfBoxs;
+        BoxCounts[msg.sender][boxType] -= numberOfBoxs;
 
         BoxBalances[recipient] += numberOfBoxs;
-        BoxCounts[recipient][BoxType] += numberOfBoxs;
+        BoxCounts[recipient][boxType] += numberOfBoxs;
 
         total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
 
-        emit BoxGifted(msg.sender, recipient, BoxType, numberOfBoxs);
+        emit BoxGifted(msg.sender, recipient, boxType, numberOfBoxs);
     }
 }
