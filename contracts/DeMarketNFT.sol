@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 
-contract DeMarketNFT is ERC721, Ownable {
+contract DeMarketNFT is ERC721, ERC721Pausable, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
     address public lockAddr;
@@ -17,15 +18,34 @@ contract DeMarketNFT is ERC721, Ownable {
     string private baseURI =
         "ipfs://QmcdDLrvhPeqrmXYDoVkrKTxZQBqrnCnQxgK2DRPCCDVAp/";
 
-    constructor() ERC721("DeMarket NFT", "DeMarket") {
+    constructor() ERC721("DeMarket NFT", "DeMarket") {}
+
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    function unpause() public onlyOwner {
+        _unpause();
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    ) internal override(ERC721, ERC721Pausable) returns (address) {
+        return super._update(to, tokenId, auth);
     }
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
     }
+
     function setToken(address _token) public onlyOwner {
         token = IERC20(_token);
     }
+
     function _setBaseURI(string memory baseURI_) internal virtual {
         baseURI = baseURI_;
     }
