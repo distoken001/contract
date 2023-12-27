@@ -344,7 +344,7 @@ contract DeMarketBox is Ownable {
     ) external view returns (uint256 _reward) {
         BonusInfo storage bonus = bonusInfo[_boxType];
         _reward =
-            (boxCounts[msg.sender][_boxType] * bonus.accPerShare) /
+            (boxCounts[_user][_boxType] * bonus.accPerShare) /
             1e22 +
             userRewardInfo[_user][_boxType].extra -
             userRewardInfo[_user][_boxType].rewardDebt;
