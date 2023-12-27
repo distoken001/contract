@@ -31,7 +31,6 @@ contract DeMarketBox is Ownable {
     }
 
     bool public isOk = true;
-    IERC20 public bonusToken;
     Box[] public availableBoxs;
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
     mapping(string => uint256) public boxTotal;
@@ -294,52 +293,47 @@ contract DeMarketBox is Ownable {
         if (boxTotal[_boxType] > 0) {
             BonusInfo storage bonus = bonusInfo[_boxType];
             if (_to != address(0)) {
-                for (uint256 i = 0; i < availableBoxs.length; i++) {
-                    UserRewardInfo storage userReward = userRewardInfo[_to][
-                        _boxType
-                    ];
-                    userReward.rewardDebt =
-                        userReward.rewardDebt +
-                        ((_number * bonus.accPerShare) / 1e22);
-                }
+                UserRewardInfo storage userReward = userRewardInfo[_to][
+                    _boxType
+                ];
+                userReward.rewardDebt =
+                    userReward.rewardDebt +
+                    ((_number * bonus.accPerShare) / 1e22);
             }
             if (_from != address(0)) {
-                for (uint256 i = 0; i < availableBoxs.length; i++) {
-                    UserRewardInfo storage userReward = userRewardInfo[_from][
-                        _boxType
-                    ];
-                    userReward.extra =
-                        userReward.extra +
-                        ((_number * bonus.accPerShare) / 1e22);
-                }
+                UserRewardInfo storage userReward = userRewardInfo[_from][
+                    _boxType
+                ];
+                userReward.extra =
+                    userReward.extra +
+                    ((_number * bonus.accPerShare) / 1e22);
             }
         }
     }
 
-    function withdraw() external {
-        for (uint256 i = 0; i < availableBoxs.length; i++) {
-            string memory _boxType = availableBoxs[i].boxType;
-            BonusInfo storage bonus = bonusInfo[_boxType];
-            UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
-                _boxType
-            ];
-            uint256 _amount = (boxCounts[msg.sender][_boxType] *
-                bonus.accPerShare) /
-                1e22 +
-                userReward.extra -
-                userReward.rewardDebt;
-            if (_amount > 0) {
-                userReward.rewardDebt =
-                    (boxCounts[msg.sender][_boxType] * bonus.accPerShare) /
-                    1e22;
-                userReward.extra = 0;
-                userReward.withdrawn = userReward.withdrawn + _amount;
-                bonusInfo[_boxType].withdrawn =
-                    bonusInfo[_boxType].withdrawn +
-                    _amount;
-                if (address(bonusToken) != address(0)) {
-                    bonusToken.safeTransfer(msg.sender, _amount);
-                }
+    function withdraw(string calldata _boxType) external {
+        BonusInfo storage bonus = bonusInfo[_boxType];
+        UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
+            _boxType
+        ];
+        uint256 _amount = (boxCounts[msg.sender][_boxType] *
+            bonus.accPerShare) /
+            1e22 +
+            userReward.extra -
+            userReward.rewardDebt;
+        if (_amount > 0) {
+            userReward.rewardDebt =
+                (boxCounts[msg.sender][_boxType] * bonus.accPerShare) /
+                1e22;
+            userReward.extra = 0;
+            userReward.withdrawn = userReward.withdrawn + _amount;
+            bonusInfo[_boxType].withdrawn =
+                bonusInfo[_boxType].withdrawn +
+                _amount;
+            address bonusToken = availableBoxs[findBoxIndex(_boxType)]
+                .tokenAddress;
+            if (bonusToken != address(0)) {
+                IERC20(bonusToken).safeTransfer(msg.sender, _amount);
             }
         }
     }
