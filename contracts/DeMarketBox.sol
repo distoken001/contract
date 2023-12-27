@@ -3,8 +3,11 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract DeMarketBox is Ownable {
+    using SafeERC20 for IERC20;
+
     struct Box {
         string boxType; // Use string identifiers to represent Box types
         string boxName;
@@ -14,18 +17,29 @@ contract DeMarketBox is Ownable {
         uint256 maxPrizeProbability;
         uint256 winningProbability;
     }
+
+    struct BonusInfo {
+        uint256 totalBonus;
+        uint256 withdrawn;
+        uint256 accPerShare;
+    }
+
+    struct UserRewardInfo {
+        uint256 rewardDebt;
+        uint256 withdrawn;
+        uint256 extra;
+    }
+
     bool public isOk = true;
-    mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
+    IERC20 public bonusToken;
     Box[] public availableBoxs;
-    mapping(address => uint256) public BoxBalances;
+    mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
+    mapping(string => uint256) public BoxTotal;
+    mapping(string => BonusInfo) public bonusInfo;
     mapping(address => mapping(string => uint256)) public BoxCounts;
-    uint256 public profitShare = 1000;
-    address public lockAddr;
-    event BoxMinted(
-        address indexed user,
-        string BoxType,
-        uint256 numberOfBoxs
-    );
+    mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
+
+    event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
 
     event BoxTypeAdded(
@@ -44,10 +58,6 @@ contract DeMarketBox is Ownable {
         string boxType,
         uint256 numberOfBoxs
     );
-
-    constructor(address _lockAddr) {
-        lockAddr = _lockAddr;
-    }
 
     function addBoxType(
         string calldata boxType,
@@ -119,14 +129,13 @@ contract DeMarketBox is Ownable {
             "Transfer failed"
         );
 
-        BoxBalances[msg.sender] += numberOfBoxs;
         BoxCounts[msg.sender][boxType] += numberOfBoxs;
+        updateAssets(address(0), msg.sender, boxType, numberOfBoxs);
         total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
         emit BoxMinted(msg.sender, boxType, numberOfBoxs);
     }
 
     function openBox(string calldata boxType) external returns (uint256) {
-        require(BoxBalances[msg.sender] > 0, "You have no Boxs to open");
         require(
             BoxCounts[msg.sender][boxType] > 0,
             "You have no Boxs of this type"
@@ -135,13 +144,10 @@ contract DeMarketBox is Ownable {
 
         require(BoxIndex < availableBoxs.length, "Invalid Box type");
         Box storage selectedBox = availableBoxs[BoxIndex];
-        BoxBalances[msg.sender]--;
         BoxCounts[msg.sender][boxType]--;
+        updateAssets(msg.sender, address(0), boxType, 1);
 
-        uint profit = (profitShare * selectedBox.price) / 10000;
         IERC20 token = IERC20(selectedBox.tokenAddress);
-        total[selectedBox.tokenAddress] -= profit;
-        token.transfer(lockAddr, profit); //fee
         uint256 randomNumber = uint256(
             keccak256(
                 abi.encodePacked(
@@ -229,13 +235,13 @@ contract DeMarketBox is Ownable {
     ) external onlyOwner {
         IERC20 profitToken = IERC20(tokenAddress);
         require(
+            total[tokenAddress] >= amountToWithdraw,
+            "Number of Boxs must be greater than zero"
+        );
+        require(
             profitToken.transfer(owner(), amountToWithdraw),
             "Transfer failed"
         );
-    }
-
-    function setProfitShare(uint256 newProfitShare) external onlyOwner {
-        profitShare = newProfitShare;
     }
 
     function changeIsOpen(bool newStatus) public onlyOwner {
@@ -254,18 +260,95 @@ contract DeMarketBox is Ownable {
         Box storage selectedBox = availableBoxs[boxIndex];
 
         require(
-            BoxBalances[msg.sender] >= numberOfBoxs,
+            BoxCounts[msg.sender][boxType] >= numberOfBoxs,
             "Insufficient Boxs to gift"
         );
 
-        BoxBalances[msg.sender] -= numberOfBoxs;
         BoxCounts[msg.sender][boxType] -= numberOfBoxs;
+        updateAssets(msg.sender, address(0), boxType, numberOfBoxs);
 
-        BoxBalances[recipient] += numberOfBoxs;
         BoxCounts[recipient][boxType] += numberOfBoxs;
+        updateAssets(address(0), recipient, boxType, numberOfBoxs);
 
         total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
 
         emit BoxGifted(msg.sender, recipient, boxType, numberOfBoxs);
+    }
+
+    function addReward(
+        string memory _boxType,
+        uint256 _amount
+    ) external onlyOwner {
+        BonusInfo storage bonus = bonusInfo[_boxType];
+        if (_amount > 0 && BoxTotal[_boxType] > 0) {
+            bonus.accPerShare =
+                bonus.accPerShare +
+                ((_amount * 1e22) / BoxTotal[_boxType]);
+            bonus.totalBonus = bonus.totalBonus + _amount;
+        }
+    }
+
+    function updateAssets(
+        address _from,
+        address _to,
+        string memory _boxType,
+        uint256 _number
+    ) internal {
+        if (BoxTotal[_boxType] > 0) {
+            BonusInfo storage bonus = bonusInfo[_boxType];
+            if (_to != address(0)) {
+                for (uint256 i = 0; i < availableBoxs.length; i++) {
+                    UserRewardInfo storage userReward = userRewardInfo[_to][
+                        _boxType
+                    ];
+                    userReward.rewardDebt =
+                        userReward.rewardDebt +
+                        ((_number * bonus.accPerShare) / 1e22);
+                }
+            }
+            if (_from != address(0)) {
+                for (uint256 i = 0; i < availableBoxs.length; i++) {
+                    UserRewardInfo storage userReward = userRewardInfo[_from][
+                        _boxType
+                    ];
+                    userReward.extra =
+                        userReward.extra +
+                        ((_number * bonus.accPerShare) / 1e22);
+                }
+            }
+        }
+    }
+
+    function withdraw() external {
+        for (uint256 i = 0; i < availableBoxs.length; i++) {
+            string memory _boxType = availableBoxs[i].boxType;
+            BonusInfo storage bonus = bonusInfo[_boxType];
+            UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
+                _boxType
+            ];
+            uint256 _amount = (BoxCounts[msg.sender][_boxType] *
+                bonus.accPerShare) /
+                1e22 +
+                userReward.extra -
+                userReward.rewardDebt;
+            if (_amount > 0) {
+                userReward.rewardDebt =
+                    (BoxCounts[msg.sender][_boxType] * bonus.accPerShare) /
+                    1e22;
+                userReward.extra = 0;
+                userReward.withdrawn = userReward.withdrawn + _amount;
+                bonusInfo[_boxType].withdrawn =
+                    bonusInfo[_boxType].withdrawn +
+                    _amount;
+                if (address(bonusToken) != address(0)) {
+                    bonusToken.safeTransfer(msg.sender, _amount);
+                }
+            }
+        }
+    }
+
+    function setBonusToken(address _bonusAddr) external onlyOwner {
+        require(_bonusAddr != address(0), "address err");
+        bonusToken = IERC20(_bonusAddr);
     }
 }
