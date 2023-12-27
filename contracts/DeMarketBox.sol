@@ -143,6 +143,7 @@ contract DeMarketBox is Ownable {
         require(BoxIndex < availableBoxs.length, "Invalid Box type");
         Box storage selectedBox = availableBoxs[BoxIndex];
         boxCounts[msg.sender][boxType]--;
+        boxTotal[boxType]--;
         updateAssets(msg.sender, address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
