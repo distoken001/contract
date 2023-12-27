@@ -17,7 +17,7 @@ contract DeMarketBox is Ownable {
         uint256 maxPrizeProbability;
         uint256 winningProbability;
     }
-
+    //奖金信息
     struct BonusInfo {
         uint256 totalBonus;
         uint256 withdrawn;
@@ -229,7 +229,8 @@ contract DeMarketBox is Ownable {
         revert("Box type not found");
     }
 
-    function withdrawProfit(
+    //tokens obtained from minting boxes
+    function withdrawEquity(
         address tokenAddress,
         uint256 amountToWithdraw
     ) external onlyOwner {
