@@ -120,31 +120,31 @@ contract DeMarketBox is Ownable {
 
         require(
             token.transferFrom(
-                msg.sender,
+                _msgSender(),
                 address(this),
                 selectedBox.price * numberOfBoxs
             ),
             "Transfer failed"
         );
         boxTotal[boxType] = boxTotal[boxType] + numberOfBoxs;
-        boxCounts[msg.sender][boxType] += numberOfBoxs;
-        updateAssets(address(0), msg.sender, boxType, numberOfBoxs);
+        boxCounts[_msgSender()][boxType] += numberOfBoxs;
+        updateAssets(address(0), _msgSender(), boxType, numberOfBoxs);
         total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
-        emit BoxMinted(msg.sender, boxType, numberOfBoxs);
+        emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
     }
 
     function openBox(string calldata boxType) external returns (uint256) {
         require(
-            boxCounts[msg.sender][boxType] > 0,
+            boxCounts[_msgSender()][boxType] > 0,
             "You have no Boxs of this type"
         );
         uint256 BoxIndex = findBoxIndex(boxType);
 
         require(BoxIndex < availableBoxs.length, "Invalid Box type");
         Box storage selectedBox = availableBoxs[BoxIndex];
-        boxCounts[msg.sender][boxType]--;
+        boxCounts[_msgSender()][boxType]--;
         boxTotal[boxType]--;
-        updateAssets(msg.sender, address(0), boxType, 1);
+        updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
         uint256 randomNumber = uint256(
@@ -152,7 +152,7 @@ contract DeMarketBox is Ownable {
                 abi.encodePacked(
                     block.timestamp,
                     block.prevrandao,
-                    msg.sender,
+                    _msgSender(),
                     "demarket"
                 )
             )
@@ -169,17 +169,14 @@ contract DeMarketBox is Ownable {
                 prize <= total[selectedBox.tokenAddress],
                 "prize exceed the total"
             );
-            require(
-                token.transfer(msg.sender, prize),
-                "Transfer of prize failed"
-            );
-            emit PrizeClaimed(msg.sender, boxType, prize);
+            token.safeTransfer(_msgSender(), prize);
+            emit PrizeClaimed(_msgSender(), boxType, prize);
 
             total[selectedBox.tokenAddress] -= prize;
 
             return prize;
         } else {
-            emit PrizeClaimed(msg.sender, boxType, 0);
+            emit PrizeClaimed(_msgSender(), boxType, 0);
             return 0;
         }
     }
@@ -208,7 +205,11 @@ contract DeMarketBox is Ownable {
     function selectRandomBox() internal view returns (uint256) {
         uint256 seed = uint256(
             keccak256(
-                abi.encodePacked(block.timestamp, block.prevrandao, msg.sender)
+                abi.encodePacked(
+                    block.timestamp,
+                    block.prevrandao,
+                    _msgSender()
+                )
             )
         ) % availableBoxs.length;
         return seed;
@@ -238,10 +239,7 @@ contract DeMarketBox is Ownable {
             total[tokenAddress] >= amountToWithdraw,
             "Number of Boxs must be greater than zero"
         );
-        require(
-            profitToken.transfer(owner(), amountToWithdraw),
-            "Transfer failed"
-        );
+        profitToken.safeTransfer(owner(), amountToWithdraw);
     }
 
     function changeIsOpen(bool newStatus) public onlyOwner {
@@ -258,17 +256,17 @@ contract DeMarketBox is Ownable {
 
         require(boxIndex < availableBoxs.length, "Invalid Box type");
         require(
-            boxCounts[msg.sender][boxType] >= numberOfBoxs,
+            boxCounts[_msgSender()][boxType] >= numberOfBoxs,
             "Insufficient Boxs to gift"
         );
 
-        boxCounts[msg.sender][boxType] -= numberOfBoxs;
-        updateAssets(msg.sender, address(0), boxType, numberOfBoxs);
+        boxCounts[_msgSender()][boxType] -= numberOfBoxs;
+        updateAssets(_msgSender(), address(0), boxType, numberOfBoxs);
 
         boxCounts[recipient][boxType] += numberOfBoxs;
         updateAssets(address(0), recipient, boxType, numberOfBoxs);
 
-        emit BoxGifted(msg.sender, recipient, boxType, numberOfBoxs);
+        emit BoxGifted(_msgSender(), recipient, boxType, numberOfBoxs);
     }
 
     function addReward(
@@ -316,14 +314,14 @@ contract DeMarketBox is Ownable {
         UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
             _boxType
         ];
-        uint256 _amount = (boxCounts[msg.sender][_boxType] *
+        uint256 _amount = (boxCounts[_msgSender()][_boxType] *
             bonus.accPerShare) /
             1e22 +
             userReward.extra -
             userReward.rewardDebt;
         if (_amount > 0) {
             userReward.rewardDebt =
-                (boxCounts[msg.sender][_boxType] * bonus.accPerShare) /
+                (boxCounts[_msgSender()][_boxType] * bonus.accPerShare) /
                 1e22;
             userReward.extra = 0;
             userReward.withdrawn = userReward.withdrawn + _amount;
@@ -333,7 +331,7 @@ contract DeMarketBox is Ownable {
             address bonusToken = availableBoxs[findBoxIndex(_boxType)]
                 .tokenAddress;
             if (bonusToken != address(0)) {
-                IERC20(bonusToken).safeTransfer(msg.sender, _amount);
+                IERC20(bonusToken).safeTransfer(_msgSender(), _amount);
             }
         }
     }
