@@ -17,7 +17,6 @@ contract DeMarketBox is Ownable {
         uint256 maxPrizeProbability;
         uint256 winningProbability;
     }
-    //奖金信息
     struct BonusInfo {
         uint256 totalBonus;
         uint256 withdrawn;
