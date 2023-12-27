@@ -4,10 +4,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract DeMarketBox is Ownable {
     using SafeERC20 for IERC20;
-
+    using SafeMath for uint256;
     struct Box {
         string boxType; // Use string identifiers to represent Box types
         string boxName;
@@ -122,14 +123,18 @@ contract DeMarketBox is Ownable {
             token.transferFrom(
                 _msgSender(),
                 address(this),
-                selectedBox.price * numberOfBoxs
+                selectedBox.price.mul(numberOfBoxs)
             ),
             "Transfer failed"
         );
-        boxTotal[boxType] = boxTotal[boxType] + numberOfBoxs;
-        boxCounts[_msgSender()][boxType] += numberOfBoxs;
+        boxTotal[boxType] = boxTotal[boxType].add(numberOfBoxs);
+        boxCounts[_msgSender()][boxType] = boxCounts[_msgSender()][boxType].add(
+            numberOfBoxs
+        );
         updateAssets(address(0), _msgSender(), boxType, numberOfBoxs);
-        total[selectedBox.tokenAddress] += selectedBox.price * numberOfBoxs;
+        total[selectedBox.tokenAddress] = total[selectedBox.tokenAddress].add(
+            selectedBox.price.mul(numberOfBoxs)
+        );
         emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
     }
 
@@ -172,7 +177,8 @@ contract DeMarketBox is Ownable {
             token.safeTransfer(_msgSender(), prize);
             emit PrizeClaimed(_msgSender(), boxType, prize);
 
-            total[selectedBox.tokenAddress] -= prize;
+            total[selectedBox.tokenAddress] = total[selectedBox.tokenAddress]
+                .sub(prize);
 
             return prize;
         } else {
@@ -185,34 +191,21 @@ contract DeMarketBox is Ownable {
         uint256 randomNumber,
         Box storage selectedBox
     ) internal view returns (uint256) {
-        if (randomNumber <= ((selectedBox.winningProbability * 60) / 100)) {
+        if (randomNumber <= ((selectedBox.winningProbability * 60).div(100))) {
             return selectedBox.price;
         } else if (
-            randomNumber <= ((selectedBox.winningProbability * 90) / 100)
+            randomNumber <= ((selectedBox.winningProbability * 90).div(100))
         ) {
-            return selectedBox.price * 2;
+            return selectedBox.price.mul(2);
         } else if (
-            randomNumber <= ((selectedBox.winningProbability * 95) / 100)
+            randomNumber <= ((selectedBox.winningProbability * 95).div(100))
         ) {
-            return selectedBox.price * 3;
+            return selectedBox.price.mul(3);
         } else if (randomNumber <= selectedBox.winningProbability) {
-            return selectedBox.price * 4;
+            return selectedBox.price.mul(4);
         } else {
             return 0;
         }
-    }
-
-    function selectRandomBox() internal view returns (uint256) {
-        uint256 seed = uint256(
-            keccak256(
-                abi.encodePacked(
-                    block.timestamp,
-                    block.prevrandao,
-                    _msgSender()
-                )
-            )
-        ) % availableBoxs.length;
-        return seed;
     }
 
     function findBoxIndex(
@@ -260,10 +253,14 @@ contract DeMarketBox is Ownable {
             "Insufficient Boxs to gift"
         );
 
-        boxCounts[_msgSender()][boxType] -= numberOfBoxs;
+        boxCounts[_msgSender()][boxType] = boxCounts[_msgSender()][boxType].sub(
+            numberOfBoxs
+        );
         updateAssets(_msgSender(), address(0), boxType, numberOfBoxs);
 
-        boxCounts[recipient][boxType] += numberOfBoxs;
+        boxCounts[recipient][boxType] = boxCounts[recipient][boxType].add(
+            numberOfBoxs
+        );
         updateAssets(address(0), recipient, boxType, numberOfBoxs);
 
         emit BoxGifted(_msgSender(), recipient, boxType, numberOfBoxs);
@@ -275,10 +272,10 @@ contract DeMarketBox is Ownable {
     ) external onlyOwner {
         BonusInfo storage bonus = bonusInfo[_boxType];
         if (_amount > 0 && boxTotal[_boxType] > 0) {
-            bonus.accPerShare =
-                bonus.accPerShare +
-                ((_amount * 1e22) / boxTotal[_boxType]);
-            bonus.totalBonus = bonus.totalBonus + _amount;
+            bonus.accPerShare = bonus.accPerShare.add(
+                ((_amount.mul(1e22)).div(boxTotal[_boxType]))
+            );
+            bonus.totalBonus = bonus.totalBonus.add(_amount);
         }
     }
 
@@ -294,17 +291,17 @@ contract DeMarketBox is Ownable {
                 UserRewardInfo storage userReward = userRewardInfo[_to][
                     _boxType
                 ];
-                userReward.rewardDebt =
-                    userReward.rewardDebt +
-                    ((_number * bonus.accPerShare) / 1e22);
+                userReward.rewardDebt = userReward.rewardDebt.add(
+                    ((_number.mul(bonus.accPerShare)).div(1e22))
+                );
             }
             if (_from != address(0)) {
                 UserRewardInfo storage userReward = userRewardInfo[_from][
                     _boxType
                 ];
-                userReward.extra =
-                    userReward.extra +
-                    ((_number * bonus.accPerShare) / 1e22);
+                userReward.extra = userReward.extra.add(
+                    ((_number * bonus.accPerShare).div(1e22))
+                );
             }
         }
     }
@@ -314,20 +311,18 @@ contract DeMarketBox is Ownable {
         UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
             _boxType
         ];
-        uint256 _amount = (boxCounts[_msgSender()][_boxType] *
-            bonus.accPerShare) /
-            1e22 +
-            userReward.extra -
-            userReward.rewardDebt;
+        uint256 _amount = (
+            boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
+        ).div(1e22).add(userReward.extra).sub(userReward.rewardDebt);
         if (_amount > 0) {
-            userReward.rewardDebt =
-                (boxCounts[_msgSender()][_boxType] * bonus.accPerShare) /
-                1e22;
+            userReward.rewardDebt = (
+                boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
+            ).div(1e22);
             userReward.extra = 0;
-            userReward.withdrawn = userReward.withdrawn + _amount;
-            bonusInfo[_boxType].withdrawn =
-                bonusInfo[_boxType].withdrawn +
-                _amount;
+            userReward.withdrawn = userReward.withdrawn.add(_amount);
+            bonusInfo[_boxType].withdrawn = bonusInfo[_boxType].withdrawn.add(
+                _amount
+            );
             address bonusToken = availableBoxs[findBoxIndex(_boxType)]
                 .tokenAddress;
             if (bonusToken != address(0)) {
@@ -341,10 +336,9 @@ contract DeMarketBox is Ownable {
         address _user
     ) external view returns (uint256 _reward) {
         BonusInfo storage bonus = bonusInfo[_boxType];
-        _reward =
-            (boxCounts[_user][_boxType] * bonus.accPerShare) /
-            1e22 +
-            userRewardInfo[_user][_boxType].extra -
-            userRewardInfo[_user][_boxType].rewardDebt;
+        _reward = (boxCounts[_user][_boxType].mul(bonus.accPerShare))
+            .div(1e22)
+            .add(userRewardInfo[_user][_boxType].extra)
+            .sub(userRewardInfo[_user][_boxType].rewardDebt);
     }
 }
