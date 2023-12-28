@@ -313,7 +313,8 @@ contract DeMarketBox is Ownable {
         ];
         uint256 _amount = (
             boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
-        ).div(1e22).add(userReward.extra).sub(userReward.rewardDebt);
+        ).div(1e22).add(userReward.extra);
+        _amount > userReward.rewardDebt ? _amount = _amount.sub(userReward.rewardDebt) : 0;
         if (_amount > 0) {
             userReward.rewardDebt = (
                 boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
@@ -338,7 +339,7 @@ contract DeMarketBox is Ownable {
         BonusInfo storage bonus = bonusInfo[_boxType];
         _reward = (boxCounts[_user][_boxType].mul(bonus.accPerShare))
             .div(1e22)
-            .add(userRewardInfo[_user][_boxType].extra)
-            .sub(userRewardInfo[_user][_boxType].rewardDebt);
+            .add(userRewardInfo[_user][_boxType].extra);
+            _reward > userRewardInfo[_user][_boxType].rewardDebt ? _reward = _reward.sub(userRewardInfo[_user][_boxType].rewardDebt) : 0;
     }
 }
