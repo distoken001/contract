@@ -232,6 +232,7 @@ contract DeMarketBox is Ownable {
             total[tokenAddress] >= amountToWithdraw,
             "Number of Boxs must be greater than zero"
         );
+        total[tokenAddress] = total[tokenAddress].sub(amountToWithdraw);
         profitToken.safeTransfer(owner(), amountToWithdraw);
     }
 
