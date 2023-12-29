@@ -8,7 +8,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  const Ebay = await hre.ethers.getContractFactory("ScratchCard");
+  const Ebay = await hre.ethers.getContractFactory("DeMarketBox");
   const ebay = await Ebay.deploy(
   );
   await ebay.deployed();
