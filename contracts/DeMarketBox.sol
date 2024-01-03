@@ -373,7 +373,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     // Assumes the subscription is funded sufficiently.
     function requestRandomWords()
-        internal
+        public
         returns (uint256 requestId)
     {
         // Will revert if subscription is not set and funded.
