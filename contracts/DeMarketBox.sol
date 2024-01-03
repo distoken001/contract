@@ -375,8 +375,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords() public returns (uint256 requestId) {
-        require(_msgSender() == address(this), "don't have permission");
+    function requestRandomWords() public onlyBox returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -412,5 +411,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
+    }
+
+    modifier onlyBox() {
+        require(_msgSender() == address(this), "don't have permission");
+        _;
     }
 }
