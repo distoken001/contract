@@ -173,7 +173,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
     }
 
-    function openBox(string calldata boxType) external returns (uint256) {
+    function burnBox(string calldata boxType) external returns (uint256) {
         require(
             boxCounts[_msgSender()][boxType] > 0,
             "You have no Boxs of this type"
