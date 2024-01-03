@@ -372,7 +372,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     // Assumes the subscription is funded sufficiently.
     function requestRandomWords()
-        public
+        internal
         returns (uint256 requestId)
     {
         // Will revert if subscription is not set and funded.
@@ -406,7 +406,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     function getRequestStatus(
         uint256 _requestId
-    ) public view returns (bool fulfilled, uint256[] memory randomWords) {
+    ) internal view returns (bool fulfilled, uint256[] memory randomWords) {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
