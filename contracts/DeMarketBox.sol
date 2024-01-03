@@ -406,7 +406,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     function getRequestStatus(
         uint256 _requestId
-    ) internal view returns (bool fulfilled, uint256[] memory randomWords) {
+    ) public view returns (bool fulfilled, uint256[] memory randomWords) {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
