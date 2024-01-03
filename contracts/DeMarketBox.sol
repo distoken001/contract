@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 
-contract DeMarketBox is Ownable {
+contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
     struct Box {
@@ -30,16 +32,38 @@ contract DeMarketBox is Ownable {
         uint256 extra;
     }
 
+    struct RequestStatus {
+        bool fulfilled; // whether the request has been successfully fulfilled
+        bool exists; // whether a requestId exists
+        uint256[] randomWords;
+    }
+
+    // Your subscription ID.
+    uint64 s_subscriptionId;
+
+    // past requests Id.
+    uint256[] public requestIds;
+    uint256 public lastRequestId;
     bool public isOk = true;
+    VRFCoordinatorV2Interface COORDINATOR;
+    uint32 callbackGasLimit = 100000;
+    uint16 requestConfirmations = 3;
+    uint32 numWords = 1;
+
+    bytes32 keyHash = 0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
+
     Box[] public availableBoxs;
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
     mapping(string => uint256) public boxTotal;
     mapping(string => BonusInfo) public bonusInfo;
     mapping(address => mapping(string => uint256)) public boxCounts;
     mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
+    mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */
 
     event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
+    event RequestSent(uint256 requestId, uint32 numWords);
+    event RequestFulfilled(uint256 requestId, uint256[] randomWords);
 
     event BoxTypeAdded(
         string boxType,
@@ -57,6 +81,17 @@ contract DeMarketBox is Ownable {
         string boxType,
         uint256 numberOfBoxs
     );
+
+    constructor(
+        uint64 subscriptionId
+    )
+        VRFConsumerBaseV2(0xc587d9053cd1118f25F645F9E08BB98c9712A4EE)
+    {
+        COORDINATOR = VRFCoordinatorV2Interface(
+            0xc587d9053cd1118f25F645F9E08BB98c9712A4EE
+        );
+        s_subscriptionId = subscriptionId;
+    }
 
     function addBoxType(
         string calldata boxType,
@@ -152,16 +187,8 @@ contract DeMarketBox is Ownable {
         updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
-        uint256 randomNumber = uint256(
-            keccak256(
-                abi.encodePacked(
-                    block.timestamp,
-                    block.prevrandao,
-                    _msgSender(),
-                    "demarket"
-                )
-            )
-        );
+        requestRandomWords();
+        uint256 randomNumber = s_requests[lastRequestId].randomWords[0];
         uint256 prize = 0;
         if (randomNumber % selectedBox.maxPrizeProbability == 0) {
             prize = selectedBox.maxPrize;
@@ -343,4 +370,37 @@ contract DeMarketBox is Ownable {
             .add(userRewardInfo[_user][_boxType].extra);
             _reward > userRewardInfo[_user][_boxType].rewardDebt ? _reward = _reward.sub(userRewardInfo[_user][_boxType].rewardDebt) : 0;
     }
+
+    // Assumes the subscription is funded sufficiently.
+    function requestRandomWords()
+        internal
+        returns (uint256 requestId)
+    {
+        // Will revert if subscription is not set and funded.
+        requestId = COORDINATOR.requestRandomWords(
+            keyHash,
+            s_subscriptionId,
+            requestConfirmations,
+            callbackGasLimit,
+            numWords
+        );
+        s_requests[requestId] = RequestStatus({
+            randomWords: new uint256[](0),
+            exists: true,
+            fulfilled: false
+        });
+        requestIds.push(requestId);
+        lastRequestId = requestId;
+        emit RequestSent(requestId, numWords);
+        return requestId;
+    }
+
+    function fulfillRandomWords(
+        uint256 _requestId,
+        uint256[] memory _randomWords
+    ) internal override {}
+
+    function getRequestStatus(
+        uint256 _requestId
+    ) external view returns (bool fulfilled, uint256[] memory randomWords) {}
 }
