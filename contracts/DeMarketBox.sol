@@ -187,6 +187,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
+        requestRandomWords();
         (, uint256[] memory randomNumber) = getRequestStatus(lastRequestId);
         uint256 prize = 0;
         if (randomNumber[0] % selectedBox.maxPrizeProbability == 0) {
@@ -375,7 +376,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords() public onlyBox returns (uint256 requestId) {
+    function requestRandomWords() internal returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -411,10 +412,5 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
-    }
-
-    modifier onlyBox() {
-        require(_msgSender() == address(this), "don't have permission");
-        _;
     }
 }
