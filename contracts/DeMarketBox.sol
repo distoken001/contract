@@ -376,7 +376,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords() internal returns (uint256 requestId) {
+    function requestRandomWords() public onlyBox returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -412,5 +412,13 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
+    }
+
+    modifier onlyBox() {
+        require(
+            _msgSender() == address(this) ||
+                _msgSender() == 0xc587d9053cd1118f25F645F9E08BB98c9712A4EE
+        );
+        _;
     }
 }
