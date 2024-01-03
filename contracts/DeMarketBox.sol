@@ -187,13 +187,12 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
-        requestRandomWords();
-        uint256 randomNumber = s_requests[lastRequestId].randomWords[0];
+             (, uint256[] memory randomNumber) = getRequestStatus(lastRequestId);
         uint256 prize = 0;
-        if (randomNumber % selectedBox.maxPrizeProbability == 0) {
+        if (randomNumber[0] % selectedBox.maxPrizeProbability == 0) {
             prize = selectedBox.maxPrize;
         } else {
-            prize = determinePrize(randomNumber % 10000, selectedBox);
+            prize = determinePrize(randomNumber[0] % 10000, selectedBox);
         }
 
         if (prize > 0) {
@@ -407,7 +406,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     function getRequestStatus(
         uint256 _requestId
-    ) external view returns (bool fulfilled, uint256[] memory randomWords) {
+    ) public view returns (bool fulfilled, uint256[] memory randomWords) {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
