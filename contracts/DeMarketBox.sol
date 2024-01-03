@@ -50,7 +50,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     uint16 requestConfirmations = 3;
     uint32 numWords = 1;
 
-    bytes32 keyHash = 0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
+    bytes32 keyHash =
+        0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
 
     Box[] public availableBoxs;
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
@@ -58,7 +59,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     mapping(string => BonusInfo) public bonusInfo;
     mapping(address => mapping(string => uint256)) public boxCounts;
     mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
-    mapping(uint256 => RequestStatus) public s_requests; /* requestId --> requestStatus */
+    mapping(uint256 => RequestStatus)
+        public s_requests; /* requestId --> requestStatus */
 
     event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
@@ -84,9 +86,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     constructor(
         uint64 subscriptionId
-    )
-        VRFConsumerBaseV2(0xc587d9053cd1118f25F645F9E08BB98c9712A4EE)
-    {
+    ) VRFConsumerBaseV2(0xc587d9053cd1118f25F645F9E08BB98c9712A4EE) {
         COORDINATOR = VRFCoordinatorV2Interface(
             0xc587d9053cd1118f25F645F9E08BB98c9712A4EE
         );
@@ -187,7 +187,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
-             (, uint256[] memory randomNumber) = getRequestStatus(lastRequestId);
+        (, uint256[] memory randomNumber) = getRequestStatus(lastRequestId);
         uint256 prize = 0;
         if (randomNumber[0] % selectedBox.maxPrizeProbability == 0) {
             prize = selectedBox.maxPrize;
@@ -341,7 +341,9 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         uint256 _amount = (
             boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
         ).div(1e22).add(userReward.extra);
-        _amount > userReward.rewardDebt ? _amount = _amount.sub(userReward.rewardDebt) : 0;
+        _amount > userReward.rewardDebt
+            ? _amount = _amount.sub(userReward.rewardDebt)
+            : 0;
         if (_amount > 0) {
             userReward.rewardDebt = (
                 boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
@@ -367,14 +369,14 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         _reward = (boxCounts[_user][_boxType].mul(bonus.accPerShare))
             .div(1e22)
             .add(userRewardInfo[_user][_boxType].extra);
-            _reward > userRewardInfo[_user][_boxType].rewardDebt ? _reward = _reward.sub(userRewardInfo[_user][_boxType].rewardDebt) : 0;
+        _reward > userRewardInfo[_user][_boxType].rewardDebt
+            ? _reward = _reward.sub(userRewardInfo[_user][_boxType].rewardDebt)
+            : 0;
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords()
-        internal
-        returns (uint256 requestId)
-    {
+    function requestRandomWords() public returns (uint256 requestId) {
+        require(_msgSender() == address(this), "don't have permission");
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
