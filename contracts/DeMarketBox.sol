@@ -146,7 +146,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     function mintBoxs(string calldata boxType, uint256 numberOfBoxs) external {
         require(isOk, "Contract is not open.");
         require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
-         require(numberOfBoxs <= 500, "Number of Boxs can not be greater than 500");
+        require(
+            numberOfBoxs <= 500,
+            "Number of Boxs can not be greater than 500"
+        );
         uint256 boxIndex = findBoxIndex(boxType);
 
         require(boxIndex < availableBoxs.length, "Invalid Box type");
@@ -169,7 +172,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         total[selectedBox.tokenAddress] = total[selectedBox.tokenAddress].add(
             selectedBox.price.mul(numberOfBoxs)
         );
-        for(uint256 i; i < numberOfBoxs; i++){
+        for (uint256 i; i < numberOfBoxs; i++) {
             requestRandomWords();
         }
         emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
@@ -299,9 +302,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         );
         updateAssets(address(0), recipient, boxType, numberOfBoxs);
 
-        for(uint256 i; i < numberOfBoxs; i++){
-            requestRandomWords();
-        }
         emit BoxGifted(_msgSender(), recipient, boxType, numberOfBoxs);
     }
 
