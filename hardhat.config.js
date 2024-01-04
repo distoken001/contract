@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 const dotenv = require("dotenv");
 
-dotenv.config({ path: ".env.development" });
+dotenv.config({ path: ".env.production" });
 
 // set proxy
 const { ProxyAgent, setGlobalDispatcher } = require("undici");
@@ -11,14 +11,14 @@ setGlobalDispatcher(proxyAgent);
 module.exports = {
   solidity: "0.8.19",
   networks: {
-    op_goerli: {
-      url: process.env.API_HTTP_OP_GOERLI,
-      accounts: [process.env.PRIVATE_KEY],
-    },
-    arb_goerli: {
-      url: process.env.API_HTTP_ARB_GOERLI,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+    // op_goerli: {
+    //   url: process.env.API_HTTP_OP_GOERLI,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
+    // arb_goerli: {
+    //   url: process.env.API_HTTP_ARB_GOERLI,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
     // op: {
     //   url: process.env.API_HTTP_OP,
     //   accounts: [process.env.PRIVATE_KEY],
@@ -35,10 +35,10 @@ module.exports = {
     //   url: process.env.API_HTTP_POLYGON,
     //   accounts: [process.env.PRIVATE_KEY],
     // },
-    // bsc: {
-    //   url: process.env.API_HTTP_BSC,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
+    bsc: {
+      url: process.env.API_HTTP_BSC,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
   etherscan: {
     apiKey: {

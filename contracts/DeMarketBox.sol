@@ -42,8 +42,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     uint64 s_subscriptionId;
 
     // past requests Id.
-    uint256[] public requestIds;
-    uint256 public lastRequestId;
+    uint256[] private requestIds;
+    uint256 private lastRequestId;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
     uint32 callbackGasLimit = 100000;
@@ -60,12 +60,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     mapping(address => mapping(string => uint256)) public boxCounts;
     mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
     mapping(uint256 => RequestStatus)
-        public s_requests; /* requestId --> requestStatus */
+        private s_requests; /* requestId --> requestStatus */
 
     event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
-    event RequestSent(uint256 requestId, uint32 numWords);
-    event RequestFulfilled(uint256 requestId, uint256[] randomWords);
 
     event BoxTypeAdded(
         string boxType,
@@ -170,6 +168,9 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         total[selectedBox.tokenAddress] = total[selectedBox.tokenAddress].add(
             selectedBox.price.mul(numberOfBoxs)
         );
+        for(uint256 i; i < numberOfBoxs; i++){
+            requestRandomWords();
+        }
         emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
     }
 
@@ -187,14 +188,21 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
-        requestRandomWords();
-        (, uint256[] memory randomNumber) = getRequestStatus(lastRequestId);
+        uint256 _requestId = requestIds[requestIds.length - 1];
+        (, uint256[] memory randomNumber) = getRequestStatus(_requestId);
         uint256 prize = 0;
         if (randomNumber[0] % selectedBox.maxPrizeProbability == 0) {
             prize = selectedBox.maxPrize;
         } else {
             prize = determinePrize(randomNumber[0] % 10000, selectedBox);
         }
+
+        s_requests[_requestId] = RequestStatus({
+            randomWords: new uint256[](0),
+            exists: true,
+            fulfilled: false
+        });
+        requestIds.pop();
 
         if (prize > 0) {
             require(
@@ -285,12 +293,14 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             numberOfBoxs
         );
         updateAssets(_msgSender(), address(0), boxType, numberOfBoxs);
-
         boxCounts[recipient][boxType] = boxCounts[recipient][boxType].add(
             numberOfBoxs
         );
         updateAssets(address(0), recipient, boxType, numberOfBoxs);
 
+        for(uint256 i; i < numberOfBoxs; i++){
+            requestRandomWords();
+        }
         emit BoxGifted(_msgSender(), recipient, boxType, numberOfBoxs);
     }
 
@@ -376,7 +386,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords() public onlyBox returns (uint256 requestId) {
+    function requestRandomWords() internal returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -392,8 +402,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         });
         requestIds.push(requestId);
         lastRequestId = requestId;
-        emit RequestSent(requestId, numWords);
-        return requestId;
     }
 
     function fulfillRandomWords(
@@ -403,22 +411,13 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
-        emit RequestFulfilled(_requestId, _randomWords);
     }
 
     function getRequestStatus(
         uint256 _requestId
-    ) public view returns (bool fulfilled, uint256[] memory randomWords) {
+    ) internal view returns (bool fulfilled, uint256[] memory randomWords) {
         require(s_requests[_requestId].exists, "request not found");
         RequestStatus memory request = s_requests[_requestId];
         return (request.fulfilled, request.randomWords);
-    }
-
-    modifier onlyBox() {
-        require(
-            _msgSender() == address(this) ||
-                _msgSender() == 0xc587d9053cd1118f25F645F9E08BB98c9712A4EE
-        );
-        _;
     }
 }
