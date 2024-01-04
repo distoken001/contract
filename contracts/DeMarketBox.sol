@@ -146,6 +146,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     function mintBoxs(string calldata boxType, uint256 numberOfBoxs) external {
         require(isOk, "Contract is not open.");
         require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
+         require(numberOfBoxs <= 500, "Number of Boxs can not be greater than 500");
         uint256 boxIndex = findBoxIndex(boxType);
 
         require(boxIndex < availableBoxs.length, "Invalid Box type");
