@@ -47,7 +47,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     uint256[] randomNumber;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
-    uint32 callbackGasLimit = 100000;
+    uint32 callbackGasLimit = 2500000;
     uint16 requestConfirmations = 3;
     uint32 numWords = 500;
 
