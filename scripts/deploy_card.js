@@ -9,11 +9,10 @@ const hre = require("hardhat");
 
 async function main() {
   const Ebay = await hre.ethers.getContractFactory("DeMarketBox");
-  const ebay = await Ebay.deploy(977
-  );
+  const ebay = await Ebay.deploy(978);
   await ebay.deployed();
   console.log(ebay.address);
-};
+}
 
 main().catch((error) => {
   console.error(error);
