@@ -39,15 +39,15 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Your subscription ID.
-    uint64 public s_subscriptionId;
+    uint64 private s_subscriptionId;
 
     // past requests Id.
-    uint256[] public requestIds;
-    uint256[] public randomNumber;
+    uint256[] private requestIds;
+    uint256[] private randomNumber;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
-    uint32 public callbackGasLimit = 100000;
-    uint16 public requestConfirmations = 3;
+    uint32 private callbackGasLimit = 100000;
+    uint16 private requestConfirmations = 3;
     uint32 public numWords = 500;
 
     bytes32 keyHash =
@@ -58,8 +58,9 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     mapping(string => uint256) public boxTotal;
     mapping(string => BonusInfo) public bonusInfo;
     mapping(address => mapping(string => uint256)) public boxCounts;
-    mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
-    mapping(uint256 => RequestStatus) public s_requests;
+    mapping(address => mapping(string => UserRewardInfo))
+        private userRewardInfo;
+    mapping(uint256 => RequestStatus) private s_requests;
 
     event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
