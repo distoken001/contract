@@ -46,9 +46,9 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     uint256[] public randomNumber;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
-    uint32 callbackGasLimit = 200000;
-    uint16 requestConfirmations = 3;
-    uint32 numWords = 500;
+    uint32 public callbackGasLimit = 200000;
+    uint16 public requestConfirmations = 3;
+    uint32 public numWords = 500;
 
     bytes32 keyHash =
         0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
@@ -183,6 +183,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             boxCounts[_msgSender()][boxType] > 0,
             "You have no Boxs of this type"
         );
+        require(randomNumber.length > 0, "randomNumber is null");
         uint256 BoxIndex = findBoxIndex(boxType);
 
         require(BoxIndex < availableBoxs.length, "Invalid Box type");
