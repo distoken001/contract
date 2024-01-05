@@ -39,10 +39,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Your subscription ID.
-    uint64 s_subscriptionId;
+    uint64 public s_subscriptionId;
 
     // past requests Id.
-    uint256[] private requestIds;
+    uint256[] public requestIds;
     uint256[] public randomNumber;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
@@ -297,6 +297,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         numWords = _numWords;
     }
 
+    function changeCallbackGasLimit(uint32 _callbackGasLimit) public onlyOwner {
+        callbackGasLimit = _callbackGasLimit;
+    }
+
     function transferBoxs(
         address recipient,
         string calldata boxType,
@@ -405,7 +409,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function requestRandomWords() public returns (uint256 requestId) {
+    function addRandomWords() public returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -429,28 +433,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
-    }
-
-    function addRandomNumber()
-        public
-        onlyOwner
-        returns (bool fulfilled, uint256[] memory randomWords)
-    {
-        require(requestIds.length > 0, "request not found");
-        uint256 _requestId = requestIds[requestIds.length - 1];
-        RequestStatus memory request = s_requests[_requestId];
-        if (request.fulfilled == true) {
-            requestIds.pop();
-            for (uint256 i = 0; i < request.randomWords.length; i++) {
-                randomNumber.push(request.randomWords[i]);
-            }
-            return (request.fulfilled, request.randomWords);
+        for (uint256 i = 0; i < _randomWords.length; i++) {
+            randomNumber.push(_randomWords[i]);
         }
-    }
-
-    function removeRequest() public onlyOwner returns (uint256 requestId) {
-        require(requestIds.length > 0, "request not found");
-        requestId = requestIds[requestIds.length - 1];
-        requestIds.pop();
     }
 }
