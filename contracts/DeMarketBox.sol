@@ -43,8 +43,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     // past requests Id.
     uint256[] private requestIds;
-    uint256 private lastRequestId;
-    uint256[] randomNumber;
+    uint256[] public randomNumber;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
     uint32 callbackGasLimit = 2500000;
@@ -421,7 +420,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             fulfilled: false
         });
         requestIds.push(requestId);
-        lastRequestId = requestId;
     }
 
     function fulfillRandomWords(
