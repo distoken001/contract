@@ -281,8 +281,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         profitToken.safeTransfer(owner(), amountToWithdraw);
     }
 
-    function changeStatus(bool newStatus) public onlyOwner {
-        isOk = newStatus;
+    function changeState(bool newState) public onlyOwner {
+        isOk = newState;
     }
 
     function changeSubscriptionId(uint64 subscriptionId) public onlyOwner {
@@ -295,6 +295,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
 
     function changeNumWords(uint32 _numWords) public onlyOwner {
         numWords = _numWords;
+    }
+
+    function changeConfirmations(uint16 _confirmations) public onlyOwner {
+        requestConfirmations = _confirmations;
     }
 
     function changeCallbackGasLimit(uint32 _callbackGasLimit) public onlyOwner {
@@ -424,6 +428,10 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             fulfilled: false
         });
         requestIds.push(requestId);
+    }
+
+    function getRandomLength() public view returns (uint256 length) {
+        length = randomNumber.length;
     }
 
     function fulfillRandomWords(
