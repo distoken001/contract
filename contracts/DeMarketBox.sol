@@ -48,7 +48,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     VRFCoordinatorV2Interface COORDINATOR;
     uint32 public callbackGasLimit = 200000;
     uint16 public requestConfirmations = 3;
-    uint32 public numWords = 500;
+    uint32 public numWords = 200;
 
     bytes32 keyHash =
         0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
@@ -421,7 +421,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             s_subscriptionId,
             requestConfirmations,
             callbackGasLimit,
-            numWords
+            1
         );
         s_requests[requestId] = RequestStatus({
             randomWords: new uint256[](0),
@@ -442,8 +442,13 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
-        for (uint256 i = 0; i < _randomWords.length; i++) {
-            randomNumber.push(_randomWords[i]);
+        for (uint256 i = 0; i < numWords; i++) {
+            randomNumber.push(
+                uint256(keccak256(abi.encode(_randomWords[0], i)))
+            );
         }
+        // for (uint256 i = 0; i < _randomWords.length; i++) {
+        //     randomNumber.push(_randomWords[i]);
+        // }
     }
 }
