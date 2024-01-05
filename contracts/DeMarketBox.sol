@@ -46,9 +46,9 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     uint256[] public randomNumber;
     bool public isOk = true;
     VRFCoordinatorV2Interface COORDINATOR;
-    uint32 public callbackGasLimit = 200000;
+    uint32 public callbackGasLimit = 100000;
     uint16 public requestConfirmations = 3;
-    uint32 public numWords = 100;
+    uint32 public numWords = 500;
 
     bytes32 keyHash =
         0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
@@ -59,8 +59,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     mapping(string => BonusInfo) public bonusInfo;
     mapping(address => mapping(string => uint256)) public boxCounts;
     mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
-    mapping(uint256 => RequestStatus)
-        private s_requests; /* requestId --> requestStatus */
+    mapping(uint256 => RequestStatus) public s_requests;
 
     event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
@@ -414,7 +413,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     // Assumes the subscription is funded sufficiently.
-    function addRandomWords() public returns (uint256 requestId) {
+    function requestRandomWords() public returns (uint256 requestId) {
         // Will revert if subscription is not set and funded.
         requestId = COORDINATOR.requestRandomWords(
             keyHash,
@@ -442,13 +441,30 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(s_requests[_requestId].exists, "request not found");
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
-        for (uint256 i = 0; i < numWords; i++) {
-            randomNumber.push(
-                uint256(keccak256(abi.encode(_randomWords[0], i)))
-            );
+    }
+
+    function addRandomNumber()
+        public
+        onlyOwner
+        returns (bool fulfilled, uint256[] memory randomWords)
+    {
+        require(requestIds.length > 0, "request not found");
+        uint256 _requestId = requestIds[requestIds.length - 1];
+        RequestStatus memory request = s_requests[_requestId];
+        if (request.fulfilled == true) {
+            requestIds.pop();
+            for (uint256 i = 0; i < numWords; i++) {
+                randomNumber.push(
+                    uint256(keccak256(abi.encode(request.randomWords[0], i)))
+                );
+            }
+            return (request.fulfilled, request.randomWords);
         }
-        // for (uint256 i = 0; i < _randomWords.length; i++) {
-        //     randomNumber.push(_randomWords[i]);
-        // }
+    }
+
+    function removeRequest() public onlyOwner returns (uint256 requestId) {
+        require(requestIds.length > 0, "request not found");
+        requestId = requestIds[requestIds.length - 1];
+        requestIds.pop();
     }
 }
