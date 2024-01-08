@@ -384,9 +384,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             ? _amount = _amount.sub(userReward.rewardDebt)
             : 0;
         if (_amount > 0) {
-            userReward.rewardDebt = (
-                boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
-            ).div(1e22);
+            userReward.rewardDebt = _amount;
             userReward.extra = 0;
             userReward.withdrawn = userReward.withdrawn.add(_amount);
             bonusInfo[_boxType].withdrawn = bonusInfo[_boxType].withdrawn.add(
