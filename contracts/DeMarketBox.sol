@@ -144,10 +144,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     function mintBoxs(string calldata boxType, uint256 numberOfBoxs) external {
         require(isOk, "Contract is not open.");
         require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
-        // require(
-        //     numberOfBoxs <= 500,
-        //     "Number of Boxs can not be greater than 500"
-        // );
         uint256 boxIndex = findBoxIndex(boxType);
 
         require(boxIndex < availableBoxs.length, "Invalid Box type");
@@ -170,9 +166,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         total[selectedBox.tokenAddress] = total[selectedBox.tokenAddress].add(
             selectedBox.price.mul(numberOfBoxs)
         );
-        // for (uint256 i; i < numberOfBoxs; i++) {
-        //     requestRandomWords();
-        // }
         emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
     }
 
@@ -191,8 +184,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         updateAssets(_msgSender(), address(0), boxType, 1);
 
         IERC20 token = IERC20(selectedBox.tokenAddress);
-        // uint256 _requestId = requestIds[requestIds.length - 1];
-        // (, uint256[] memory randomNumber) = getRequestStatus(_requestId);
         uint256 prize = 0;
         if (
             randomNumber[randomNumber.length - 1] %
@@ -206,12 +197,6 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
                 selectedBox
             );
         }
-
-        // s_requests[_requestId] = RequestStatus({
-        //     randomWords: new uint256[](0),
-        //     exists: true,
-        //     fulfilled: false
-        // });
         randomNumber.pop();
         if (prize > 0) {
             require(
@@ -266,8 +251,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         revert("Box type not found");
     }
 
-    //tokens obtained from minting boxes
-    function withdrawEquity(
+    function withdrawMint(
         address tokenAddress,
         uint256 amountToWithdraw
     ) external onlyOwner {
