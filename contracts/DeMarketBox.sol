@@ -405,7 +405,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         requestIds.push(requestId);
     }
 
-    function getRandomLength() public view returns (uint256 length) {
+    function getLength() public view returns (uint256 length) {
         length = randomNumber.length;
     }
 
@@ -418,7 +418,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         s_requests[_requestId].randomWords = _randomWords;
     }
 
-    function addRandomNumber(
+    function addRandom(
         uint32 numWords
     ) public onlyOwner returns (bool fulfilled, uint256[] memory randomWords) {
         require(requestIds.length > 0, "request not found");
@@ -439,18 +439,5 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(requestIds.length > 0, "request not found");
         requestId = requestIds[requestIds.length - 1];
         requestIds.pop();
-    }
-
-    function test(
-        string calldata _boxType
-    ) external view returns (uint256 _amount, uint256 _rewardDebt) {
-        BonusInfo storage bonus = bonusInfo[_boxType];
-        UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
-            _boxType
-        ];
-        _amount = (boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare))
-            .div(1e22)
-            .add(userReward.extra);
-        _rewardDebt = userReward.rewardDebt;
     }
 }
