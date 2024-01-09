@@ -58,8 +58,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     mapping(string => uint256) public boxTotal;
     mapping(string => BonusInfo) public bonusInfo;
     mapping(address => mapping(string => uint256)) public boxCounts;
-    mapping(address => mapping(string => UserRewardInfo))
-        private userRewardInfo;
+    mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
     mapping(uint256 => RequestStatus) private s_requests;
 
     event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
@@ -380,7 +379,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         uint256 _amount = (
             boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
         ).div(1e22).add(userReward.extra).sub(userReward.rewardDebt);
-        
+
         if (_amount > 0) {
             userReward.rewardDebt = (
                 boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
