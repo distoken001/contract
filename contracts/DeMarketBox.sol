@@ -379,10 +379,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         ];
         uint256 _amount = (
             boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
-        ).div(1e22).add(userReward.extra);
-        _amount > userReward.rewardDebt
-            ? _amount = _amount.sub(userReward.rewardDebt)
-            : 0;
+        ).div(1e22).add(userReward.extra).sub(userReward.rewardDebt);
+        
         if (_amount > 0) {
             userReward.rewardDebt = (
                 boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare)
