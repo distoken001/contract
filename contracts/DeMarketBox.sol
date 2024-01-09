@@ -404,10 +404,8 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         BonusInfo storage bonus = bonusInfo[_boxType];
         _reward = (boxCounts[_user][_boxType].mul(bonus.accPerShare))
             .div(1e22)
-            .add(userRewardInfo[_user][_boxType].extra);
-        _reward > userRewardInfo[_user][_boxType].rewardDebt
-            ? _reward = _reward.sub(userRewardInfo[_user][_boxType].rewardDebt)
-            : 0;
+            .add(userRewardInfo[_user][_boxType].extra)
+            .sub(userRewardInfo[_user][_boxType].rewardDebt);
     }
 
     // Assumes the subscription is funded sufficiently.
@@ -464,5 +462,18 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         require(requestIds.length > 0, "request not found");
         requestId = requestIds[requestIds.length - 1];
         requestIds.pop();
+    }
+
+    function testWithdraw(
+        string calldata _boxType
+    ) external view returns (uint256 _amount, uint256 _rewardDebt) {
+        BonusInfo storage bonus = bonusInfo[_boxType];
+        UserRewardInfo storage userReward = userRewardInfo[_msgSender()][
+            _boxType
+        ];
+        _amount = (boxCounts[_msgSender()][_boxType].mul(bonus.accPerShare))
+            .div(1e22)
+            .add(userReward.extra);
+        _rewardDebt = userReward.rewardDebt;
     }
 }
