@@ -52,7 +52,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     bytes32 keyHash =
         0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
 
-    Box[] public availableBoxs;
+    Box[] public availableBoxes;
     mapping(address => uint256) public total; //Total amount of tokens (differentiated by token types)
     mapping(string => uint256) public boxTotal;
     mapping(string => BonusInfo) public bonusInfo;
@@ -60,7 +60,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     mapping(address => mapping(string => UserRewardInfo)) public userRewardInfo;
     mapping(uint256 => RequestStatus) private s_requests;
 
-    event BoxMinted(address indexed user, string BoxType, uint256 numberOfBoxs);
+    event BoxMinted(address indexed user, string BoxType, uint256 numberOfBox);
     event PrizeClaimed(address indexed user, string BoxType, uint256 prize);
 
     event BoxTypeAdded(
@@ -77,7 +77,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         address indexed sender,
         address indexed recipient,
         string boxType,
-        uint256 numberOfBoxs
+        uint256 numberOfBox
     );
 
     constructor(
@@ -98,15 +98,15 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         uint256 maxPrizeProbability,
         uint256 winningProbability
     ) external onlyOwner {
-        for (uint256 i = 0; i < availableBoxs.length; i++) {
+        for (uint256 i = 0; i < availableBoxes.length; i++) {
             if (
-                keccak256(abi.encodePacked(availableBoxs[i].boxType)) ==
+                keccak256(abi.encodePacked(availableBoxes[i].boxType)) ==
                 keccak256(abi.encodePacked(boxType))
             ) {
                 revert("Box type exist");
             }
         }
-        availableBoxs.push(
+        availableBoxes.push(
             Box(
                 boxType,
                 boxName,
@@ -129,56 +129,56 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     }
 
     function removeBoxType(string calldata boxType) external onlyOwner {
-        for (uint256 i = 0; i < availableBoxs.length; i++) {
+        for (uint256 i = 0; i < availableBoxes.length; i++) {
             if (
-                keccak256(abi.encodePacked(availableBoxs[i].boxType)) ==
+                keccak256(abi.encodePacked(availableBoxes[i].boxType)) ==
                 keccak256(abi.encodePacked(boxType))
             ) {
-                availableBoxs[i] = availableBoxs[availableBoxs.length - 1];
-                availableBoxs.pop();
+                availableBoxes[i] = availableBoxes[availableBoxes.length - 1];
+                availableBoxes.pop();
                 emit BoxTypeRemoved(boxType);
             }
         }
     }
 
-    function mintBoxs(string calldata boxType, uint256 numberOfBoxs) external {
+    function mintBoxes(string calldata boxType, uint256 numberOfBox) external {
         require(isOk, "Contract is not open.");
-        require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
+        require(numberOfBox > 0, "Number of Box must be greater than zero");
         uint256 boxIndex = findBoxIndex(boxType);
 
-        require(boxIndex < availableBoxs.length, "Invalid Box type");
-        Box storage selectedBox = availableBoxs[boxIndex];
+        require(boxIndex < availableBoxes.length, "Invalid Box type");
+        Box storage selectedBox = availableBoxes[boxIndex];
         IERC20 token = IERC20(selectedBox.tokenAddress);
 
         require(
             token.transferFrom(
                 _msgSender(),
                 address(this),
-                selectedBox.price.mul(numberOfBoxs)
+                selectedBox.price.mul(numberOfBox)
             ),
             "Transfer failed"
         );
-        boxTotal[boxType] = boxTotal[boxType].add(numberOfBoxs);
+        boxTotal[boxType] = boxTotal[boxType].add(numberOfBox);
         boxCounts[_msgSender()][boxType] = boxCounts[_msgSender()][boxType].add(
-            numberOfBoxs
+            numberOfBox
         );
-        updateAssets(address(0), _msgSender(), boxType, numberOfBoxs);
+        updateAssets(address(0), _msgSender(), boxType, numberOfBox);
         total[selectedBox.tokenAddress] = total[selectedBox.tokenAddress].add(
-            selectedBox.price.mul(numberOfBoxs)
+            selectedBox.price.mul(numberOfBox)
         );
-        emit BoxMinted(_msgSender(), boxType, numberOfBoxs);
+        emit BoxMinted(_msgSender(), boxType, numberOfBox);
     }
 
     function burnBox(string calldata boxType) external returns (uint256) {
         require(
             boxCounts[_msgSender()][boxType] > 0,
-            "You have no Boxs of this type"
+            "You have no Box of this type"
         );
         require(randomNumber.length > 0, "randomNumber is null");
         uint256 BoxIndex = findBoxIndex(boxType);
 
-        require(BoxIndex < availableBoxs.length, "Invalid Box type");
-        Box storage selectedBox = availableBoxs[BoxIndex];
+        require(BoxIndex < availableBoxes.length, "Invalid Box type");
+        Box storage selectedBox = availableBoxes[BoxIndex];
         boxCounts[_msgSender()][boxType]--;
         boxTotal[boxType]--;
         updateAssets(_msgSender(), address(0), boxType, 1);
@@ -240,9 +240,9 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     function findBoxIndex(
         string calldata boxType
     ) internal view returns (uint256) {
-        for (uint256 i = 0; i < availableBoxs.length; i++) {
+        for (uint256 i = 0; i < availableBoxes.length; i++) {
             if (
-                keccak256(abi.encodePacked(availableBoxs[i].boxType)) ==
+                keccak256(abi.encodePacked(availableBoxes[i].boxType)) ==
                 keccak256(abi.encodePacked(boxType))
             ) {
                 return i;
@@ -251,17 +251,17 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         revert("Box type not found");
     }
 
-    function withdrawMint(
+    function ownerClaims(
         address tokenAddress,
-        uint256 amountToWithdraw
+        uint256 amount
     ) external onlyOwner {
         IERC20 profitToken = IERC20(tokenAddress);
         require(
-            total[tokenAddress] >= amountToWithdraw,
-            "Number of Boxs must be greater than zero"
+            total[tokenAddress] >= amount,
+            "amount must be greater than zero"
         );
-        total[tokenAddress] = total[tokenAddress].sub(amountToWithdraw);
-        profitToken.safeTransfer(owner(), amountToWithdraw);
+        total[tokenAddress] = total[tokenAddress].sub(amount);
+        profitToken.safeTransfer(owner(), amount);
     }
 
     function changeState(bool newState) public onlyOwner {
@@ -284,30 +284,30 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         callbackGasLimit = _callbackGasLimit;
     }
 
-    function transferBoxs(
+    function transferBoxes(
         address recipient,
         string calldata boxType,
-        uint256 numberOfBoxs
+        uint256 numberOfBox
     ) external {
-        require(numberOfBoxs > 0, "Number of Boxs must be greater than zero");
+        require(numberOfBox > 0, "Number of Box must be greater than zero");
         uint256 boxIndex = findBoxIndex(boxType);
 
-        require(boxIndex < availableBoxs.length, "Invalid Box type");
+        require(boxIndex < availableBoxes.length, "Invalid Box type");
         require(
-            boxCounts[_msgSender()][boxType] >= numberOfBoxs,
-            "Insufficient Boxs to gift"
+            boxCounts[_msgSender()][boxType] >= numberOfBox,
+            "Insufficient Boxes"
         );
 
         boxCounts[_msgSender()][boxType] = boxCounts[_msgSender()][boxType].sub(
-            numberOfBoxs
+            numberOfBox
         );
-        updateAssets(_msgSender(), address(0), boxType, numberOfBoxs);
+        updateAssets(_msgSender(), address(0), boxType, numberOfBox);
         boxCounts[recipient][boxType] = boxCounts[recipient][boxType].add(
-            numberOfBoxs
+            numberOfBox
         );
-        updateAssets(address(0), recipient, boxType, numberOfBoxs);
+        updateAssets(address(0), recipient, boxType, numberOfBox);
 
-        emit BoxGifted(_msgSender(), recipient, boxType, numberOfBoxs);
+        emit BoxGifted(_msgSender(), recipient, boxType, numberOfBox);
     }
 
     function addReward(
@@ -368,7 +368,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
             bonusInfo[_boxType].withdrawn = bonusInfo[_boxType].withdrawn.add(
                 _amount
             );
-            address bonusToken = availableBoxs[findBoxIndex(_boxType)]
+            address bonusToken = availableBoxes[findBoxIndex(_boxType)]
                 .tokenAddress;
             if (bonusToken != address(0)) {
                 IERC20(bonusToken).safeTransfer(_msgSender(), _amount);
