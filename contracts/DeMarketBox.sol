@@ -441,7 +441,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         requestIds.pop();
     }
 
-    function testWithdraw(
+    function test(
         string calldata _boxType
     ) external view returns (uint256 _amount, uint256 _rewardDebt) {
         BonusInfo storage bonus = bonusInfo[_boxType];
