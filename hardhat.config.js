@@ -19,22 +19,22 @@ module.exports = {
     //   url: process.env.API_HTTP_ARB_GOERLI,
     //   accounts: [process.env.PRIVATE_KEY],
     // },
-    // op: {
-    //   url: process.env.API_HTTP_OP,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
-    // arb: {
-    //   url: process.env.API_HTTP_ARB,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
+    op: {
+      url: process.env.API_HTTP_OP,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    arb: {
+      url: process.env.API_HTTP_ARB,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     // mainnet: {
     //   url: process.env.API_HTTP_MAIN,
     //   accounts: [process.env.PRIVATE_KEY],
     // },
-    // polygon: {
-    //   url: process.env.API_HTTP_POLYGON,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
+    polygon: {
+      url: process.env.API_HTTP_POLYGON,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     bsc: {
       url: process.env.API_HTTP_BSC,
       accounts: [process.env.PRIVATE_KEY],

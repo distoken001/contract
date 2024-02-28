@@ -10,9 +10,9 @@ const hre = require("hardhat");
 async function main() {
   const Ebay = await hre.ethers.getContractFactory("Ebay");
   const ebay = await Ebay.deploy(
-    100,
-    100,
-    "0xb1B8a8E9c2FFcc0B2072937d170bAe4E794f6238"
+    90,
+    90,
+    "0xd163dB5c6d0233E2F39Ed2498106C8E9313A0A98"
   );
   await ebay.deployed();
   console.log(ebay.address);
