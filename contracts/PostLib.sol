@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 library PostLib {
     using SafeMath for uint256;
     enum Status {
-        Initial, //待购买0
+        Initial, //待卖家下单0
         Ordered, //被下单1
         Completed, //已完成2
         ConfirmShip, //卖家发货3
