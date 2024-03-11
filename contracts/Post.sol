@@ -158,8 +158,7 @@ contract Post is Ownable {
     function update(
         uint256 _orderId,
         uint256 _price,
-        uint256 _amount,
-        uint256 _sellerRatio
+        uint256 _amount
     ) external {
         (Order storage order, address _user) = validate(_orderId, false);
         require(
