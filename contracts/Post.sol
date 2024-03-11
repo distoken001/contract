@@ -147,9 +147,9 @@ contract Post is Ownable {
         extend[_orderId].seller_ratio = _sellerRatio;
         total[_token] += _buyer_pledge;
         buyerList[_user].push(_orderId);
-        if (_seller != address(0)) {
-            sellerList[_seller].push(_orderId);
-        }
+        // if (_seller != address(0)) {
+        //     sellerList[_seller].push(_orderId);
+        // }
 
         emit AddOrder(_user, _orderId, Status.Initial, _seller, _user);
     }
@@ -216,9 +216,10 @@ contract Post is Ownable {
         if (_amount == order.amount) {
             order.status = _status;
             order.seller_pledge = _seller_pledge;
-            if (order.seller == address(0)) {
-                sellerList[_user].push(_orderId);
-            }
+            // if (order.seller == address(0)) {
+            //     sellerList[_user].push(_orderId);
+            // }
+            sellerList[_user].push(_orderId);
             order.seller = _user;
             contact[_orderId].seller = _sellerContact;
             emit SetStatus(_user, _orderId, _status, order.seller, order.buyer);
