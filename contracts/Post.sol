@@ -38,9 +38,11 @@ contract Post is Ownable {
         uint256 buyer_pledge; //买家实际质押数量（至少得是商品总价）
         uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
-        uint256 seller_ratio;//指定卖家质押比例
+        uint256 seller_ratio; //指定卖家质押比例
     }
-
+    struct OrderExtend {
+        uint256 seller_ratio; //指定卖家质押比例
+    }
     struct Contact {
         string seller; //卖家联系方式
         string buyer; //买家联系方式
@@ -51,6 +53,7 @@ contract Post is Ownable {
 
     Order[] public orders;
     mapping(uint256 => Contact) contact;
+    mapping(uint256 => OrderExtend) extend;
     mapping(address => uint256[]) public sellerList; //卖家订单
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
@@ -118,7 +121,7 @@ contract Post is Ownable {
     ) external {
         address _user = _msgSender();
         //1.质押数量
-     (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
+        (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
             _price,
             _amount
         );
@@ -137,19 +140,19 @@ contract Post is Ownable {
                 status: Status.Initial,
                 description: _description,
                 img: _img,
-                price: _price,
-                seller_ratio:_sellerRatio
+                price: _price
             })
         );
         uint256 _orderId = orders.length - 1;
         contact[_orderId].buyer = _contactBuyer;
+        extend[_orderId].seller_ratio = _sellerRatio;
         total[_token] += _buyer_pledge;
         buyerList[_user].push(_orderId);
         if (_user != address(0)) {
             buyerList[_user].push(_orderId);
         }
 
-        emit AddOrder(_user, _orderId, Status.Initial, _seller,_user );
+        emit AddOrder(_user, _orderId, Status.Initial, _seller, _user);
     }
 
     //修改订单
@@ -169,16 +172,19 @@ contract Post is Ownable {
             order.buyer_pledge
         );
 
-        (uint256 _buyer_pledge, ) = calculateBuyerPledge(
-            _price,
-            _amount
-        );
+        (uint256 _buyer_pledge, ) = calculateBuyerPledge(_price, _amount);
         order.price = _price;
         order.amount = _amount;
         order.buyer = _buyer_pledge;
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         total[address(order.token)] += _buyer_pledge;
-        emit SetStatus(_user, _orderId, Status.Initial, order.seller, order.buyer);
+        emit SetStatus(
+            _user,
+            _orderId,
+            Status.Initial,
+            order.seller,
+            order.buyer
+        );
     }
 
     //买家下单
@@ -200,12 +206,12 @@ contract Post is Ownable {
             "Non designated seller"
         );
         Status _status = Status.Ordered;
-           (uint256 _seller_pledge, ) = calculateSellerPledge(
+        (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
             _amount,
-            order.seller_ratio
+            extend[_orderId].seller_ratio
         );
-             (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
+        (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
             _price,
             _amount
         );
@@ -237,8 +243,7 @@ contract Post is Ownable {
                     status: _status,
                     description: order.description,
                     img: order.img,
-                    price: order.price,
-                    seller_ratio:order.seller_ratio
+                    price: order.price
                 })
             );
             uint256 _order_id_new = orders.length - 1;
@@ -246,9 +251,10 @@ contract Post is Ownable {
             buyerList[order.buyer].push(_order_id_new);
             contact[_order_id_new].buyer = contact[_orderId].buyer;
             contact[_order_id_new].seller = _sellerContact;
+            extend[_order_id_new].seller_ratio = extend[_orderId].seller_ratio;
             order.amount -= _amount;
-             order.buyer_pledge -= _buyer_pledge;
-             order.buyer_ex-=_buyer_tx_fee;
+            order.buyer_pledge -= _buyer_pledge;
+            order.buyer_ex -= _buyer_tx_fee;
             emit SetStatus(
                 _user,
                 _orderId,
