@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./PostLib.sol";
 import "./Validate.sol";
-
 contract Post is Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -38,7 +37,6 @@ contract Post is Ownable {
         uint256 buyer_pledge; //买家实际质押数量（至少得是商品总价）
         uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
-        uint256 seller_ratio; //指定卖家质押比例
     }
     struct OrderExtend {
         uint256 seller_ratio; //指定卖家质押比例
@@ -175,7 +173,7 @@ contract Post is Ownable {
         (uint256 _buyer_pledge, ) = calculateBuyerPledge(_price, _amount);
         order.price = _price;
         order.amount = _amount;
-        order.buyer = _buyer_pledge;
+        order.buyer_pledge = _buyer_pledge;
         order.token.transferFrom(_user, address(this), _buyer_pledge);
         total[address(order.token)] += _buyer_pledge;
         emit SetStatus(
