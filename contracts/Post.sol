@@ -185,7 +185,7 @@ contract Post is Ownable {
         );
     }
 
-    //买家下单
+    //卖家下单
     function place(
         uint256 _orderId,
         uint256 _price,
