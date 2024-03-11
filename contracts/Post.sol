@@ -161,25 +161,24 @@ contract Post is Ownable {
     ) external {
         (Order storage order, address _user) = validate(_orderId, false);
         require(
-            order.seller == _user && order.status == Status.Initial,
+            order.buyer == _user && order.status == Status.Initial,
             "No permissions"
         );
-        order.token.safeTransfer(order.seller, order.seller_pledge);
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] = total[address(order.token)].sub(
-            order.seller_pledge
+            order.buyer_pledge
         );
 
-        (uint256 _seller_pledge, ) = calculateSellerPledge(
+        (uint256 _buyer_pledge, ) = calculateBuyerPledge(
             _price,
-            _amount,
-            _sellerRatio
+            _amount
         );
         order.price = _price;
         order.amount = _amount;
-        order.seller_pledge = _seller_pledge;
-        order.token.transferFrom(_user, address(this), _seller_pledge);
-        total[address(order.token)] += _seller_pledge;
-        emit SetStatus(_user, _orderId, Status.Initial, _user, order.buyer);
+        order.buyer = _buyer_pledge;
+        order.token.transferFrom(_user, address(this), _buyer_pledge);
+        total[address(order.token)] += _buyer_pledge;
+        emit SetStatus(_user, _orderId, Status.Initial, order.seller, order.buyer);
     }
 
     //买家下单
