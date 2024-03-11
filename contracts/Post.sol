@@ -34,9 +34,9 @@ contract Post is Ownable {
         string description; //描述
         string img; //商品图片
         IERC20 token; //质押代币合约地址
-        uint256 seller_pledge; //卖家实际质押数量，如果是白名单用户则是手续费
+        uint256 seller_pledge; //卖家实际质押数量
         uint256 buyer_pledge; //买家实际质押数量（至少得是商品总价）
-        uint256 buyer_ex; // 买家超出商品总价质押部分（如果是白名单用户则是手续费）
+        uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
         uint256 sellerRatio;//指定卖家质押比例
     }

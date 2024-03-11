@@ -41,6 +41,7 @@ DS_Store
 yarn.lock
 yarn 2.lock
 .env.production
+.env.development
 .env.local
 dist/
 artifacts/
