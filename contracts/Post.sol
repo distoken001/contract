@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "./PostLib.sol";
 import "./Validate.sol";
+
 contract Post is Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint256;
@@ -146,8 +147,8 @@ contract Post is Ownable {
         extend[_orderId].seller_ratio = _sellerRatio;
         total[_token] += _buyer_pledge;
         buyerList[_user].push(_orderId);
-        if (_user != address(0)) {
-            buyerList[_user].push(_orderId);
+        if (_seller != address(0)) {
+            sellerList[_seller].push(_orderId);
         }
 
         emit AddOrder(_user, _orderId, Status.Initial, _seller, _user);
