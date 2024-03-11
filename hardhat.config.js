@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 const dotenv = require("dotenv");
 
-dotenv.config({ path: ".env.production" });
+dotenv.config({ path: ".env.development" });
 
 // set proxy
 const { ProxyAgent, setGlobalDispatcher } = require("undici");
@@ -11,34 +11,38 @@ setGlobalDispatcher(proxyAgent);
 module.exports = {
   solidity: "0.8.19",
   networks: {
-    // op_goerli: {
-    //   url: process.env.API_HTTP_OP_GOERLI,
-    //   accounts: [process.env.PRIVATE_KEY],
-    // },
+    op_goerli: {
+      url: process.env.API_HTTP_OP_GOERLI,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    sepolia: {
+      url: process.env.API_HTTP_SEPOLIA,
+      accounts: [process.env.PRIVATE_KEY],
+    },
     // arb_goerli: {
     //   url: process.env.API_HTTP_ARB_GOERLI,
     //   accounts: [process.env.PRIVATE_KEY],
     // },
-    op: {
-      url: process.env.API_HTTP_OP,
-      accounts: [process.env.PRIVATE_KEY],
-    },
-    arb: {
-      url: process.env.API_HTTP_ARB,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+    // op: {
+    //   url: process.env.API_HTTP_OP,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
+    // arb: {
+    //   url: process.env.API_HTTP_ARB,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
     // mainnet: {
     //   url: process.env.API_HTTP_MAIN,
     //   accounts: [process.env.PRIVATE_KEY],
     // },
-    polygon: {
-      url: process.env.API_HTTP_POLYGON,
-      accounts: [process.env.PRIVATE_KEY],
-    },
-    bsc: {
-      url: process.env.API_HTTP_BSC,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+    // polygon: {
+    //   url: process.env.API_HTTP_POLYGON,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
+    // bsc: {
+    //   url: process.env.API_HTTP_BSC,
+    //   accounts: [process.env.PRIVATE_KEY],
+    // },
   },
   etherscan: {
     apiKey: {

@@ -38,7 +38,7 @@ contract Post is Ownable {
         uint256 buyer_pledge; //买家实际质押数量（至少得是商品总价）
         uint256 buyer_ex; // 买家超出商品总价质押部分
         Status status; //订单状态
-        uint256 sellerRatio;//指定卖家质押比例
+        uint256 seller_ratio;//指定卖家质押比例
     }
 
     struct Contact {
@@ -138,7 +138,7 @@ contract Post is Ownable {
                 description: _description,
                 img: _img,
                 price: _price,
-                sellerRatio:_sellerRatio
+                seller_ratio:_sellerRatio
             })
         );
         uint256 _orderId = orders.length - 1;
@@ -204,7 +204,7 @@ contract Post is Ownable {
            (uint256 _seller_pledge, ) = calculateSellerPledge(
             _price,
             _amount,
-            order.sellerRatio
+            order.seller_ratio
         );
              (uint256 _buyer_pledge, uint256 _buyer_tx_fee) = calculateBuyerPledge(
             _price,
@@ -239,7 +239,7 @@ contract Post is Ownable {
                     description: order.description,
                     img: order.img,
                     price: order.price,
-                    sellerRatio:order.sellerRatio
+                    seller_ratio:order.seller_ratio
                 })
             );
             uint256 _order_id_new = orders.length - 1;
