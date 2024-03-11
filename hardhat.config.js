@@ -55,6 +55,7 @@ module.exports = {
       polygon: process.env.POLYGON_KEY,
       polygonMumbai: process.env.POLYGON_KEY,
       bsc: process.env.BSC_KEY,
+      sepolia:process.env.SEPOLIA_KEY,
     },
   },
 };

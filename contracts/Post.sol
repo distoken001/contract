@@ -52,7 +52,7 @@ contract Post is Ownable {
 
     Order[] public orders;
     mapping(uint256 => Contact) contact;
-    mapping(uint256 => OrderExtend) extend;
+    mapping(uint256 => OrderExtend) public extend;
     mapping(address => uint256[]) public sellerList; //卖家订单
     mapping(address => uint256[]) public buyerList; //买家订单
     mapping(address => uint256) public total; //代币总质押数量
