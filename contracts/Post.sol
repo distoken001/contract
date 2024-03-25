@@ -232,8 +232,8 @@ contract Post is Ownable {
             orders.push(
                 Order({
                     name: order.name,
-                    seller: order.seller,
-                    buyer: _user,
+                    seller: _user,
+                    buyer: order.buyer,
                     token: order.token,
                     amount: _amount,
                     seller_pledge: _seller_pledge,
