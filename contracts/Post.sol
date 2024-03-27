@@ -279,12 +279,12 @@ contract Post is Ownable {
         //1、校验订单是否存在
         (Order storage order, address _user) = validate(_orderId, true);
         //2、校验订单状态是否可以取消
-        require(order.seller == _user, "No permissions");
+        require(order.buyer == _user, "No permissions");
         require(order.status == Status.Initial, "Order status error");
         Status _status = Status.SellerCancelWithoutDuty;
-        order.token.safeTransfer(order.seller, order.seller_pledge);
+        order.token.safeTransfer(order.buyer, order.buyer_pledge);
         total[address(order.token)] = total[address(order.token)].sub(
-            order.seller_pledge
+            order.buyer_pledge
         );
         //3、将订单更新为取消状态
         order.status = _status;
