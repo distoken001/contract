@@ -48,6 +48,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     VRFCoordinatorV2Interface COORDINATOR;
     uint32 private callbackGasLimit = 100000;
     uint16 private requestConfirmations = 3;
+    address private _authorizedAddress;
 
     bytes32 keyHash =
         0x114f3da0a805b6a67d6e9cd2ec746f7028f1b7376365af575cfea3550dd1aa04;
@@ -81,12 +82,22 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     );
 
     constructor(
-        uint64 subscriptionId
+        uint64 subscriptionId,
+        address authorizedAddress
     ) VRFConsumerBaseV2(0xc587d9053cd1118f25F645F9E08BB98c9712A4EE) {
         COORDINATOR = VRFCoordinatorV2Interface(
             0xc587d9053cd1118f25F645F9E08BB98c9712A4EE
         );
         s_subscriptionId = subscriptionId;
+        _authorizedAddress = authorizedAddress;
+    }
+
+    modifier onlyOwnerOrAuthorized() {
+        require(
+            owner() == msg.sender || _authorizedAddress == msg.sender,
+            "Not owner or authorized"
+        );
+        _;
     }
 
     function addBoxType(
@@ -272,6 +283,12 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
         s_subscriptionId = subscriptionId;
     }
 
+    function changeAuthorizedAddress(
+        address authorizedAddress
+    ) public onlyOwner {
+        _authorizedAddress = authorizedAddress;
+    }
+
     function changeKeyHash(bytes32 _keyHash) public onlyOwner {
         keyHash = _keyHash;
     }
@@ -313,7 +330,7 @@ contract DeMarketBox is Ownable, VRFConsumerBaseV2 {
     function addReward(
         string memory _boxType,
         uint256 _amount
-    ) external onlyOwner {
+    ) external onlyOwnerOrAuthorized {
         BonusInfo storage bonus = bonusInfo[_boxType];
         if (_amount > 0 && boxTotal[_boxType] > 0) {
             bonus.accPerShare = bonus.accPerShare.add(
